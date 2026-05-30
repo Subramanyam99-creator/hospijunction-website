@@ -1,8 +1,8 @@
 # Privacy Policy
 
-**Last Updated: [DATE_TO_UPDATE]**
+**Last Updated: 30 May 2026**
 
-**[YOUR_REGISTERED_COMPANY_NAME]** ("HospiJunction," "we," "us") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains what information we collect, why we collect it, how we use it, and your rights under India's **Digital Personal Data Protection Act, 2023 (DPDP Act)**.
+**Univerin Private Limited** ("HospiJunction," "we," "us") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains what information we collect, why we collect it, how we use it, and your rights under India's **Digital Personal Data Protection Act, 2023 (DPDP Act)**.
 
 This policy applies to the HospiJunction mobile app and any related services.
 
@@ -11,8 +11,8 @@ This policy applies to the HospiJunction mobile app and any related services.
 ## 1. Who We Are
 
 We are the Data Fiduciary for the personal data you provide to the Service. We can be reached at:
-- Email: **[privacy@yourdomain.com]**
-- Address: **[Your registered business address]**
+- Email: **privacy@hospijunction.com**
+- Address: **5-31 Bommana Palli, Gundagallu, Madanapalle, Chittoor - 517432, Andhra Pradesh, India**
 
 ## 2. What Data We Collect
 
@@ -123,7 +123,7 @@ As a Data Principal, you have the following rights:
 5. **Right to grievance redressal** — File a complaint with our Grievance Officer (see Section 11)
 6. **Right to nominate** — Nominate someone to exercise your rights in case of your death or incapacity
 
-To exercise any of these rights, email us at **[privacy@yourdomain.com]**. We will respond within 30 days.
+To exercise any of these rights, email us at **privacy@hospijunction.com**. We will respond within 30 days.
 
 ## 8. Children's Privacy
 
@@ -141,9 +141,9 @@ Some of our service providers (such as Supabase) are based outside India. When d
 
 In accordance with the DPDP Act and IT Rules:
 
-**Grievance Officer**: [TO_BE_APPOINTED_NAME]
-**Email**: **[grievance@yourdomain.com]**
-**Address**: **[Your registered business address]**
+**Grievance Officer**: Subramanyam Amudala
+**Email**: **grievance@hospijunction.com**
+**Address**: **5-31 Bommana Palli, Gundagallu, Madanapalle, Chittoor - 517432, Andhra Pradesh, India**
 **Response time**: We will acknowledge complaints within 24 hours and resolve them within 30 days.
 
 ## 12. Changes to This Policy
@@ -153,8 +153,8 @@ We may update this Privacy Policy from time to time. Material changes will be no
 ## 13. Contact Us
 
 For privacy questions:
-- Email: **[privacy@yourdomain.com]**
-- Address: **[Your registered business address]**
+- Email: **privacy@hospijunction.com**
+- Address: **5-31 Bommana Palli, Gundagallu, Madanapalle, Chittoor - 517432, Andhra Pradesh, India**
 
 ---
 

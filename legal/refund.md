@@ -1,8 +1,8 @@
 # Refund Policy
 
-**Last Updated: [DATE_TO_UPDATE]**
+**Last Updated: 30 May 2026**
 
-This Refund Policy explains when and how refunds are issued for transactions on **HospiJunction**, operated by **[YOUR_REGISTERED_COMPANY_NAME]**.
+This Refund Policy explains when and how refunds are issued for transactions on **HospiJunction**, operated by **Univerin Private Limited**.
 
 This policy applies only to the **Platform Fee** of ₹20 (inclusive of GST) charged by HospiJunction at the time of booking an appointment. **Consultation fees are paid directly to the hospital** in person and are not handled by HospiJunction.
 
@@ -70,7 +70,7 @@ If a payment is deducted from your account but the booking is not confirmed in t
 
 ## 6. Duplicate Bookings
 
-If a technical error causes you to be charged twice for the same booking, please email us at **[support@yourdomain.com]** with:
+If a technical error causes you to be charged twice for the same booking, please email us at **support@hospijunction.com** with:
 - Your booking reference / appointment ID
 - The transaction IDs of both payments
 
@@ -79,7 +79,7 @@ We will refund the duplicate charge within 3 business days.
 ## 7. Disputes
 
 If you disagree with a refund decision:
-1. First, contact our support team at **[support@yourdomain.com]**
+1. First, contact our support team at **support@hospijunction.com**
 2. We will respond within 24 hours and aim to resolve disputes within 7 business days
 3. For unresolved issues, you may approach the appropriate consumer forum or our Grievance Officer
 
@@ -90,9 +90,9 @@ We may update this Refund Policy. Material changes will be communicated via the 
 ## 9. Contact Us
 
 For refund-related questions:
-- Email: **[support@yourdomain.com]**
-- Phone: **[+91-XXXXXXXXXX]**
-- Address: **[Your registered business address]**
+- Email: **support@hospijunction.com**
+- Phone: **+91-9000869619**
+- Address: **5-31 Bommana Palli, Gundagallu, Madanapalle, Chittoor - 517432, Andhra Pradesh, India**
 
 ---
 

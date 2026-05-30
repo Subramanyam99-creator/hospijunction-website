@@ -1,8 +1,8 @@
 # Terms & Conditions
 
-**Last Updated: [DATE_TO_UPDATE]**
+**Last Updated: 30 May 2026**
 
-Welcome to HospiJunction. These Terms & Conditions ("Terms") govern your use of the HospiJunction mobile application and platform (collectively, the "Service") operated by **[YOUR_REGISTERED_COMPANY_NAME]** ("HospiJunction," "we," "us," or "our").
+Welcome to HospiJunction. These Terms & Conditions ("Terms") govern your use of the HospiJunction mobile application and platform (collectively, the "Service") operated by **Univerin Private Limited** ("HospiJunction," "we," "us," or "our").
 
 By creating an account or using the Service, you agree to be bound by these Terms. If you do not agree, please do not use the Service.
 
@@ -143,14 +143,14 @@ We may update these Terms occasionally. We will notify you of material changes v
 
 ## 16. Governing Law & Jurisdiction
 
-These Terms are governed by the laws of India. Any disputes shall be resolved exclusively by courts in **[YOUR_CITY], India**.
+These Terms are governed by the laws of India. Any disputes shall be resolved exclusively by courts in **Chittoor, India**.
 
 ## 17. Contact Us
 
 For questions about these Terms:
-- Email: **[support@yourdomain.com]**
-- Phone: **[+91-XXXXXXXXXX]**
-- Address: **[Your registered business address]**
+- Email: **support@hospijunction.com**
+- Phone: **+91-9000869619**
+- Address: **5-31 Bommana Palli, Gundagallu, Madanapalle, Chittoor - 517432, Andhra Pradesh, India**
 
 ---
 

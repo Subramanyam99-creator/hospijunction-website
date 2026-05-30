@@ -42,14 +42,14 @@ Consultation fees are paid directly to the hospital, by you, in person.
 
 ## Built In India, For India
 
-We are a registered Indian company, run by a small team based in **[YOUR_CITY]**. We comply with India's IT Act, DPDP Act 2023, and consumer protection laws.
+We are a registered Indian company, run by a small team based in **Chittoor**. We comply with India's IT Act, DPDP Act 2023, and consumer protection laws.
 
 ## Get In Touch
 
-- **Partnership inquiries**: **[partnerships@yourdomain.com]**
-- **Support**: **[support@yourdomain.com]**
-- **Press / media**: **[hello@yourdomain.com]**
+- **Partnership inquiries**: **support@hospijunction.com**
+- **Support**: **support@hospijunction.com**
+- **Press / media**: **hello@hospijunction.com**
 
 ---
 
-*HospiJunction is operated by **[YOUR_REGISTERED_COMPANY_NAME]**.*
+*HospiJunction is operated by **Univerin Private Limited**.*

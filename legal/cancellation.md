@@ -1,8 +1,8 @@
 # Cancellation Policy
 
-**Last Updated: [DATE_TO_UPDATE]**
+**Last Updated: 30 May 2026**
 
-This Cancellation Policy explains how to cancel an appointment booked through **HospiJunction**, operated by **[YOUR_REGISTERED_COMPANY_NAME]**.
+This Cancellation Policy explains how to cancel an appointment booked through **HospiJunction**, operated by **Univerin Private Limited**.
 
 ---
 
@@ -61,5 +61,5 @@ In all such cases, your **Platform Fee is refunded in full** (see Section 2). Yo
 ## 6. Contact Us
 
 For cancellation-related issues:
-- Email: **[support@yourdomain.com]**
-- Phone: **[+91-XXXXXXXXXX]**
+- Email: **support@hospijunction.com**
+- Phone: **+91-9000869619**
