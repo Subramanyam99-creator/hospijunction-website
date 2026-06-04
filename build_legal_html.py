@@ -13,12 +13,11 @@ from pathlib import Path
 
 # Order matches the in-app tab order
 PAGES = [
-    ("terms",        "terms.md",        "Terms & Conditions"),
-    ("privacy",      "privacy.md",      "Privacy Policy"),
-    ("refund",       "refund.md",       "Refund Policy"),
-    ("cancellation", "cancellation.md", "Cancellation Policy"),
-    ("contact",      "contact.md",      "Contact Us"),
-    ("about",        "about.md",        "About"),
+    ("terms",   "terms.md",                  "Terms & Conditions"),
+    ("privacy", "privacy.md",                "Privacy Policy"),
+    ("refund",  "refund-cancellation.md",    "Refund & Cancellation"),
+    ("contact", "contact.md",                "Contact Us"),
+    ("about",   "about.md",                  "About"),
 ]
 
 SITE_DIR  = Path(__file__).parent
@@ -213,8 +212,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
         <h4>Legal</h4>
         <a href="/legal/terms.html">Terms</a>
         <a href="/legal/privacy.html">Privacy</a>
-        <a href="/legal/refund.html">Refund</a>
-        <a href="/legal/cancellation.html">Cancellation</a>
+        <a href="/legal/refund.html">Refund &amp; Cancellation</a>
       </div>
       <div class="footer-col">
         <h4>Company</h4>
@@ -313,13 +311,8 @@ HUB_TEMPLATE = """<!DOCTYPE html>
         <span class="legal-card-arrow">→</span>
       </a>
       <a href="refund.html" class="legal-card">
-        <h3>Refund Policy</h3>
-        <p>When you get your ₹20 back, and how.</p>
-        <span class="legal-card-arrow">→</span>
-      </a>
-      <a href="cancellation.html" class="legal-card">
-        <h3>Cancellation Policy</h3>
-        <p>How to cancel, and what happens next.</p>
+        <h3>Refund &amp; Cancellation</h3>
+        <p>Reschedule freely. Refunds when the hospital cancels.</p>
         <span class="legal-card-arrow">→</span>
       </a>
       <a href="contact.html" class="legal-card">
@@ -354,8 +347,7 @@ HUB_TEMPLATE = """<!DOCTYPE html>
         <h4>Legal</h4>
         <a href="terms.html">Terms</a>
         <a href="privacy.html">Privacy</a>
-        <a href="refund.html">Refund</a>
-        <a href="cancellation.html">Cancellation</a>
+        <a href="refund.html">Refund &amp; Cancellation</a>
       </div>
       <div class="footer-col">
         <h4>Company</h4>
