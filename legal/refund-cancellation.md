@@ -24,7 +24,7 @@ This policy applies only to the **Platform Fee** of ₹20 (inclusive of GST) cha
 
 ## 1. Reschedule Is Free — Use It Instead of Cancelling
 
-If you can''t make your appointment, **the easiest option is to reschedule**, not cancel. Rescheduling is **free of charge** and keeps your Platform Fee active for the new slot.
+If you can't make your appointment, **the easiest option is to reschedule**, not cancel. Rescheduling is **free of charge** and keeps your Platform Fee active for the new slot.
 
 **To reschedule:**
 
@@ -94,7 +94,7 @@ We recommend cancelling at least 1 hour before your appointment if you cannot at
 
 ## 6. Consultation Fees
 
-The consultation fee (doctor''s fee for the visit) is set by the hospital and **paid by you directly to the hospital** at the time of your visit. HospiJunction does NOT collect, hold, or refund consultation fees.
+The consultation fee (doctor's fee for the visit) is set by the hospital and **paid by you directly to the hospital** at the time of your visit. HospiJunction does NOT collect, hold, or refund consultation fees.
 
 If you have a dispute about a consultation fee — overcharging, undelivered service, or service quality — please raise it directly with the hospital. We may be able to assist as a mediator but are not financially liable for consultation fees.
 
@@ -137,4 +137,4 @@ For refund or cancellation queries:
 
 ---
 
-*This Refund & Cancellation Policy applies only to HospiJunction''s Platform Fee. Consultation fees, charges for tests, medicines, or in-hospital services are between you and the hospital.*
+*This Refund & Cancellation Policy applies only to HospiJunction's Platform Fee. Consultation fees, charges for tests, medicines, or in-hospital services are between you and the hospital.*
