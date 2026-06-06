@@ -127,8 +127,8 @@ def md_to_html(md: str) -> str:
 
 
 # ----------------------------------------------------------------------
-# HTML page template (single source of truth - every legal page uses this)
-# Uses HTML entities instead of raw Unicode to survive any source encoding.
+# HTML page template
+# Uses absolute /legal/ paths and HTML entities (encoding-safe).
 # ----------------------------------------------------------------------
 
 PAGE_TEMPLATE = """<!DOCTYPE html>
@@ -142,7 +142,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body class="legal-page">
 
@@ -218,7 +218,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 
 def build_tabs(active_key: str) -> str:
     return ''.join(
-        f'<a href="{k}.html" class="{"is-active" if k == active_key else ""}">{label}</a>'
+        f'<a href="/legal/{k}.html" class="{"is-active" if k == active_key else ""}">{label}</a>'
         for k, _md, label in PAGES
     )
 
@@ -250,7 +250,7 @@ HUB_TEMPLATE = """<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body class="legal-page">
 
@@ -281,32 +281,32 @@ HUB_TEMPLATE = """<!DOCTYPE html>
     <p>Everything covering your rights, our obligations, and how HospiJunction works behind the scenes. Updated whenever something material changes.</p>
 
     <div class="legal-hub-grid">
-      <a href="terms.html" class="legal-card">
+      <a href="/legal/terms.html" class="legal-card">
         <h3>Terms &amp; Conditions</h3>
         <p>The rules of using HospiJunction.</p>
         <span class="legal-card-arrow">&rarr;</span>
       </a>
-      <a href="privacy.html" class="legal-card">
+      <a href="/legal/privacy.html" class="legal-card">
         <h3>Privacy Policy</h3>
         <p>What we collect, why, and how it's protected.</p>
         <span class="legal-card-arrow">&rarr;</span>
       </a>
-      <a href="refund.html" class="legal-card">
+      <a href="/legal/refund.html" class="legal-card">
         <h3>Refund &amp; Cancellation</h3>
         <p>Reschedule freely. Refunds when the hospital cancels.</p>
         <span class="legal-card-arrow">&rarr;</span>
       </a>
-      <a href="account-deletion.html" class="legal-card">
+      <a href="/legal/account-deletion.html" class="legal-card">
         <h3>Delete Account</h3>
         <p>How to request account deletion and what data is removed.</p>
         <span class="legal-card-arrow">&rarr;</span>
       </a>
-      <a href="contact.html" class="legal-card">
+      <a href="/legal/contact.html" class="legal-card">
         <h3>Contact Us</h3>
         <p>Support, privacy, and grievance channels.</p>
         <span class="legal-card-arrow">&rarr;</span>
       </a>
-      <a href="about.html" class="legal-card">
+      <a href="/legal/about.html" class="legal-card">
         <h3>About</h3>
         <p>Who we are and what we believe.</p>
         <span class="legal-card-arrow">&rarr;</span>
@@ -331,14 +331,14 @@ HUB_TEMPLATE = """<!DOCTYPE html>
       </div>
       <div class="footer-col">
         <h4>Legal</h4>
-        <a href="terms.html">Terms</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="refund.html">Refund &amp; Cancellation</a>
+        <a href="/legal/terms.html">Terms</a>
+        <a href="/legal/privacy.html">Privacy</a>
+        <a href="/legal/refund.html">Refund &amp; Cancellation</a>
       </div>
       <div class="footer-col">
         <h4>Company</h4>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
+        <a href="/legal/about.html">About</a>
+        <a href="/legal/contact.html">Contact</a>
       </div>
     </div>
     <div class="container footer-bottom">
