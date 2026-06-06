@@ -13,11 +13,12 @@ from pathlib import Path
 
 # Order matches the in-app tab order
 PAGES = [
-    ("terms",   "terms.md",                  "Terms & Conditions"),
-    ("privacy", "privacy.md",                "Privacy Policy"),
-    ("refund",  "refund-cancellation.md",    "Refund & Cancellation"),
-    ("contact", "contact.md",                "Contact Us"),
-    ("about",   "about.md",                  "About"),
+    ("terms",            "terms.md",                  "Terms & Conditions"),
+    ("privacy",          "privacy.md",                "Privacy Policy"),
+    ("refund",           "refund-cancellation.md",    "Refund & Cancellation"),
+    ("account-deletion", "account-deletion.md",       "Delete Account"),
+    ("contact",          "contact.md",                "Contact Us"),
+    ("about",            "about.md",                  "About"),
 ]
 
 SITE_DIR  = Path(__file__).parent
@@ -313,7 +314,12 @@ HUB_TEMPLATE = """<!DOCTYPE html>
       <a href="refund.html" class="legal-card">
         <h3>Refund &amp; Cancellation</h3>
         <p>Reschedule freely. Refunds when the hospital cancels.</p>
-        <span class="legal-card-arrow">→</span>
+        <span class="legal-card-arrow">â†’</span>
+      </a>
+      <a href="account-deletion.html" class="legal-card">
+        <h3>Delete Account</h3>
+        <p>How to request account deletion and what data is removed.</p>
+        <span class="legal-card-arrow">â†’</span>
       </a>
       <a href="contact.html" class="legal-card">
         <h3>Contact Us</h3>
