@@ -3,7 +3,7 @@
 Build script: converts each /legal/*.md file into a styled /legal/*.html page
 using the editorial-medical aesthetic defined in styles.css.
 
-Run from inside the site/ folder:  python3 build_legal_html.py
+Run from inside the site/ folder:  python build_legal_html.py
 """
 
 import re
@@ -31,20 +31,10 @@ LEGAL_DIR = SITE_DIR / "legal"
 
 def render_inline(text: str) -> str:
     """Inline-level: escape HTML, then re-apply our markdown spans."""
-    # Escape HTML special chars first
     text = html.escape(text, quote=False)
-
-    # Links: [label](url)
-    text = re.sub(
-        r'\[([^\]]+)\]\(([^)\s]+)\)',
-        r'<a href="\2">\1</a>',
-        text
-    )
-    # Bold: **text**
+    text = re.sub(r'\[([^\]]+)\]\(([^)\s]+)\)', r'<a href="\2">\1</a>', text)
     text = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', text)
-    # Italic: *text* (avoid matching **)
     text = re.sub(r'(?<!\*)\*([^*\n]+)\*(?!\*)', r'<em>\1</em>', text)
-    # Inline code: `text`
     text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
     return text
 
@@ -69,20 +59,17 @@ def md_to_html(md: str) -> str:
         raw  = lines[i]
         line = raw.strip()
 
-        # Blank line: close paragraph
         if not line:
             flush_paragraph(para_buf)
             i += 1
             continue
 
-        # Horizontal rule
         if line == '---':
             flush_paragraph(para_buf)
             out.append('<hr />')
             i += 1
             continue
 
-        # Headings
         if line.startswith('### '):
             flush_paragraph(para_buf)
             out.append(f"<h3>{render_inline(line[4:])}</h3>")
@@ -99,7 +86,6 @@ def md_to_html(md: str) -> str:
             i += 1
             continue
 
-        # Blockquote
         if line.startswith('> '):
             flush_paragraph(para_buf)
             quote_lines = []
@@ -109,7 +95,6 @@ def md_to_html(md: str) -> str:
             out.append(f"<blockquote>{render_inline(' '.join(quote_lines))}</blockquote>")
             continue
 
-        # Unordered list
         if line.startswith('- ') or line.startswith('* '):
             flush_paragraph(para_buf)
             items = []
@@ -120,7 +105,6 @@ def md_to_html(md: str) -> str:
             out.append(f"<ul>{li_html}</ul>")
             continue
 
-        # Ordered list
         if re.match(r'^\d+\.\s', line):
             flush_paragraph(para_buf)
             items = []
@@ -131,12 +115,10 @@ def md_to_html(md: str) -> str:
             out.append(f"<ol>{li_html}</ol>")
             continue
 
-        # Pipe tables — skip (not used in our docs)
         if line.startswith('|'):
             i += 1
             continue
 
-        # Normal paragraph line — accumulate
         para_buf.append(line)
         i += 1
 
@@ -145,7 +127,8 @@ def md_to_html(md: str) -> str:
 
 
 # ----------------------------------------------------------------------
-# HTML page template (single source of truth — every legal page uses this)
+# HTML page template (single source of truth - every legal page uses this)
+# Uses HTML entities instead of raw Unicode to survive any source encoding.
 # ----------------------------------------------------------------------
 
 PAGE_TEMPLATE = """<!DOCTYPE html>
@@ -153,8 +136,8 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title} — HospiJunction</title>
-  <meta name="description" content="{title} — HospiJunction, an Indian doctor appointment booking platform." />
+  <title>{title} &mdash; HospiJunction</title>
+  <meta name="description" content="{title} &mdash; HospiJunction, an Indian doctor appointment booking platform." />
   <meta name="theme-color" content="#0F2E5C" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -182,7 +165,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <div class="legal-page-header">
     <div class="container">
       <div class="legal-breadcrumb">
-        <a href="/">Home</a> · <a href="/legal/">Legal</a> · {title}
+        <a href="/">Home</a> &middot; <a href="/legal/">Legal</a> &middot; {title}
       </div>
       <div class="legal-tabs">
         {tabs}
@@ -201,7 +184,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
           <span class="logo-mark">HJ</span>
           <span class="logo-text">HospiJunction</span>
         </div>
-        <p class="footer-tag">An Indian healthcare booking platform. We are a technology facilitator — not a healthcare provider. In a medical emergency, call <strong>108</strong>.</p>
+        <p class="footer-tag">An Indian healthcare booking platform. We are a technology facilitator &mdash; not a healthcare provider. In a medical emergency, call <strong>108</strong>.</p>
       </div>
       <div class="footer-col">
         <h4>Product</h4>
@@ -222,8 +205,8 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>© <span id="year">2026</span> HospiJunction. All rights reserved.</span>
-      <span>Made in India 🇮🇳</span>
+      <span>&copy; <span id="year">2026</span> HospiJunction. All rights reserved.</span>
+      <span>Made in India</span>
     </div>
   </footer>
 
@@ -243,9 +226,6 @@ def build_tabs(active_key: str) -> str:
 def build_page(key: str, md_filename: str, title: str):
     md_text = (LEGAL_DIR / md_filename).read_text(encoding='utf-8')
     content_html = md_to_html(md_text)
-    # The H1 inside content_html will collide with title presentation,
-    # so we strip the first heading-1 and let the article render naturally.
-    # Actually, we keep the H1 — it acts as the article title.
     page = PAGE_TEMPLATE.format(
         title=title,
         tabs=build_tabs(key),
@@ -264,7 +244,7 @@ HUB_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legal &amp; Policies — HospiJunction</title>
+  <title>Legal &amp; Policies &mdash; HospiJunction</title>
   <meta name="description" content="HospiJunction legal documents: Terms, Privacy, Refund, Cancellation, Contact, About." />
   <meta name="theme-color" content="#0F2E5C" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -292,7 +272,7 @@ HUB_TEMPLATE = """<!DOCTYPE html>
 
   <div class="legal-page-header">
     <div class="container">
-      <div class="legal-breadcrumb"><a href="/">Home</a> · Legal</div>
+      <div class="legal-breadcrumb"><a href="/">Home</a> &middot; Legal</div>
     </div>
   </div>
 
@@ -304,32 +284,32 @@ HUB_TEMPLATE = """<!DOCTYPE html>
       <a href="terms.html" class="legal-card">
         <h3>Terms &amp; Conditions</h3>
         <p>The rules of using HospiJunction.</p>
-        <span class="legal-card-arrow">→</span>
+        <span class="legal-card-arrow">&rarr;</span>
       </a>
       <a href="privacy.html" class="legal-card">
         <h3>Privacy Policy</h3>
         <p>What we collect, why, and how it's protected.</p>
-        <span class="legal-card-arrow">→</span>
+        <span class="legal-card-arrow">&rarr;</span>
       </a>
       <a href="refund.html" class="legal-card">
         <h3>Refund &amp; Cancellation</h3>
         <p>Reschedule freely. Refunds when the hospital cancels.</p>
-        <span class="legal-card-arrow">â†’</span>
+        <span class="legal-card-arrow">&rarr;</span>
       </a>
       <a href="account-deletion.html" class="legal-card">
         <h3>Delete Account</h3>
         <p>How to request account deletion and what data is removed.</p>
-        <span class="legal-card-arrow">â†’</span>
+        <span class="legal-card-arrow">&rarr;</span>
       </a>
       <a href="contact.html" class="legal-card">
         <h3>Contact Us</h3>
         <p>Support, privacy, and grievance channels.</p>
-        <span class="legal-card-arrow">→</span>
+        <span class="legal-card-arrow">&rarr;</span>
       </a>
       <a href="about.html" class="legal-card">
         <h3>About</h3>
         <p>Who we are and what we believe.</p>
-        <span class="legal-card-arrow">→</span>
+        <span class="legal-card-arrow">&rarr;</span>
       </a>
     </div>
   </article>
@@ -341,7 +321,7 @@ HUB_TEMPLATE = """<!DOCTYPE html>
           <span class="logo-mark">HJ</span>
           <span class="logo-text">HospiJunction</span>
         </div>
-        <p class="footer-tag">An Indian healthcare booking platform. We are a technology facilitator — not a healthcare provider. In a medical emergency, call <strong>108</strong>.</p>
+        <p class="footer-tag">An Indian healthcare booking platform. We are a technology facilitator &mdash; not a healthcare provider. In a medical emergency, call <strong>108</strong>.</p>
       </div>
       <div class="footer-col">
         <h4>Product</h4>
@@ -362,8 +342,8 @@ HUB_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>© <span id="year">2026</span> HospiJunction. All rights reserved.</span>
-      <span>Made in India 🇮🇳</span>
+      <span>&copy; <span id="year">2026</span> HospiJunction. All rights reserved.</span>
+      <span>Made in India</span>
     </div>
   </footer>
 
@@ -380,7 +360,7 @@ def main():
         build_page(key, md_filename, title)
     (LEGAL_DIR / "index.html").write_text(HUB_TEMPLATE, encoding='utf-8')
     print(f"  built  legal/index.html (hub)")
-    print("Done ✓")
+    print("Done.")
 
 
 if __name__ == "__main__":
