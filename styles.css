@@ -118,6 +118,7 @@ img, svg { max-width: 100%; display: block; }
 
 .nav-links {
   display: flex;
+  align-items: center;
   gap: 30px;
 }
 
@@ -129,12 +130,30 @@ img, svg { max-width: 100%; display: block; }
 
 .nav-links a:hover { color: var(--blue-900); }
 
+/* Navbar "Get the app" pill */
+.nav-download {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--blue-900);
+  color: var(--white) !important;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s, transform 0.2s var(--ease-out);
+}
+.nav-download:hover {
+  background: var(--blue-700);
+  color: var(--white) !important;
+  transform: translateY(-1px);
+}
+
 @media (max-width: 720px) {
   .nav-links { gap: 18px; }
   .nav-links a { font-size: 13.5px; }
+  .nav-download { padding: 7px 13px; font-size: 13px; }
 }
 @media (max-width: 560px) {
-  .nav-links { display: none; }
+  .nav-links a:not(.nav-download) { display: none; }
+  .nav-links { gap: 0; }
 }
 
 /* ============================================================
@@ -262,6 +281,101 @@ img, svg { max-width: 100%; display: block; }
   background: var(--positive);
   box-shadow: 0 0 0 0 rgba(4, 120, 87, 0.5);
   animation: pulse 2s infinite;
+}
+
+/* ============================================================
+   App download — Play Store button + QR
+   ============================================================ */
+
+.hero-download {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+  animation: rise 0.9s 0.25s var(--ease-out) both;
+}
+
+/* Google Play button (brand-themed) */
+.btn-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--blue-900);
+  color: var(--white);
+  padding: 11px 20px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  border: 1.5px solid var(--blue-900);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out), background 0.2s;
+}
+.btn-play:hover {
+  background: var(--blue-700);
+  border-color: var(--blue-700);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(15, 46, 92, 0.28);
+}
+
+.play-icon { width: 26px; height: 26px; flex-shrink: 0; }
+
+.btn-play-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+}
+.btn-play-text small {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+.btn-play-text strong {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* QR code + caption */
+.hero-download-qr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 22px;
+  border-left: 1px solid var(--border);
+}
+
+.qr-box {
+  width: 92px;
+  height: 92px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(15, 46, 92, 0.14);
+}
+
+.qr-caption {
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* Hide the QR on small screens — you can't scan your own phone */
+@media (max-width: 620px) {
+  .hero-download-qr { display: none; }
+}
+
+/* Play button reused in footer */
+.footer-play {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.footer-play:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: none;
 }
 
 /* Hero card — the booking confirmation visual */
