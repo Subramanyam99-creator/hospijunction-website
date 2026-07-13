@@ -350,10 +350,12 @@ img, svg { max-width: 100%; display: block; }
 .qr-box {
   width: 100px;
   height: 100px;
+  max-width: 100px;
   border-radius: 6px;
   padding: 6px;
   background: #fff;
   box-shadow: 0 6px 20px rgba(15, 46, 92, 0.14);
+  image-rendering: pixelated;
 }
 
 .qr-caption {
