@@ -299,7 +299,10 @@ function DashboardPage() {
    HOSPITALS
    ========================================================= */
 function HospitalsPage() {
-  const [search,setSearch]=useState('');const [page,setPage]=useState(0);const [detail,setDetail]=useState(null);const [filter,setFilter]=useState('all');
+  const [search,setSearch]=useState('');const [page,setPage]=useState(0);
+  const [detail,setDetail]=useState(null);const [filter,setFilter]=useState('all');
+  const [docs,setDocs]=useState([]);const [docsLoading,setDocsLoading]=useState(false);
+
   const filters=[];
   if(filter==='verified') filters.push(['is_verified','eq',true]);
   if(filter==='unverified') filters.push(['is_verified','eq',false]);
@@ -307,6 +310,19 @@ function HospitalsPage() {
   const {data,count,loading,reload} = useQuery('hospital_profiles',{order:'created_at',page,search,searchCols:['name','city','phone'],filters});
 
   const toggle = async(id,field,val)=>{await sb.from('hospital_profiles').update({[field]:val}).eq('id',id);reload();};
+
+  const viewHospital = async (h) => {
+    setDetail(h);
+    setDocsLoading(true);
+    const {data:docRows} = await sb.from('hospital_documents').select('*').eq('hospital_id',h.id).order('uploaded_at',{ascending:false});
+    const docsWithUrls = await Promise.all((docRows||[]).map(async d => {
+      // Try to get a signed URL from storage
+      const {data:urlData} = await sb.storage.from('hospital-documents').createSignedUrl(d.storage_path, 3600);
+      return {...d, signedUrl: urlData?.signedUrl || null};
+    }));
+    setDocs(docsWithUrls);
+    setDocsLoading(false);
+  };
 
   return (
     <>
@@ -328,7 +344,7 @@ function HospitalsPage() {
               <td>{h.is_verified?<span className="badge badge-green">Verified</span>:<span className="badge badge-amber">Pending</span>}</td>
               <td>{h.is_active?<span className="badge badge-green">Active</span>:<span className="badge badge-red">Inactive</span>}</td>
               <td style={{display:'flex',gap:6}}>
-                <button className="btn-sm" onClick={()=>setDetail(h)}>View</button>
+                <button className="btn-sm" onClick={()=>viewHospital(h)}>View</button>
                 {!h.is_verified&&<button className="btn-sm success" onClick={()=>toggle(h.id,'is_verified',true)}>Verify</button>}
                 <button className={`btn-sm ${h.is_active?'danger':'success'}`} onClick={()=>toggle(h.id,'is_active',!h.is_active)}>{h.is_active?'Deactivate':'Activate'}</button>
               </td>
@@ -337,16 +353,42 @@ function HospitalsPage() {
         )}
         <Pager page={page} setPage={setPage} count={count}/>
       </div>
-      {detail&&<DetailModal title={detail.name} onClose={()=>setDetail(null)} rows={[
+      {detail&&<DetailModal title={detail.name} onClose={()=>{setDetail(null);setDocs([]);}} rows={[
         ['City',`${detail.city}, ${detail.state}`],['Address',detail.address],['Phone',detail.phone],['Email',detail.email],
         ['Type',detail.hospital_type],['Registration #',detail.registration_number],
         ['Admin',`${detail.admin_name||'—'} (${detail.admin_role||'—'})`],['Beds',detail.beds],
         ['Consultation Fee',fmt.money(detail.consultation_fee)],
         ['Rating',detail.rating?`${detail.rating} (${detail.total_reviews} reviews)`:'—'],
         ['Verified',detail.is_verified?'Yes':'No'],['Active',detail.is_active?'Yes':'No'],
+        ['Verification Notes',detail.verification_notes||'—'],
+        ['Docs Submitted',fmt.date(detail.documents_submitted_at)],
         ['Map',detail.map_link?<a href={detail.map_link} target="_blank" rel="noopener">Open map</a>:'—'],
         ['Created',fmt.date(detail.created_at)],
-      ]}/>}
+      ]}>
+        <div style={{fontFamily:'var(--display)',fontWeight:600,fontSize:16,marginTop:24,marginBottom:12,color:'var(--ink)'}}>
+          Documents ({docs.length})
+        </div>
+        {docsLoading ? <div className="loading"><div className="spin"/></div> : docs.length===0 ? <div style={{color:'var(--muted)',fontSize:13}}>No documents uploaded</div> : (
+          <div style={{display:'flex',flexDirection:'column',gap:10}}>
+            {docs.map(d=>(
+              <div key={d.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'var(--blue-50)',borderRadius:10,border:'1px solid var(--border-2)'}}>
+                <div>
+                  <div style={{fontWeight:600,fontSize:13,color:'var(--ink)'}}>{d.document_type}</div>
+                  <div style={{fontSize:12,color:'var(--muted)'}}>{d.file_name} · {d.size_bytes ? `${(d.size_bytes/1024).toFixed(0)} KB` : '—'} · {fmt.date(d.uploaded_at)}</div>
+                  {d.notes && <div style={{fontSize:12,color:'var(--ink-2)',marginTop:2}}>{d.notes}</div>}
+                </div>
+                <div style={{display:'flex',gap:6}}>
+                  {d.signedUrl ? (
+                    <a href={d.signedUrl} target="_blank" rel="noopener" className="btn-sm primary" style={{textDecoration:'none'}}>View</a>
+                  ) : (
+                    <span style={{fontSize:11,color:'var(--red)'}}>URL failed</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </DetailModal>}
     </>
   );
 }
