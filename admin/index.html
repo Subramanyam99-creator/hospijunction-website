@@ -10,6 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- JSZip + SheetJS for downloads -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- React -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -93,7 +96,7 @@
    CONFIG
    ========================================================= */
 const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";   // ← paste your anon (public) key
+const SUPABASE_ANON_KEY = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
 const ADMIN_EMAIL = "admin@hospijunction.com";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -111,6 +114,7 @@ const Icon = ({ name }) => {
     calendar:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>,
     payment:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>,
     refund:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>,
+    gst:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h6"/></svg>,
   };
   return d[name]||null;
 };
@@ -175,6 +179,7 @@ const PAGES = [
   {id:'appointments',label:'Appointments',icon:'calendar'},
   {id:'payments',label:'Payments',icon:'payment'},
   {id:'refunds',label:'Refunds',icon:'refund'},
+  {id:'gst',label:'GST & Invoices',icon:'gst'},
 ];
 function Sidebar({ page, setPage, user }) {
   const logout = async () => { await sb.auth.signOut(); };
@@ -316,7 +321,6 @@ function HospitalsPage() {
     setDocsLoading(true);
     const {data:docRows} = await sb.from('hospital_documents').select('*').eq('hospital_id',h.id).order('uploaded_at',{ascending:false});
     const docsWithUrls = await Promise.all((docRows||[]).map(async d => {
-      // Try to get a signed URL from storage
       const {data:urlData} = await sb.storage.from('hospital-documents').createSignedUrl(d.storage_path, 3600);
       return {...d, signedUrl: urlData?.signedUrl || null};
     }));
@@ -365,9 +369,7 @@ function HospitalsPage() {
         ['Map',detail.map_link?<a href={detail.map_link} target="_blank" rel="noopener">Open map</a>:'—'],
         ['Created',fmt.date(detail.created_at)],
       ]}>
-        <div style={{fontFamily:'var(--display)',fontWeight:600,fontSize:16,marginTop:24,marginBottom:12,color:'var(--ink)'}}>
-          Documents ({docs.length})
-        </div>
+        <div style={{fontFamily:'var(--display)',fontWeight:600,fontSize:16,marginTop:24,marginBottom:12,color:'var(--ink)'}}>Documents ({docs.length})</div>
         {docsLoading ? <div className="loading"><div className="spin"/></div> : docs.length===0 ? <div style={{color:'var(--muted)',fontSize:13}}>No documents uploaded</div> : (
           <div style={{display:'flex',flexDirection:'column',gap:10}}>
             {docs.map(d=>(
@@ -378,11 +380,7 @@ function HospitalsPage() {
                   {d.notes && <div style={{fontSize:12,color:'var(--ink-2)',marginTop:2}}>{d.notes}</div>}
                 </div>
                 <div style={{display:'flex',gap:6}}>
-                  {d.signedUrl ? (
-                    <a href={d.signedUrl} target="_blank" rel="noopener" className="btn-sm primary" style={{textDecoration:'none'}}>View</a>
-                  ) : (
-                    <span style={{fontSize:11,color:'var(--red)'}}>URL failed</span>
-                  )}
+                  {d.signedUrl ? <a href={d.signedUrl} target="_blank" rel="noopener" className="btn-sm primary" style={{textDecoration:'none'}}>View</a> : <span style={{fontSize:11,color:'var(--red)'}}>URL failed</span>}
                 </div>
               </div>
             ))}
@@ -590,6 +588,175 @@ function RefundsPage() {
 }
 
 /* =========================================================
+   GST & INVOICES
+   ========================================================= */
+function GSTPage() {
+  const now = new Date();
+  const [month,setMonth] = useState(now.getMonth());
+  const [year,setYear] = useState(now.getFullYear());
+  const [page,setPage] = useState(0);
+  const [filter,setFilter] = useState('all');
+  const [detail,setDetail] = useState(null);
+  const [downloading,setDownloading] = useState(false);
+  const [downloadMsg,setDownloadMsg] = useState('');
+
+  const monthStart = `${year}-${String(month+1).padStart(2,'0')}-01`;
+  const nextMonth = month===11 ? `${year+1}-01-01` : `${year}-${String(month+2).padStart(2,'0')}-01`;
+
+  const filters = [['invoice_date','gte',monthStart],['invoice_date','lt',nextMonth]];
+  if (filter!=='all') filters.push(['invoice_type','eq',filter]);
+
+  const {data,count,loading} = useQuery('gst_invoices',{order:'invoice_date',ascending:false,page,filters,pageSize:PAGE_SIZE});
+
+  const [monthStats,setMonthStats] = useState({total:0,taxable:0,gst:0,count:0,credits:0});
+  useEffect(()=>{
+    (async()=>{
+      const {data:all} = await sb.from('gst_invoices').select('invoice_type,taxable_value,cgst_amount,sgst_amount,igst_amount,total_amount')
+        .gte('invoice_date',monthStart).lt('invoice_date',nextMonth);
+      if(!all) return;
+      const invoices = all.filter(i=>i.invoice_type==='invoice'||i.invoice_type==='tax_invoice');
+      const credits = all.filter(i=>i.invoice_type==='credit_note');
+      setMonthStats({
+        count:invoices.length, credits:credits.length,
+        taxable:invoices.reduce((s,r)=>s+Number(r.taxable_value||0),0),
+        gst:invoices.reduce((s,r)=>s+Number(r.cgst_amount||0)+Number(r.sgst_amount||0)+Number(r.igst_amount||0),0),
+        total:invoices.reduce((s,r)=>s+Number(r.total_amount||0),0),
+      });
+    })();
+  },[monthStart,nextMonth]);
+
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  const viewPdf = async inv => {
+    if(!inv.pdf_storage_path){alert('No PDF available for this invoice');return;}
+    const {data:urlData} = await sb.storage.from('gst-invoices').createSignedUrl(inv.pdf_storage_path,3600);
+    if(urlData?.signedUrl) window.open(urlData.signedUrl,'_blank');
+    else alert('Could not generate PDF link');
+  };
+
+  const downloadExcel = async () => {
+    setDownloading(true);setDownloadMsg('Fetching invoices…');
+    const {data:all} = await sb.from('gst_invoices').select('*').gte('invoice_date',monthStart).lt('invoice_date',nextMonth).order('invoice_date',{ascending:true});
+    if(!all||all.length===0){setDownloading(false);setDownloadMsg('');alert('No invoices for this month');return;}
+    setDownloadMsg('Generating Excel…');
+    const rows = all.map(inv=>({
+      'Invoice #':inv.invoice_number,'Date':inv.invoice_date,'Type':inv.invoice_type,
+      'Financial Year':inv.financial_year,'Buyer Name':inv.buyer_name,'Buyer State':inv.buyer_state,
+      'Buyer State Code':inv.buyer_state_code,'Buyer Email':inv.buyer_email,'Buyer Phone':inv.buyer_phone,
+      'HSN/SAC':inv.hsn_sac_code,'Description':inv.description,'Place of Supply':inv.place_of_supply_state_code,
+      'Taxable Value':Number(inv.taxable_value),'CGST Rate %':Number(inv.cgst_rate),'CGST Amount':Number(inv.cgst_amount),
+      'SGST Rate %':Number(inv.sgst_rate),'SGST Amount':Number(inv.sgst_amount),
+      'IGST Rate %':Number(inv.igst_rate),'IGST Amount':Number(inv.igst_amount),
+      'Total Amount':Number(inv.total_amount),'Reverse Charge':inv.reverse_charge?'Yes':'No',
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = Object.keys(rows[0]).map(k=>({wch:Math.max(k.length,...rows.map(r=>String(r[k]||'').length))+2}));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,`${monthNames[month]} ${year}`);
+    XLSX.writeFile(wb,`HospiJunction_GST_${monthNames[month]}_${year}.xlsx`);
+    setDownloading(false);setDownloadMsg('');
+  };
+
+  const downloadZip = async () => {
+    setDownloading(true);setDownloadMsg('Fetching invoice list…');
+    const {data:all} = await sb.from('gst_invoices').select('invoice_number,invoice_type,invoice_date,pdf_storage_path')
+      .gte('invoice_date',monthStart).lt('invoice_date',nextMonth).order('invoice_date',{ascending:true});
+    const withPdfs = (all||[]).filter(i=>i.pdf_storage_path);
+    if(withPdfs.length===0){setDownloading(false);setDownloadMsg('');alert('No PDFs available for this month');return;}
+    const zip = new JSZip();
+    let done = 0;
+    for(const inv of withPdfs){
+      done++;setDownloadMsg(`Downloading PDF ${done}/${withPdfs.length}…`);
+      try{
+        const {data:urlData} = await sb.storage.from('gst-invoices').createSignedUrl(inv.pdf_storage_path,300);
+        if(urlData?.signedUrl){const resp=await fetch(urlData.signedUrl);if(resp.ok){const blob=await resp.blob();zip.file(`${inv.invoice_number}_${inv.invoice_type}.pdf`,blob);}}
+      }catch(e){console.error('Failed to fetch',inv.invoice_number,e);}
+    }
+    setDownloadMsg('Creating ZIP file…');
+    const zipBlob = await zip.generateAsync({type:'blob'});
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');a.href=url;a.download=`HospiJunction_Invoices_${monthNames[month]}_${year}.zip`;a.click();
+    URL.revokeObjectURL(url);setDownloading(false);setDownloadMsg('');
+  };
+
+  const downloadAll = async () => { await downloadExcel(); await downloadZip(); };
+
+  return (
+    <>
+      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:20,flexWrap:'wrap'}}>
+        <select value={month} onChange={e=>{setMonth(Number(e.target.value));setPage(0);}}
+          style={{padding:'8px 14px',borderRadius:8,border:'1.5px solid var(--border)',fontFamily:'var(--body)',fontSize:14,fontWeight:600}}>
+          {monthNames.map((m,i)=><option key={i} value={i}>{m}</option>)}
+        </select>
+        <select value={year} onChange={e=>{setYear(Number(e.target.value));setPage(0);}}
+          style={{padding:'8px 14px',borderRadius:8,border:'1.5px solid var(--border)',fontFamily:'var(--body)',fontSize:14,fontWeight:600}}>
+          {[2024,2025,2026,2027].map(y=><option key={y} value={y}>{y}</option>)}
+        </select>
+        <div style={{flex:1}}/>
+        <button className="btn-sm primary" onClick={downloadExcel} disabled={downloading} style={{padding:'8px 16px'}}>📊 Excel</button>
+        <button className="btn-sm primary" onClick={downloadZip} disabled={downloading} style={{padding:'8px 16px'}}>📁 PDFs ZIP</button>
+        <button className="btn-sm" onClick={downloadAll} disabled={downloading} style={{padding:'8px 16px',background:'var(--positive)',color:'var(--white)',borderColor:'var(--positive)'}}>⬇ Download All</button>
+      </div>
+      {downloading&&<div style={{padding:'14px 20px',background:'var(--blue-50)',borderRadius:10,marginBottom:18,fontSize:13,color:'var(--blue-900)',display:'flex',alignItems:'center',gap:10}}><div className="spin" style={{width:18,height:18,borderWidth:2}}/> {downloadMsg}</div>}
+      <div className="stats">
+        <div className="stat-card"><div className="stat-label">Invoices</div><div className="stat-value">{monthStats.count}</div></div>
+        <div className="stat-card"><div className="stat-label">Credit Notes</div><div className="stat-value">{monthStats.credits}</div></div>
+        <div className="stat-card"><div className="stat-label">Taxable Value</div><div className="stat-value">{fmt.money(monthStats.taxable)}</div></div>
+        <div className="stat-card"><div className="stat-label">GST Collected</div><div className="stat-value">{fmt.money(monthStats.gst)}</div></div>
+        <div className="stat-card"><div className="stat-label">Total Billed</div><div className="stat-value">{fmt.money(monthStats.total)}</div></div>
+      </div>
+      <div className="card">
+        <div className="card-header">
+          <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
+            <div className="card-title">{monthNames[month]} {year} Invoices ({count})</div>
+            <div className="filter-row">
+              {['all','tax_invoice','invoice','credit_note'].map(f=><button key={f} className={`filter-btn ${filter===f?'active':''}`} onClick={()=>{setFilter(f);setPage(0);}}>
+                {f==='all'?'All':f==='tax_invoice'?'Tax Invoice':f==='credit_note'?'Credit Note':'Invoice'}
+              </button>)}
+            </div>
+          </div>
+        </div>
+        {loading?<div className="loading"><div className="spin"/></div>:data.length===0?<div className="empty">No invoices for this period</div>:(
+          <table><thead><tr><th>Invoice #</th><th>Date</th><th>Type</th><th>Buyer</th><th>Taxable</th><th>CGST</th><th>SGST</th><th>IGST</th><th>Total</th><th>Actions</th></tr></thead><tbody>
+            {data.map(inv=><tr key={inv.id}>
+              <td style={{fontWeight:600,color:'var(--ink)',fontFamily:'monospace',fontSize:12}}>{inv.invoice_number}</td>
+              <td>{fmt.date(inv.invoice_date)}</td>
+              <td>{inv.invoice_type==='credit_note'?<span className="badge badge-amber">Credit Note</span>:<span className="badge badge-blue">Invoice</span>}</td>
+              <td><div style={{fontWeight:500}}>{inv.buyer_name}</div><div style={{fontSize:11,color:'var(--muted)'}}>{inv.buyer_state}</div></td>
+              <td>{fmt.money(inv.taxable_value)}</td><td>{fmt.money(inv.cgst_amount)}</td><td>{fmt.money(inv.sgst_amount)}</td><td>{fmt.money(inv.igst_amount)}</td>
+              <td style={{fontWeight:600}}>{fmt.money(inv.total_amount)}</td>
+              <td style={{display:'flex',gap:6}}>
+                <button className="btn-sm" onClick={()=>setDetail(inv)}>Details</button>
+                <button className="btn-sm primary" onClick={()=>viewPdf(inv)}>PDF</button>
+              </td>
+            </tr>)}
+          </tbody></table>
+        )}
+        <Pager page={page} setPage={setPage} count={count}/>
+      </div>
+      {detail&&<DetailModal title={`Invoice ${detail.invoice_number}`} onClose={()=>setDetail(null)} rows={[
+        ['Invoice #',detail.invoice_number],['Date',fmt.date(detail.invoice_date)],['Type',detail.invoice_type],
+        ['Financial Year',detail.financial_year],['HSN/SAC',detail.hsn_sac_code],['Description',detail.description],
+        ['—',''],
+        ['Seller',detail.seller_name],['Seller GSTIN',detail.seller_gstin],['Seller CIN',detail.seller_cin],
+        ['Seller Address',detail.seller_address],['Seller State Code',detail.seller_state_code],
+        ['—',''],
+        ['Buyer',detail.buyer_name],['Buyer State',`${detail.buyer_state} (${detail.buyer_state_code})`],
+        ['Buyer Email',detail.buyer_email],['Buyer Phone',detail.buyer_phone],
+        ['Place of Supply',detail.place_of_supply_state_code],
+        ['—',''],
+        ['Taxable Value',fmt.money(detail.taxable_value)],
+        ['CGST',`${detail.cgst_rate}% → ${fmt.money(detail.cgst_amount)}`],
+        ['SGST',`${detail.sgst_rate}% → ${fmt.money(detail.sgst_amount)}`],
+        ['IGST',`${detail.igst_rate}% → ${fmt.money(detail.igst_amount)}`],
+        ['Total',fmt.money(detail.total_amount)],
+        ['Reverse Charge',detail.reverse_charge?'Yes':'No'],
+      ]}/>}
+    </>
+  );
+}
+
+/* =========================================================
    APP
    ========================================================= */
 function App() {
@@ -610,7 +777,7 @@ function App() {
   if(checking) return <div className="login-wrap"><div className="spin"/></div>;
   if(!user) return <LoginPage/>;
 
-  const PageComponent = {dashboard:DashboardPage,hospitals:HospitalsPage,doctors:DoctorsPage,patients:PatientsPage,appointments:AppointmentsPage,payments:PaymentsPage,refunds:RefundsPage}[page]||DashboardPage;
+  const PageComponent = {dashboard:DashboardPage,hospitals:HospitalsPage,doctors:DoctorsPage,patients:PatientsPage,appointments:AppointmentsPage,payments:PaymentsPage,refunds:RefundsPage,gst:GSTPage}[page]||DashboardPage;
   const pageLabel = PAGES.find(p=>p.id===page)?.label||'Dashboard';
 
   return (
