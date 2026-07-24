@@ -162,7 +162,7 @@ img, svg { max-width: 100%; display: block; }
 
 .hero {
   position: relative;
-  padding: 90px 0 110px;
+  padding: 50px 0 80px;
   overflow: hidden;
   background: var(--cream);
 }
