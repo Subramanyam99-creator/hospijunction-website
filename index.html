@@ -6,18 +6,66 @@
   <title>HospiJunction — Skip the wait. Book your doctor in 30 seconds.</title>
   <meta name="description" content="HospiJunction is an Indian doctor appointment booking platform. Find verified hospitals near you, book OPD slots, and get a stable token number — all for a flat ₹20 platform fee." />
   <meta name="theme-color" content="#0F2E5C" />
-  
+
   <!-- Favicon -->
-<link rel="icon" href="/favicon.ico" sizes="48x48" />
-<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
-<link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
-<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://www.hospijunction.com/" />
 
   <!-- Open Graph / social -->
   <meta property="og:title" content="HospiJunction — Book your doctor in 30 seconds" />
   <meta property="og:description" content="Verified hospitals. Stable tokens. ₹20 flat platform fee. Pay consultation directly at the hospital." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://hospijunction.com/" />
+  <meta property="og:url" content="https://www.hospijunction.com/" />
+  <meta property="og:image" content="https://www.hospijunction.com/og-image.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="HospiJunction — Book your doctor in 30 seconds" />
+  <meta name="twitter:description" content="Verified hospitals. Stable tokens. ₹20 flat platform fee." />
+  <meta name="twitter:image" content="https://www.hospijunction.com/og-image.png" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalBusiness",
+    "name": "HospiJunction",
+    "url": "https://www.hospijunction.com",
+    "logo": "https://www.hospijunction.com/favicon-192.png",
+    "description": "Book doctor appointments at verified hospitals across India. Flat ₹20 platform fee.",
+    "areaServed": { "@type": "Country", "name": "India" },
+    "sameAs": [
+      "https://play.google.com/store/apps/details?id=com.hospijunction.app"
+    ],
+    "offers": {
+      "@type": "Offer",
+      "price": "20",
+      "priceCurrency": "INR",
+      "description": "Platform fee per booking"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "HospiJunction",
+    "operatingSystem": "Android",
+    "applicationCategory": "HealthApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    },
+    "installUrl": "https://play.google.com/store/apps/details?id=com.hospijunction.app",
+    "description": "Book doctor appointments at verified hospitals across India. Get a stable token number for just ₹20 platform fee."
+  }
+  </script>
 
   <!-- Fonts: Fraunces (display serif) + DM Sans (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -89,7 +137,7 @@
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKsAAACrCAIAAACWivtOAAAGKklEQVR4nO2dwc4cIQyDO1Xf/5W3N3pIlcaOma1kf8f+DKCpZSAJs8/n8/kRjPn57QmELxMFuBMFuBMFuBMFuBMFuBMFuBMFuBMFuBMFuBMFuPNr0uh5ns0YJ/VQ+6lZiUmbiqrn00Y+sfoSJqOr3nxDPMCdKMCd0SpwgFLJnIPJnXlirZwzQxOrQO/n3puPB7gTBbiDrQKHxmcmfjU5HUBezW2eJ425DX/zFLdkTBpz5V7xAHeiAHfIVYCjiYrUDXbzFBdm4eItE9eFhoAWiBeIB7gTBbjz6ipQady7wm3LmzbQ41w8arJSfPfKRjzAnSjAHXIV4IwLiv80baAjQNPhZIaTP3GDQitg08+SeIA7UYA72CqwLFk5QMbO/Usz1oE7ichnOJmP6s1X4gHuRAHujFaBeyGLSeBlmW6GRp+0gYy9wmW97xEPcCcKcOdRxXYO3A55Ame2qtr7CVztEzfEYVk1FA9wJwpwZ7QKTDwNCnRAtTSq1WQ5VtMhBHSCkCc+KvEAd6IAd8iIUBPWaB5f1udzudcJXM/Qhr9WBHEr16TQFFpo4gHuRAHukGeBBlUoe3k6aDp8IT8rP/U0Q9QZ5iwQAKIAd7b3BSYVOE1jzmxVsRRoWeG+TVEbT/7E1cTmLBAYogB3sLOAvGQFMrfmT6pge21TWVYE1X64I4DqPyUe4E4U4A5ZI/SXjnbOfK+fA/RVB1W2WpXRngB9reIQD3AnCnBnWyNU29wL8kzgktT3Vhzu8aaf5ViVeIA7UYA72y9Lc9nPiuoIwGWQ711kgBx+mdrmGscD3IkC3NnWCKmOErWxKoAzGaKBW9S4Ap7lXTPuUBAPcCcKcAe7L8Bt5if9cOX0k6m+sFGftFnWji77aYgHuBMFuLP9xcnGbKs7cRVBS5Z1/pN+3gxDQdfHJsQD3IkC3CHzAveqYpqxliwrTpdLGHeVoDKJhiUvEACiAHe2X5aenAWafuRtIAOcnF8aljErqOdlPKohHuBOFOCO7Nfn5ft8uSGrEg1NG24+3NVjVRFpPMCdKMAd/S9OqlaKSYdNz/cOKU0/3ONcgVPTT/ICASAKcIeMCHFVQ8uxmj9xWV3uppv8oxAN0Ay55SAe4E4U4M7FX59XpUpVhgzNUHV3+N69YFUxVTzAnSjAHew7QsvPRDRwu2huh7ycDzfWvTdWO0xEKABEAe5svym6LJKsyMNH0ON1GtClXfkFYe4mAkQ8wJ0owB3y7nANyB/k31VQNVZ9OKJhWSzEwU31EA9wJwpwR/Zl6T89UvbLfSeHS9RORr+3KsmHWB4K4gHuRAHu6H9foKKK+TeDqhYI+TVeedXQ8vBViQe4EwW4Q+YFuP2nvNa96bly7/7X0urvvYSsAuHfRAHubGuEVLvxCZO0ApTIlp8FJmPVx7k5Q/NpiAe4EwW4s/2CxKSgfbLF5b6iMJmhvEC09ty8lmXqdjIW1KYSD3AnCnBne2sMqntUxW2g+ajGmtRHNY2Xt+FUy1MlHuBOFOCOLC+wrHW/dzXszW25qh4Jer3QDCvxAHeiAHfIvMBhWSfD9cxVZlagIbiVS3UfrU4DeqohHuBOFOCOPjssv01c4dwb6qdpU1meMu6Vp06IB7gTBbizzQssQx/cUYIL43NRLG59aaYBPT7pGRq0Eg9wJwpwh1wFGv/k4tWNRS8PF6qsRJMdXhbQqo5jXIfxAHeiAHew7HBF5fkTlvEoVRhKFepfzqfpMKtAAIgC3NF/R6gbbGfRqmSEvIAHGuvNKtAJ8QB3ogB3RhEh1S56WffYNJZXVKqyANAtA2iGqtBQPMCdKMAd2a/PV5bbe24I6HGu8eT+lyow1cxwsnJNiAe4EwW4I8sOH6Bd/cT85ft81a3kezWx0FPJDocVUYA7F393eMLyzq+q2keV1Z3UEdUOm36g0bmDVTzAnSjAne+sAhNDlkd7oCxABXJmKIlQO5SXyzbEA9yJAtwhVwEuBD3ZrC7LY15IQDeoLhpzx43J45V4gDtRgDvYKvBCiTsUzeAqZ5aHgslYUKyJM3bV/0U8wJ0owJ1X7wuE/5B4gDtRgDtRgDtRgDtRgDtRgDtRgDtRgDtRgDtRgDtRgDu/AXwOuI09j0NQAAAAAElFTkSuQmCC" alt="Scan to download HospiJunction on Google Play" class="qr-box" width="100" height="100" loading="lazy" />
             <span class="qr-caption">Scan to<br />download</span>
           </div>
-          </div>
+        </div>
 
         <p class="hero-meta">
           <span class="pulse-dot" aria-hidden="true"></span>
@@ -255,12 +303,12 @@
         <p class="section-sub">Read the full versions any time. We update these whenever something material changes.</p>
       </div>
       <div class="legal-grid">
-        <a href="/legal/terms.html"   class="legal-card"><h3>Terms &amp; Conditions</h3><p>The rules of using HospiJunction.</p><span class="legal-card-arrow">→</span></a>
+        <a href="/legal/terms.html" class="legal-card"><h3>Terms &amp; Conditions</h3><p>The rules of using HospiJunction.</p><span class="legal-card-arrow">→</span></a>
         <a href="/legal/privacy.html" class="legal-card"><h3>Privacy Policy</h3><p>What we collect, why, and how it's protected.</p><span class="legal-card-arrow">→</span></a>
-        <a href="/legal/refund.html"  class="legal-card"><h3>Refund &amp; Cancellation</h3><p>Reschedule freely. Refunds when the hospital cancels.</p><span class="legal-card-arrow">&rarr;</span></a>
+        <a href="/legal/refund.html" class="legal-card"><h3>Refund &amp; Cancellation</h3><p>Reschedule freely. Refunds when the hospital cancels.</p><span class="legal-card-arrow">&rarr;</span></a>
         <a href="/legal/account-deletion.html" class="legal-card"><h3>Delete Account</h3><p>How to request account deletion and what data is removed.</p><span class="legal-card-arrow">&rarr;</span></a>
         <a href="/legal/contact.html" class="legal-card"><h3>Contact Us</h3><p>How to reach support, privacy, or grievance teams.</p><span class="legal-card-arrow">&rarr;</span></a>
-        <a href="/legal/about.html"   class="legal-card"><h3>About</h3><p>Who we are and what we believe.</p><span class="legal-card-arrow">→</span></a>
+        <a href="/legal/about.html" class="legal-card"><h3>About</h3><p>Who we are and what we believe.</p><span class="legal-card-arrow">→</span></a>
       </div>
     </div>
   </section>
