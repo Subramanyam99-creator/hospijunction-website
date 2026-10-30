@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospitals near you — HospiJunction</title>
+  <meta name="description" content="Find verified hospitals and book doctor appointments across India. Browse hospitals by city on HospiJunction." />
+  <meta name="theme-color" content="#0F2E5C" />
+  <link rel="canonical" href="https://www.hospijunction.com/hospitals/" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- OG -->
+  <meta property="og:title" content="Find hospitals near you — HospiJunction" />
+  <meta property="og:description" content="Browse verified hospitals across India. Book OPD appointments for a flat ₹20 fee." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.hospijunction.com/hospitals/" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <style>
+    .city-hero{background:var(--cream);padding:60px 0 50px;text-align:center}
+    .city-hero .section-title{margin-top:12px}
+    .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px;margin-top:40px}
+    .city-card{background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:30px 28px;transition:all .25s var(--ease-out);text-decoration:none;color:var(--ink)}
+    .city-card:hover{border-color:var(--blue-700);transform:translateY(-3px);box-shadow:0 14px 32px -14px rgba(15,46,92,.18)}
+    .city-card h3{font-family:var(--display);font-weight:600;font-size:22px;margin-bottom:6px;letter-spacing:-.01em}
+    .city-card .city-state{font-size:14px;color:var(--muted);margin-bottom:14px}
+    .city-card .city-stat{display:flex;gap:18px;font-size:13px;color:var(--ink-2)}
+    .city-card .city-stat span{display:flex;align-items:center;gap:5px}
+    .city-card .city-stat strong{color:var(--blue-900)}
+    .city-loading{text-align:center;padding:60px;color:var(--muted)}
+    .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue-700);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .city-empty{text-align:center;padding:60px;color:var(--muted);font-size:16px}
+    .download-cta{background:var(--blue-900);color:var(--white);text-align:center;padding:50px 28px;margin-top:60px;border-radius:var(--radius-lg)}
+    .download-cta h2{font-family:var(--display);font-weight:600;font-size:clamp(26px,4vw,36px);margin-bottom:12px;color:var(--white)}
+    .download-cta p{color:rgba(255,255,255,.75);margin-bottom:24px;font-size:16px}
+    .download-cta .btn-primary{background:var(--white);color:var(--blue-900)}
+    .download-cta .btn-primary:hover{background:var(--cream)}
+  </style>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+  <div class="brand-line"></div>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">HJ</span>
+        <span class="logo-text">HospiJunction</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/#how">How it works</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/hospitals/">Hospitals</a>
+        <a href="/legal/">Legal</a>
+        <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="city-hero">
+    <div class="container">
+      <span class="eyebrow eyebrow-center">Browse by city</span>
+      <h1 class="section-title">Hospitals near you</h1>
+      <p class="section-sub">Find verified hospitals and book OPD appointments across India.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div id="cities" class="city-loading"><div class="spin"></div><p style="margin-top:16px">Loading cities&hellip;</p></div>
+
+      <div class="download-cta" style="display:none" id="download-cta">
+        <h2>Book your doctor in 30 seconds</h2>
+        <p>Download the HospiJunction app, pick a hospital, choose a slot, and walk in at your time.</p>
+        <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="btn btn-primary" target="_blank" rel="noopener">Download on Google Play</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">HJ</span><span class="logo-text">HospiJunction</span></div>
+        <p class="footer-tag">An Indian healthcare booking platform. We are a technology facilitator &mdash; not a healthcare provider. In a medical emergency, call <strong>108</strong>.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><a href="/#how">How it works</a><a href="/#pricing">Pricing</a><a href="/hospitals/">Hospitals</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="/legal/terms.html">Terms</a><a href="/legal/privacy.html">Privacy</a><a href="/legal/refund.html">Refund</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/legal/about.html">About</a><a href="/legal/contact.html">Contact</a></div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; <span id="year">2026</span> HospiJunction. All rights reserved.</span>
+      <span>Made in India</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    (async () => {
+      const container = document.getElementById('cities');
+      try {
+        // Get all active, verified hospitals grouped by city
+        const { data: hospitals, error } = await sb
+          .from('hospital_profiles')
+          .select('city, state')
+          .eq('is_active', true)
+          .eq('is_verified', true);
+
+        if (error) throw error;
+
+        // Group by city
+        const cityMap = {};
+        (hospitals || []).forEach(h => {
+          const key = (h.city || '').trim();
+          if (!key) return;
+          if (!cityMap[key]) cityMap[key] = { city: key, state: h.state || '', count: 0 };
+          cityMap[key].count++;
+        });
+
+        const cities = Object.values(cityMap).sort((a, b) => b.count - a.count);
+
+        if (cities.length === 0) {
+          container.innerHTML = '<div class="city-empty">No hospitals listed yet. We\'re onboarding hospitals across India &mdash; check back soon!</div>';
+          document.getElementById('download-cta').style.display = 'block';
+          return;
+        }
+
+        let html = '<div class="city-grid">';
+        cities.forEach(c => {
+          const slug = c.city.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          html += `
+            <a href="/hospitals/${slug}/" class="city-card">
+              <h3>${c.city}</h3>
+              <div class="city-state">${c.state}</div>
+              <div class="city-stat">
+                <span><strong>${c.count}</strong> hospital${c.count > 1 ? 's' : ''}</span>
+              </div>
+            </a>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+        document.getElementById('download-cta').style.display = 'block';
+
+      } catch (err) {
+        container.innerHTML = '<div class="city-empty">Could not load hospitals. Please try again later.</div>';
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>

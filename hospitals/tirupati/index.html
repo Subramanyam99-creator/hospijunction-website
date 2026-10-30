@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospitals in Tirupati — Book Doctor Appointments | HospiJunction</title>
+  <meta name="description" content="Find verified hospitals in Tirupati, Andhra Pradesh. Book OPD appointments online, get a stable token number, and skip the queue — all for ₹20 on HospiJunction." />
+  <meta name="theme-color" content="#0F2E5C" />
+  <link rel="canonical" href="https://www.hospijunction.com/hospitals/tirupati/" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- OG -->
+  <meta property="og:title" content="Hospitals in Tirupati — HospiJunction" />
+  <meta property="og:description" content="Book doctor appointments in Tirupati for ₹20. Verified hospitals, stable tokens, no queues." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.hospijunction.com/hospitals/tirupati/" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <style>
+    .city-hero{background:var(--cream);padding:60px 0 50px}
+    .city-hero .section-title{margin-top:12px}
+    .breadcrumb{font-size:13.5px;color:var(--muted);margin-bottom:8px}
+    .breadcrumb a{color:var(--muted)}.breadcrumb a:hover{color:var(--ink)}
+
+    .hospital-list{display:flex;flex-direction:column;gap:24px;margin-top:32px}
+    .hospital-card{background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:30px 28px;transition:border-color .25s}
+    .hospital-card:hover{border-color:var(--blue-700)}
+    .hospital-card h2{font-family:var(--display);font-weight:600;font-size:22px;color:var(--ink);margin-bottom:4px;letter-spacing:-.01em}
+    .hospital-meta{display:flex;flex-wrap:wrap;gap:16px;font-size:13.5px;color:var(--muted);margin-bottom:18px}
+    .hospital-meta span{display:flex;align-items:center;gap:5px}
+    .hospital-type{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--blue-50);color:var(--blue-700)}
+
+    .doctors-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:16px}
+    .doc-card{background:var(--blue-50);border-radius:var(--radius-sm);padding:16px 18px}
+    .doc-card h4{font-family:var(--display);font-weight:600;font-size:15px;color:var(--ink);margin-bottom:2px}
+    .doc-card .doc-spec{font-size:12.5px;color:var(--blue-700);margin-bottom:8px}
+    .doc-card .doc-detail{font-size:12.5px;color:var(--muted);line-height:1.5}
+    .doc-card .doc-fee{font-weight:600;color:var(--ink)}
+
+    .city-loading{text-align:center;padding:60px;color:var(--muted)}
+    .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue-700);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .city-empty{text-align:center;padding:60px;color:var(--muted);font-size:16px}
+
+    .download-cta{background:var(--blue-900);color:var(--white);text-align:center;padding:50px 28px;margin-top:60px;border-radius:var(--radius-lg)}
+    .download-cta h2{font-family:var(--display);font-weight:600;font-size:clamp(26px,4vw,36px);margin-bottom:12px;color:var(--white)}
+    .download-cta p{color:rgba(255,255,255,.75);margin-bottom:24px;font-size:16px}
+    .download-cta .btn-primary{background:var(--white);color:var(--blue-900)}
+    .download-cta .btn-primary:hover{background:var(--cream)}
+
+    .map-link{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--blue-700);margin-top:10px}
+    .map-link:hover{color:var(--blue-900)}
+  </style>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <!-- Structured Data -->
+  <script type="application/ld+json" id="structured-data">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Hospitals in Tirupati",
+    "description": "Verified hospitals in Tirupati on HospiJunction",
+    "itemListElement": []
+  }
+  </script>
+</head>
+<body>
+
+  <div class="brand-line"></div>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">HJ</span>
+        <span class="logo-text">HospiJunction</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/#how">How it works</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/hospitals/">Hospitals</a>
+        <a href="/legal/">Legal</a>
+        <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="city-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/hospitals/">Hospitals</a> &rsaquo; Tirupati</div>
+      <h1 class="section-title">Hospitals in Tirupati</h1>
+      <p class="section-sub">Book OPD appointments at verified hospitals in Tirupati, Andhra Pradesh.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div id="hospitals" class="city-loading"><div class="spin"></div><p style="margin-top:16px">Loading hospitals&hellip;</p></div>
+
+      <div class="download-cta" style="display:none" id="download-cta">
+        <h2>Book an appointment in Tirupati</h2>
+        <p>Download the HospiJunction app to book your slot, get a token number, and skip the queue.</p>
+        <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="btn btn-primary" target="_blank" rel="noopener">Download on Google Play</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">HJ</span><span class="logo-text">HospiJunction</span></div>
+        <p class="footer-tag">An Indian healthcare booking platform. We are a technology facilitator &mdash; not a healthcare provider. In a medical emergency, call <strong>108</strong>.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><a href="/#how">How it works</a><a href="/#pricing">Pricing</a><a href="/hospitals/">Hospitals</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="/legal/terms.html">Terms</a><a href="/legal/privacy.html">Privacy</a><a href="/legal/refund.html">Refund</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/legal/about.html">About</a><a href="/legal/contact.html">Contact</a></div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; <span id="year">2026</span> HospiJunction. All rights reserved.</span>
+      <span>Made in India</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const CITY_NAME  = "Tirupati";
+    const CITY_STATE = "Andhra Pradesh";
+
+    const SUPABASE_URL  = "https://xamjhwkclcftbyjpzvnq.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    (async () => {
+      const container = document.getElementById('hospitals');
+      try {
+        // Fetch hospitals in this city
+        const { data: hospitals, error } = await sb
+          .from('hospital_profiles')
+          .select('id, name, address, phone, hospital_type, consultation_fee, rating, total_reviews, map_link')
+          .eq('is_active', true)
+          .eq('is_verified', true)
+          .ilike('city', CITY_NAME)
+          .order('name');
+
+        if (error) throw error;
+
+        if (!hospitals || hospitals.length === 0) {
+          container.innerHTML = '<div class="city-empty">No verified hospitals in ' + CITY_NAME + ' yet. We\'re expanding &mdash; check back soon!</div>';
+          document.getElementById('download-cta').style.display = 'block';
+          return;
+        }
+
+        // Fetch doctors for these hospitals
+        const hospitalIds = hospitals.map(h => h.id);
+        const { data: doctors } = await sb
+          .from('doctors')
+          .select('id, hospital_id, full_name, specialization, qualification, experience_years, consultation_fee, languages')
+          .eq('is_active', true)
+          .in('hospital_id', hospitalIds)
+          .order('full_name');
+
+        // Group doctors by hospital
+        const docMap = {};
+        (doctors || []).forEach(d => {
+          if (!docMap[d.hospital_id]) docMap[d.hospital_id] = [];
+          docMap[d.hospital_id].push(d);
+        });
+
+        // Update structured data
+        const structuredData = {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "Hospitals in " + CITY_NAME,
+          "description": "Verified hospitals in " + CITY_NAME + " on HospiJunction",
+          "itemListElement": hospitals.map((h, i) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "item": {
+              "@type": "Hospital",
+              "name": h.name,
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": CITY_NAME,
+                "addressRegion": CITY_STATE,
+                "addressCountry": "IN"
+              },
+              ...(h.phone ? { "telephone": h.phone } : {})
+            }
+          }))
+        };
+        document.getElementById('structured-data').textContent = JSON.stringify(structuredData);
+
+        let html = '<div class="hospital-list">';
+        hospitals.forEach(h => {
+          const hospDocs = docMap[h.id] || [];
+          html += `
+            <div class="hospital-card">
+              <h2>${escapeHtml(h.name)}</h2>
+              <div class="hospital-meta">
+                ${h.hospital_type ? `<span class="hospital-type">${escapeHtml(h.hospital_type)}</span>` : ''}
+                ${h.address ? `<span>${escapeHtml(h.address)}</span>` : ''}
+                ${h.phone ? `<span>${escapeHtml(h.phone)}</span>` : ''}
+                ${h.rating ? `<span>&#9733; ${h.rating}${h.total_reviews ? ' (' + h.total_reviews + ' reviews)' : ''}</span>` : ''}
+              </div>
+
+              ${hospDocs.length > 0 ? `
+                <div style="font-family:var(--display);font-weight:600;font-size:15px;color:var(--ink);margin-bottom:8px">
+                  Doctors (${hospDocs.length})
+                </div>
+                <div class="doctors-strip">
+                  ${hospDocs.map(d => `
+                    <div class="doc-card">
+                      <h4>${escapeHtml(d.full_name)}</h4>
+                      <div class="doc-spec">${escapeHtml(d.specialization)}</div>
+                      <div class="doc-detail">
+                        ${d.qualification ? escapeHtml(d.qualification) + '<br>' : ''}
+                        ${d.experience_years ? d.experience_years + ' years exp · ' : ''}
+                        <span class="doc-fee">${d.consultation_fee != null ? '₹' + Number(d.consultation_fee).toLocaleString('en-IN') : ''}</span>
+                        ${d.languages && d.languages.length ? '<br>' + d.languages.map(l => escapeHtml(l)).join(', ') : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : '<div style="font-size:13px;color:var(--muted)">Doctor details coming soon</div>'}
+
+              ${h.map_link ? `<a href="${escapeHtml(h.map_link)}" target="_blank" rel="noopener" class="map-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7 8-13a8 8 0 00-16 0c0 6 8 13 8 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                View on map
+              </a>` : ''}
+            </div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+        document.getElementById('download-cta').style.display = 'block';
+
+      } catch (err) {
+        container.innerHTML = '<div class="city-empty">Could not load hospitals. Please try again later.</div>';
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>
