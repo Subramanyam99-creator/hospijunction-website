@@ -26,9 +26,10 @@
   <link rel="stylesheet" href="/styles.css" />
 
   <style>
-    .city-hero{background:var(--cream);padding:60px 0 50px;text-align:center}
+    .city-hero{background:var(--cream);padding:40px 0 30px;text-align:center}
     .city-hero .section-title{margin-top:12px}
-    .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px;margin-top:40px}
+    .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px;margin-top:20px}
+    .section.city-section{padding-top:24px}
     .city-card{background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:30px 28px;transition:all .25s var(--ease-out);text-decoration:none;color:var(--ink)}
     .city-card:hover{border-color:var(--blue-700);transform:translateY(-3px);box-shadow:0 14px 32px -14px rgba(15,46,92,.18)}
     .city-card h3{font-family:var(--display);font-weight:600;font-size:22px;margin-bottom:6px;letter-spacing:-.01em}
@@ -83,7 +84,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section city-section">
     <div class="container">
       <div id="cities" class="city-loading"><div class="spin"></div><p style="margin-top:16px">Loading cities&hellip;</p></div>
 

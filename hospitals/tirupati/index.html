@@ -26,12 +26,13 @@
   <link rel="stylesheet" href="/styles.css" />
 
   <style>
-    .city-hero{background:var(--cream);padding:60px 0 50px}
+    .city-hero{background:var(--cream);padding:40px 0 24px}
+    .section.city-section{padding-top:20px}
     .city-hero .section-title{margin-top:12px}
     .breadcrumb{font-size:13.5px;color:var(--muted);margin-bottom:8px}
     .breadcrumb a{color:var(--muted)}.breadcrumb a:hover{color:var(--ink)}
 
-    .hospital-list{display:flex;flex-direction:column;gap:24px;margin-top:32px}
+    .hospital-list{display:flex;flex-direction:column;gap:24px;margin-top:16px}
     .hospital-card{background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:30px 28px;transition:border-color .25s}
     .hospital-card:hover{border-color:var(--blue-700)}
     .hospital-header{display:flex;align-items:center;gap:18px;margin-bottom:14px}
@@ -110,7 +111,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section city-section">
     <div class="container">
       <div id="hospitals" class="city-loading"><div class="spin"></div><p style="margin-top:16px">Loading hospitals&hellip;</p></div>
 
