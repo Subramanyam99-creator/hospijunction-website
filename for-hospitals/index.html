@@ -513,12 +513,15 @@
 
         btn.disabled = true;
         btn.textContent = 'Creating account...';
-
-        // Create Firebase Auth account
-        const userCred = await fb.createUserWithEmailAndPassword(data.contact_email, data.password);
-        firebaseUid = userCred.user.uid;
-        await userCred.user.updateProfile({ displayName: data.contact_name });
       }
+
+      try {
+        if (!window._googleSignUp) {
+          // Create Firebase Auth account
+          const userCred = await fb.createUserWithEmailAndPassword(data.contact_email, data.password);
+          firebaseUid = userCred.user.uid;
+          await userCred.user.updateProfile({ displayName: data.contact_name });
+        }
 
         btn.textContent = 'Saving details...';
 
