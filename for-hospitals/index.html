@@ -792,7 +792,7 @@
         btn.innerHTML = 'Saving hospital details...';
 
         // 2. Insert into hospital_profiles
-        var { data: insertedRows, error: dbError } = await sb
+        var { error: dbError } = await sb
           .from('hospital_profiles')
           .insert({
             name: data.hospital_name,
@@ -807,15 +807,14 @@
             registration_number: data.registration_number || null,
             is_active: false,
             is_verified: false
-          })
-          .select('id');
+          });
 
         if (dbError) {
           console.error('Supabase insert error:', dbError);
           throw new Error('Could not save hospital details. Please try again.');
         }
 
-        var hospitalId = insertedRows && insertedRows[0] ? insertedRows[0].id : firebaseUid;
+        var hospitalId = firebaseUid;
 
         // 3. Upload documents (if provided)
         btn.innerHTML = 'Uploading documents...';
