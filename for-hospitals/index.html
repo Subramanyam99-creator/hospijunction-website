@@ -292,6 +292,17 @@
 
           <div class="form-row-half">
             <div class="form-row">
+              <label for="password">Create password *</label>
+              <input type="password" id="password" name="password" required minlength="6" placeholder="Min 6 characters" />
+            </div>
+            <div class="form-row">
+              <label for="confirm-password">Confirm password *</label>
+              <input type="password" id="confirm-password" name="confirm_password" required minlength="6" placeholder="Re-enter password" />
+            </div>
+          </div>
+
+          <div class="form-row-half">
+            <div class="form-row">
               <label for="hospital-type">Hospital type</label>
               <select id="hospital-type" name="hospital_type">
                 <option value="">Select type</option>
@@ -320,7 +331,7 @@
 
         <div class="form-success" id="form-success">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--blue-700);margin-bottom:12px"><circle cx="12" cy="12" r="10"/><polyline points="16 8 10 16 7 13"/></svg>
-          <p>Thank you! Your registration has been received.<br />Our team will contact you within 24-48 hours.</p>
+          <p>Thank you! Your account has been created.<br />Our team will verify your hospital within 24-48 hours.<br /><br />You can now <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" target="_blank" rel="noopener" style="color:var(--blue-700);font-weight:700">download the app</a> and log in with your email &amp; password.</p>
         </div>
       </div>
     </div>
@@ -388,39 +399,119 @@
     </div>
   </footer>
 
+  <!-- Firebase SDK (compat for simple usage on static site) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Firebase init
+    firebase.initializeApp({
+      apiKey: "AIzaSyD73bUT1PmaHTlSCMz8hRO3OrAb54PoHi8",
+      authDomain: "hospijunction-37aa0.firebaseapp.com",
+      projectId: "hospijunction-37aa0",
+      storageBucket: "hospijunction-37aa0.firebasestorage.app",
+      messagingSenderId: "792451871538",
+      appId: "1:792451871538:web:03d2c719f73ec6d3af9d2b"
+    });
+
+    // Supabase init
+    const sb = supabase.createClient(
+      'https://xamjhwkclcftbyjpzvnq.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhbWpod2tjbGNmdGJ5anB6dm5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwNTcxNzYsImV4cCI6MjA2MjYzMzE3Nn0.sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM'
+    );
 
     async function submitForm(e) {
       e.preventDefault();
       const btn = document.getElementById('submit-btn');
-      btn.disabled = true;
-      btn.textContent = 'Submitting...';
-
       const form = document.getElementById('hospital-form');
       const data = Object.fromEntries(new FormData(form));
 
+      // Validate passwords match
+      if (data.password !== data.confirm_password) {
+        alert('Passwords do not match. Please re-enter.');
+        return false;
+      }
+      if (data.password.length < 6) {
+        alert('Password must be at least 6 characters.');
+        return false;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+
       try {
-        // Send to email via formsubmit.co (free, no backend needed)
-        const resp = await fetch('https://formsubmit.co/ajax/admin@hospijunction.com', {
+        // Step 1: Create Firebase Auth account
+        const userCred = await firebase.auth().createUserWithEmailAndPassword(data.contact_email, data.password);
+        const firebaseUid = userCred.user.uid;
+
+        // Update display name
+        await userCred.user.updateProfile({ displayName: data.contact_name });
+
+        btn.textContent = 'Saving details...';
+
+        // Step 2: Save registration to Supabase
+        const { error: dbError } = await sb
+          .from('hospital_registrations')
+          .insert({
+            firebase_uid: firebaseUid,
+            hospital_name: data.hospital_name,
+            city: data.city,
+            state: data.state,
+            address: data.address,
+            contact_name: data.contact_name,
+            phone: data.contact_phone,
+            email: data.contact_email,
+            hospital_type: data.hospital_type || null,
+            num_doctors: data.num_doctors ? parseInt(data.num_doctors) : null,
+            message: data.message || null
+          });
+
+        if (dbError) console.error('Supabase insert error:', dbError);
+
+        // Step 3: Send email notification to admin (fire & forget)
+        fetch('https://formsubmit.co/ajax/admin@hospijunction.com', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({
-            _subject: 'New Hospital Registration: ' + data.hospital_name,
-            ...data
+            _subject: '🏥 New Hospital Registration: ' + data.hospital_name,
+            'Hospital Name': data.hospital_name,
+            'City': data.city,
+            'State': data.state,
+            'Address': data.address,
+            'Contact Person': data.contact_name,
+            'Phone': data.contact_phone,
+            'Email': data.contact_email,
+            'Hospital Type': data.hospital_type || '-',
+            'Number of Doctors': data.num_doctors || '-',
+            'Message': data.message || '-',
+            'Firebase UID': firebaseUid,
+            'Registered At': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
           })
-        });
+        }).catch(() => {}); // don't block on email
 
-        if (resp.ok) {
-          form.style.display = 'none';
-          document.getElementById('form-success').style.display = 'block';
-        } else {
-          throw new Error('Failed');
-        }
+        // Success
+        form.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+
       } catch (err) {
         btn.disabled = false;
         btn.textContent = 'Submit registration';
-        alert('Could not submit. Please try again or email us at admin@hospijunction.com');
+
+        if (err.code === 'auth/email-already-in-use') {
+          alert('This email is already registered. Please log in through the app, or use a different email.');
+        } else if (err.code === 'auth/weak-password') {
+          alert('Password is too weak. Please use at least 6 characters.');
+        } else if (err.code === 'auth/invalid-email') {
+          alert('Please enter a valid email address.');
+        } else {
+          alert('Registration failed: ' + (err.message || 'Please try again or email us at admin@hospijunction.com'));
+          console.error(err);
+        }
       }
       return false;
     }
