@@ -6,66 +6,18 @@
   <title>HospiJunction — Skip the wait. Book your doctor in 30 seconds.</title>
   <meta name="description" content="HospiJunction is an Indian doctor appointment booking platform. Find verified hospitals near you, book OPD slots, and get a stable token number — all for a flat ₹20 platform fee." />
   <meta name="theme-color" content="#0F2E5C" />
-
+  
   <!-- Favicon -->
-  <link rel="icon" href="/favicon.ico" sizes="48x48" />
-  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
-  <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <!-- Canonical -->
-  <link rel="canonical" href="https://www.hospijunction.com/" />
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
   <!-- Open Graph / social -->
   <meta property="og:title" content="HospiJunction — Book your doctor in 30 seconds" />
   <meta property="og:description" content="Verified hospitals. Stable tokens. ₹20 flat platform fee. Pay consultation directly at the hospital." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.hospijunction.com/" />
-  <meta property="og:image" content="https://www.hospijunction.com/og-image.png" />
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="HospiJunction — Book your doctor in 30 seconds" />
-  <meta name="twitter:description" content="Verified hospitals. Stable tokens. ₹20 flat platform fee." />
-  <meta name="twitter:image" content="https://www.hospijunction.com/og-image.png" />
-
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "MedicalBusiness",
-    "name": "HospiJunction",
-    "url": "https://www.hospijunction.com",
-    "logo": "https://www.hospijunction.com/favicon-192.png",
-    "description": "Book doctor appointments at verified hospitals across India. Flat ₹20 platform fee.",
-    "areaServed": { "@type": "Country", "name": "India" },
-    "sameAs": [
-      "https://play.google.com/store/apps/details?id=com.hospijunction.app"
-    ],
-    "offers": {
-      "@type": "Offer",
-      "price": "20",
-      "priceCurrency": "INR",
-      "description": "Platform fee per booking"
-    }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "HospiJunction",
-    "operatingSystem": "Android",
-    "applicationCategory": "HealthApplication",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "INR"
-    },
-    "installUrl": "https://play.google.com/store/apps/details?id=com.hospijunction.app",
-    "description": "Book doctor appointments at verified hospitals across India. Get a stable token number for just ₹20 platform fee."
-  }
-  </script>
+  <meta property="og:url" content="https://hospijunction.com/" />
 
   <!-- Fonts: Fraunces (display serif) + DM Sans (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -73,6 +25,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    #find{scroll-margin-top:80px}
+    .search-wrap{max-width:600px;margin:0 auto 28px;position:relative}
+    .search-input{width:100%;padding:16px 20px 16px 48px;font-size:16px;font-family:var(--body);border:2px solid var(--border-2);border-radius:var(--radius-sm);background:var(--white);color:var(--ink);outline:none;transition:border-color .2s;box-sizing:border-box}
+    .search-input:focus{border-color:var(--blue-700)}
+    .search-input::placeholder{color:var(--muted)}
+    .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+    .sr-card{background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-sm);padding:20px;display:flex;gap:16px;align-items:center;margin-bottom:14px;transition:border-color .2s}
+    .sr-card:hover{border-color:var(--blue-700)}
+    .sr-logo{width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--border-2);flex-shrink:0}
+    .sr-logo-ph{width:56px;height:56px;border-radius:10px;background:var(--blue-50);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:20px;color:var(--blue-700);flex-shrink:0}
+    .sr-info{flex:1;min-width:0}
+    .sr-info h3{font-family:var(--display);font-weight:600;font-size:17px;color:var(--ink);margin-bottom:3px}
+    .sr-info p{font-size:13px;color:var(--muted);margin:0}
+    .sr-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+    .sr-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .sr-btn-book{background:var(--blue-700);color:var(--white)}.sr-btn-book:hover{background:var(--blue-900)}
+    .sr-btn-wa{background:#25D366;color:#fff}.sr-btn-wa:hover{background:#1ebe57}
+    .sr-btn-copy{background:var(--cream);color:var(--ink);border:1px solid var(--border-2)}.sr-btn-copy:hover{background:var(--border)}
+    .sr-btn-copy.copied{background:#22c55e;color:#fff;border-color:#22c55e}
+    .sr-empty{text-align:center;padding:24px;color:var(--muted);font-size:14px}
+    .sr-hint{text-align:center;color:var(--muted);font-size:14px}
+    @media(max-width:600px){
+      .sr-card{flex-direction:column;text-align:center}
+      .sr-actions{justify-content:center}
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -87,9 +69,9 @@
         <span class="logo-text">HospiJunction</span>
       </a>
       <nav class="nav-links">
+        <a href="#find">Find hospital</a>
         <a href="#how">How it works</a>
         <a href="#pricing">Pricing</a>
-        <a href="#why">Why us</a>
         <a href="/legal/">Legal</a>
         <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
       </nav>
@@ -131,13 +113,13 @@
               <small>GET IT ON</small>
               <strong>Google Play</strong>
             </span>
-          </a>
+          </a> 
 
           <div class="hero-download-qr">
             <img src="data:image/png;base64,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" alt="Scan to download HospiJunction on Google Play" class="qr-box" width="100" height="100" loading="lazy" />
             <span class="qr-caption">Scan to<br />download</span>
           </div>
-        </div>
+          </div>
 
         <p class="hero-meta">
           <span class="pulse-dot" aria-hidden="true"></span>
@@ -170,6 +152,22 @@
         </div>
         <div class="hero-card-stamp">Confirmed</div>
       </aside>
+    </div>
+  </section>
+
+  <!-- FIND & BOOK -->
+  <section id="find" class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow eyebrow-center">Find &amp; Book</span>
+        <h2 class="section-title">Search your hospital</h2>
+        <p class="section-sub">Find a hospital, book an appointment, or share the link on WhatsApp.</p>
+      </div>
+      <div class="search-wrap">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="hospital-search" placeholder="Type hospital name or city..." autocomplete="off" />
+      </div>
+      <div id="search-results"><div class="sr-hint">Start typing to search verified hospitals</div></div>
     </div>
   </section>
 
@@ -303,12 +301,12 @@
         <p class="section-sub">Read the full versions any time. We update these whenever something material changes.</p>
       </div>
       <div class="legal-grid">
-        <a href="/legal/terms.html" class="legal-card"><h3>Terms &amp; Conditions</h3><p>The rules of using HospiJunction.</p><span class="legal-card-arrow">→</span></a>
+        <a href="/legal/terms.html"   class="legal-card"><h3>Terms &amp; Conditions</h3><p>The rules of using HospiJunction.</p><span class="legal-card-arrow">→</span></a>
         <a href="/legal/privacy.html" class="legal-card"><h3>Privacy Policy</h3><p>What we collect, why, and how it's protected.</p><span class="legal-card-arrow">→</span></a>
-        <a href="/legal/refund.html" class="legal-card"><h3>Refund &amp; Cancellation</h3><p>Reschedule freely. Refunds when the hospital cancels.</p><span class="legal-card-arrow">&rarr;</span></a>
+        <a href="/legal/refund.html"  class="legal-card"><h3>Refund &amp; Cancellation</h3><p>Reschedule freely. Refunds when the hospital cancels.</p><span class="legal-card-arrow">&rarr;</span></a>
         <a href="/legal/account-deletion.html" class="legal-card"><h3>Delete Account</h3><p>How to request account deletion and what data is removed.</p><span class="legal-card-arrow">&rarr;</span></a>
         <a href="/legal/contact.html" class="legal-card"><h3>Contact Us</h3><p>How to reach support, privacy, or grievance teams.</p><span class="legal-card-arrow">&rarr;</span></a>
-        <a href="/legal/about.html" class="legal-card"><h3>About</h3><p>Who we are and what we believe.</p><span class="legal-card-arrow">→</span></a>
+        <a href="/legal/about.html"   class="legal-card"><h3>About</h3><p>Who we are and what we believe.</p><span class="legal-card-arrow">→</span></a>
       </div>
     </div>
   </section>
@@ -365,6 +363,97 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Supabase search
+    const SUPABASE_URL  = "https://xamjhwkclcftbyjpzvnq.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+    const APP_URL = "https://play.google.com/store/apps/details?id=com.hospijunction.app";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let allHospitals = null;
+    let searchTimeout = null;
+
+    function escH(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function slug(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
+    function initials(name) { return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase(); }
+
+    function waUrl(h) {
+      const link = 'https://www.hospijunction.com/book/' + slug(h.name) + '/';
+      const msg = 'Book your appointment at *' + h.name + '*' + (h.city ? ', ' + h.city : '') + ' through HospiJunction.\n\n✅ Stable token number\n✅ No queue\n✅ ₹20 flat fee\n\nBook now: ' + link;
+      return 'https://wa.me/?text=' + encodeURIComponent(msg);
+    }
+
+    function copyLink(btn, name) {
+      const url = 'https://www.hospijunction.com/book/' + slug(name) + '/';
+      navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy link'; }, 2000);
+      });
+    }
+
+    async function loadHospitals() {
+      if (allHospitals) return allHospitals;
+      const { data, error } = await sb
+        .from('hospital_profiles')
+        .select('id, name, city, state, address, hospital_type, logo_url, rating, total_reviews')
+        .eq('is_active', true)
+        .eq('is_verified', true)
+        .order('name');
+      if (error) throw error;
+      allHospitals = data || [];
+      return allHospitals;
+    }
+
+    function renderResults(hospitals) {
+      const box = document.getElementById('search-results');
+      if (hospitals.length === 0) {
+        box.innerHTML = '<div class="sr-empty">No hospitals found. Try a different name or city.</div>';
+        return;
+      }
+      let html = '';
+      hospitals.forEach(h => {
+        const s = slug(h.name);
+        const bookUrl = '/book/?h=' + s;
+        html += '<div class="sr-card">';
+        html += h.logo_url
+          ? '<img src="' + escH(h.logo_url) + '" alt="' + escH(h.name) + '" class="sr-logo" loading="lazy" />'
+          : '<div class="sr-logo-ph">' + initials(h.name) + '</div>';
+        html += '<div class="sr-info"><h3>' + escH(h.name) + '</h3>';
+        html += '<p>' + (h.city ? escH(h.city) : '') + (h.state ? ', ' + escH(h.state) : '');
+        if (h.rating) html += ' · ⭐ ' + h.rating;
+        html += '</p></div>';
+        html += '<div class="sr-actions">';
+        html += '<a href="' + bookUrl + '" class="sr-btn sr-btn-book">Book</a>';
+        html += '<a href="' + waUrl(h) + '" target="_blank" rel="noopener" class="sr-btn sr-btn-wa">';
+        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>';
+        html += '<button class="sr-btn sr-btn-copy" onclick="copyLink(this,\'' + escH(h.name).replace(/'/g, "\\'") + '\')">Copy link</button>';
+        html += '</div></div>';
+      });
+      box.innerHTML = html;
+    }
+
+    document.getElementById('hospital-search').addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      const q = this.value.trim().toLowerCase();
+      if (q.length < 2) {
+        document.getElementById('search-results').innerHTML = '<div class="sr-hint">Start typing to search verified hospitals</div>';
+        return;
+      }
+      searchTimeout = setTimeout(async () => {
+        try {
+          const list = await loadHospitals();
+          const filtered = list.filter(h =>
+            h.name.toLowerCase().includes(q) ||
+            (h.city && h.city.toLowerCase().includes(q)) ||
+            (h.state && h.state.toLowerCase().includes(q))
+          );
+          renderResults(filtered);
+        } catch (e) {
+          document.getElementById('search-results').innerHTML = '<div class="sr-empty">Could not search. Try again.</div>';
+        }
+      }, 300);
+    });
   </script>
 </body>
 </html>
