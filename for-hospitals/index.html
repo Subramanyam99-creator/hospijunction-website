@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>List Your Hospital on HospiJunction — Grow Your Patient Base</title>
+  <meta name="description" content="Join HospiJunction to get more patients, manage OPD appointments digitally, and grow your hospital's online presence. Zero setup cost. No commission on consultations." />
+  <meta name="theme-color" content="#0F2E5C" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <meta property="og:title" content="List Your Hospital on HospiJunction" />
+  <meta property="og:description" content="Get more patients, manage OPD digitally, and grow your online presence. Zero setup cost." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://hospijunction.com/for-hospitals/" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/styles.css" />
+
+  <style>
+    /* Hero */
+    .h-hero{background:linear-gradient(135deg,var(--blue-900) 0%,#1A56B5 100%);color:var(--white);padding:80px 0 60px;position:relative;overflow:hidden}
+    .h-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(255,255,255,.05) 0%,transparent 70%);border-radius:50%}
+    .h-hero h1{font-family:var(--display);font-weight:700;font-size:clamp(32px,5vw,52px);line-height:1.15;margin-bottom:18px;position:relative}
+    .h-hero p{font-size:18px;line-height:1.7;color:rgba(255,255,255,.8);max-width:600px;margin-bottom:28px;position:relative}
+    .h-hero .btn-primary{background:var(--white);color:var(--blue-900);font-size:16px;padding:14px 32px}
+    .h-hero .btn-primary:hover{background:var(--cream)}
+    .h-hero .btn-ghost{color:var(--white);border-color:rgba(255,255,255,.3)}
+    .h-hero .btn-ghost:hover{background:rgba(255,255,255,.1)}
+    .hero-cta-row{display:flex;gap:14px;flex-wrap:wrap}
+
+    /* Stats */
+    .stats-bar{background:var(--white);border-bottom:1px solid var(--border-2);padding:28px 0}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center}
+    .stat-num{font-family:var(--display);font-weight:700;font-size:32px;color:var(--blue-700);margin-bottom:4px}
+    .stat-label{font-size:13px;color:var(--muted);font-weight:500}
+    @media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+
+    /* Benefits */
+    .benefits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;margin-top:8px}
+    .benefit-card{background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:32px 28px;transition:border-color .25s}
+    .benefit-card:hover{border-color:var(--blue-700)}
+    .benefit-icon{width:52px;height:52px;border-radius:12px;background:var(--blue-50);display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--blue-700)}
+    .benefit-card h3{font-family:var(--display);font-weight:600;font-size:19px;color:var(--ink);margin-bottom:8px}
+    .benefit-card p{font-size:14.5px;color:var(--muted);line-height:1.65}
+
+    /* How it works */
+    .how-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px;margin-top:8px;counter-reset:step}
+    .how-step{position:relative;padding:28px;background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg)}
+    .how-step::before{counter-increment:step;content:counter(step);font-family:var(--display);font-weight:800;font-size:40px;color:var(--blue-50);position:absolute;top:16px;right:20px}
+    .how-step h3{font-family:var(--display);font-weight:600;font-size:17px;color:var(--ink);margin-bottom:8px}
+    .how-step p{font-size:14px;color:var(--muted);line-height:1.6}
+
+    /* Pricing */
+    .pricing-simple{max-width:500px;margin:8px auto 0;background:var(--white);border:2px solid var(--blue-700);border-radius:var(--radius-lg);padding:40px;text-align:center}
+    .pricing-simple .price-big{font-family:var(--display);font-weight:700;font-size:48px;color:var(--blue-700)}
+    .pricing-simple .price-label{font-size:15px;color:var(--muted);margin-bottom:20px}
+    .pricing-simple ul{text-align:left;list-style:none;padding:0;margin:20px 0}
+    .pricing-simple li{padding:8px 0;font-size:14.5px;color:var(--ink);border-bottom:1px solid var(--border)}
+    .pricing-simple li::before{content:'✓';color:var(--blue-700);font-weight:700;margin-right:10px}
+    .pricing-simple li:last-child{border-bottom:none}
+
+    /* Registration form */
+    .reg-form{max-width:600px;margin:8px auto 0;background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:40px}
+    .reg-form h3{font-family:var(--display);font-weight:600;font-size:22px;color:var(--ink);margin-bottom:6px;text-align:center}
+    .reg-form .form-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:28px}
+    .form-row{margin-bottom:18px}
+    .form-row label{display:block;font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:6px}
+    .form-row input,.form-row select,.form-row textarea{width:100%;padding:12px 16px;font-size:15px;font-family:var(--body);border:1.5px solid var(--border-2);border-radius:var(--radius-sm);background:var(--white);color:var(--ink);outline:none;transition:border-color .2s;box-sizing:border-box}
+    .form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:var(--blue-700)}
+    .form-row textarea{resize:vertical;min-height:80px}
+    .form-row-half{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:500px){.form-row-half{grid-template-columns:1fr}}
+    .form-submit{width:100%;padding:14px;font-size:16px;font-weight:600;font-family:var(--body);background:var(--blue-700);color:var(--white);border:none;border-radius:var(--radius-sm);cursor:pointer;transition:background .2s}
+    .form-submit:hover{background:var(--blue-900)}
+    .form-submit:disabled{background:var(--muted);cursor:not-allowed}
+    .form-success{text-align:center;padding:40px;color:var(--blue-700);font-size:16px;font-weight:600;display:none}
+    .form-note{text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px}
+
+    /* FAQ */
+    .faq-list{max-width:700px;margin:8px auto 0}
+    .faq-item{border-bottom:1px solid var(--border-2);padding:20px 0}
+    .faq-q{font-family:var(--display);font-weight:600;font-size:16px;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+    .faq-q::after{content:'+';font-size:22px;color:var(--muted);transition:transform .2s}
+    .faq-item.open .faq-q::after{transform:rotate(45deg)}
+    .faq-a{font-size:14.5px;color:var(--muted);line-height:1.65;max-height:0;overflow:hidden;transition:max-height .3s,padding .3s}
+    .faq-item.open .faq-a{max-height:200px;padding-top:12px}
+  </style>
+</head>
+<body>
+
+  <div class="brand-line"></div>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">HJ</span>
+        <span class="logo-text">HospiJunction</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/#how">How it works</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/hospitals/">Hospitals</a>
+        <a href="/legal/">Legal</a>
+        <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="h-hero">
+    <div class="container">
+      <h1>Grow your hospital.<br />Digitise your OPD.</h1>
+      <p>HospiJunction brings patients directly to your hospital. Zero setup cost, zero commission on consultations. We handle the bookings — you focus on patient care.</p>
+      <div class="hero-cta-row">
+        <a href="#register" class="btn btn-primary">Register your hospital</a>
+        <a href="#benefits" class="btn btn-ghost">See the benefits</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div><div class="stat-num">₹0</div><div class="stat-label">Setup cost</div></div>
+        <div><div class="stat-num">₹0</div><div class="stat-label">Commission</div></div>
+        <div><div class="stat-num">₹20</div><div class="stat-label">Per booking (patient pays)</div></div>
+        <div><div class="stat-num">24/7</div><div class="stat-label">Online bookings</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section id="benefits" class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow eyebrow-center">Why join HospiJunction</span>
+        <h2 class="section-title">Everything your hospital needs to grow</h2>
+      </div>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <h3>More patients, less effort</h3>
+          <p>Patients find and book your hospital online. Get discovered on Google, WhatsApp shares, and the HospiJunction app without marketing spend.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h3>Digital OPD management</h3>
+          <p>Manage your OPD schedule, doctor availability, and patient queue digitally. No more manual registers or phone-tag booking.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </div>
+          <h3>Reduce no-shows</h3>
+          <p>Patients get push notifications, stable token numbers, and can reschedule easily. Result: fewer empty slots, happier doctors.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7 8-13a8 8 0 00-16 0c0 6 8 13 8 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          </div>
+          <h3>Google My Business ready</h3>
+          <p>Get a direct booking link for your Google Business Profile. Patients searching on Google Maps can book instantly.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>Verified badge</h3>
+          <p>Every hospital on HospiJunction is manually verified. Your verified badge builds patient trust and sets you apart from unverified listings.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <h3>Zero financial risk</h3>
+          <p>No setup fees, no monthly charges, no commission on consultation fees. The ₹20 platform fee is paid entirely by the patient.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS FOR HOSPITALS -->
+  <section class="section section-cream">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow eyebrow-center">Getting started</span>
+        <h2 class="section-title">How it works for hospitals</h2>
+      </div>
+      <div class="how-steps">
+        <div class="how-step">
+          <h3>Register online</h3>
+          <p>Fill in your hospital details below. Our team will verify your registration within 24-48 hours.</p>
+        </div>
+        <div class="how-step">
+          <h3>Add your doctors</h3>
+          <p>List your doctors with their specializations, OPD timings, and consultation fees through our admin panel.</p>
+        </div>
+        <div class="how-step">
+          <h3>Go live</h3>
+          <p>Once verified, your hospital appears on the app and website. Patients can start booking immediately.</p>
+        </div>
+        <div class="how-step">
+          <h3>Manage from admin panel</h3>
+          <p>View bookings, manage schedules, update doctor availability, and track your hospital's performance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow eyebrow-center">Hospital pricing</span>
+        <h2 class="section-title">Simple, transparent pricing</h2>
+        <p class="section-sub">No hidden fees. No surprises. You earn from consultations — we never take a cut.</p>
+      </div>
+      <div class="pricing-simple">
+        <div class="price-big">FREE</div>
+        <div class="price-label">for hospitals — always</div>
+        <ul>
+          <li>Zero registration or setup fee</li>
+          <li>Zero monthly subscription</li>
+          <li>Zero commission on consultation fees</li>
+          <li>Unlimited doctor listings</li>
+          <li>Admin panel access</li>
+          <li>Google My Business booking link</li>
+          <li>Patient pays ₹20 platform fee per booking</li>
+          <li>Dedicated support for onboarding</li>
+        </ul>
+        <a href="#register" class="btn btn-primary" style="display:inline-block;width:auto;padding:14px 40px">Register now — it's free</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTRATION FORM -->
+  <section id="register" class="section section-cream" style="scroll-margin-top:80px">
+    <div class="container">
+      <div class="reg-form">
+        <h3>Register your hospital</h3>
+        <p class="form-sub">Fill in the details below and our team will reach out within 24-48 hours.</p>
+
+        <form id="hospital-form" onsubmit="return submitForm(event)">
+          <div class="form-row">
+            <label for="hospital-name">Hospital / Clinic name *</label>
+            <input type="text" id="hospital-name" name="hospital_name" required placeholder="e.g. Apollo Hospital" />
+          </div>
+
+          <div class="form-row-half">
+            <div class="form-row">
+              <label for="city">City *</label>
+              <input type="text" id="city" name="city" required placeholder="e.g. Tirupati" />
+            </div>
+            <div class="form-row">
+              <label for="state">State *</label>
+              <input type="text" id="state" name="state" required placeholder="e.g. Andhra Pradesh" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="address">Full address *</label>
+            <input type="text" id="address" name="address" required placeholder="Street, area, pincode" />
+          </div>
+
+          <div class="form-row-half">
+            <div class="form-row">
+              <label for="contact-name">Contact person name *</label>
+              <input type="text" id="contact-name" name="contact_name" required placeholder="Your name" />
+            </div>
+            <div class="form-row">
+              <label for="contact-phone">Phone number *</label>
+              <input type="tel" id="contact-phone" name="contact_phone" required placeholder="e.g. 9876543210" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="contact-email">Email address *</label>
+            <input type="email" id="contact-email" name="contact_email" required placeholder="hospital@example.com" />
+          </div>
+
+          <div class="form-row-half">
+            <div class="form-row">
+              <label for="hospital-type">Hospital type</label>
+              <select id="hospital-type" name="hospital_type">
+                <option value="">Select type</option>
+                <option value="Hospital">Hospital</option>
+                <option value="Clinic">Clinic</option>
+                <option value="Nursing Home">Nursing Home</option>
+                <option value="Diagnostic Centre">Diagnostic Centre</option>
+                <option value="Multi-Speciality">Multi-Speciality</option>
+                <option value="Super-Speciality">Super-Speciality</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="num-doctors">Number of doctors</label>
+              <input type="number" id="num-doctors" name="num_doctors" placeholder="e.g. 5" min="1" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="message">Anything else you'd like us to know?</label>
+            <textarea id="message" name="message" placeholder="Specializations, existing software, questions, etc."></textarea>
+          </div>
+
+          <button type="submit" class="form-submit" id="submit-btn">Submit registration</button>
+          <p class="form-note">We'll never share your details with third parties. By registering, you agree to our <a href="/legal/terms.html">Terms</a>.</p>
+        </form>
+
+        <div class="form-success" id="form-success">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--blue-700);margin-bottom:12px"><circle cx="12" cy="12" r="10"/><polyline points="16 8 10 16 7 13"/></svg>
+          <p>Thank you! Your registration has been received.<br />Our team will contact you within 24-48 hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow eyebrow-center">FAQ</span>
+        <h2 class="section-title">Common questions from hospitals</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Is there any cost to register?</div>
+          <div class="faq-a">No. Registration, setup, and listing on HospiJunction is completely free for hospitals. The ₹20 platform fee is paid by patients, not hospitals.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Do you take commission on consultation fees?</div>
+          <div class="faq-a">Never. Consultation fees are paid directly by the patient to the hospital. We never take a percentage or commission on doctor fees.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How long does verification take?</div>
+          <div class="faq-a">Our team verifies hospital registrations within 24-48 hours. We may call or visit to confirm details before making your listing live.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I manage my hospital listing myself?</div>
+          <div class="faq-a">Yes. Once verified, you get access to our admin panel where you can add/edit doctors, manage OPD schedules, view bookings, and update hospital information.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What if a patient cancels?</div>
+          <div class="faq-a">If a patient cancels, the ₹20 platform fee is non-refundable (they keep their slot credit for rebooking). If the hospital cancels, the patient gets a full refund automatically.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do patients find my hospital?</div>
+          <div class="faq-a">Your hospital appears on the HospiJunction app (Google Play), our website with SEO-optimized pages, and through WhatsApp links. You also get a direct booking link for your Google My Business profile.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section-cream" style="text-align:center">
+    <div class="container">
+      <h2 class="section-title">Ready to grow your patient base?</h2>
+      <p class="section-sub" style="margin-bottom:24px">Join HospiJunction today. Zero cost. Zero risk. More patients.</p>
+      <a href="#register" class="btn btn-primary" style="font-size:16px;padding:14px 40px">Register your hospital — free</a>
+      <p style="margin-top:16px;font-size:14px;color:var(--muted)">Or email us at <a href="mailto:admin@hospijunction.com" style="color:var(--blue-700);font-weight:600">admin@hospijunction.com</a></p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">HJ</span><span class="logo-text">HospiJunction</span></div>
+        <p class="footer-tag">An Indian healthcare booking platform. We are a technology facilitator &mdash; not a healthcare provider. In a medical emergency, call <strong>108</strong>.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><a href="/#how">How it works</a><a href="/#pricing">Pricing</a><a href="/hospitals/">Hospitals</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="/legal/terms.html">Terms</a><a href="/legal/privacy.html">Privacy</a><a href="/legal/refund.html">Refund</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/legal/about.html">About</a><a href="/legal/contact.html">Contact</a></div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; <span id="year">2026</span> HospiJunction. All rights reserved.</span>
+      <span>Made in India</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    async function submitForm(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      const form = document.getElementById('hospital-form');
+      const data = Object.fromEntries(new FormData(form));
+
+      try {
+        // Send to email via formsubmit.co (free, no backend needed)
+        const resp = await fetch('https://formsubmit.co/ajax/admin@hospijunction.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            _subject: 'New Hospital Registration: ' + data.hospital_name,
+            ...data
+          })
+        });
+
+        if (resp.ok) {
+          form.style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          throw new Error('Failed');
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Submit registration';
+        alert('Could not submit. Please try again or email us at admin@hospijunction.com');
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>

@@ -69,10 +69,27 @@
     .sr-btn-copy.copied{background:#22c55e;color:#fff;border-color:#22c55e}
     .sr-empty{text-align:center;padding:24px;color:var(--muted);font-size:14px}
     .sr-hint{text-align:center;color:var(--muted);font-size:14px}
+    .sr-section-label{font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:14px 20px 6px;border-bottom:1px solid var(--border)}
+    .sr-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;background:var(--blue-50);color:var(--blue-700);margin-left:6px}
+    .sr-doc-spec{font-size:12px;color:var(--blue-700);font-weight:500}
     @media(max-width:600px){
       .sr-card{flex-direction:column;text-align:center}
       .sr-actions{justify-content:center}
     }
+
+    /* Nav search doctor items */
+    .nr-doc-badge{width:40px;height:40px;border-radius:50%;background:var(--blue-700);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:var(--white);flex-shrink:0}
+    .nr-doc-photo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--border-2);flex-shrink:0}
+
+    /* Testimonials */
+    .testimonials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;margin-top:8px}
+    .testimonial-card{background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:28px;position:relative}
+    .testimonial-stars{color:#F59E0B;font-size:16px;margin-bottom:12px;letter-spacing:2px}
+    .testimonial-text{font-size:15px;line-height:1.7;color:var(--ink);margin-bottom:16px;font-style:italic}
+    .testimonial-author{display:flex;align-items:center;gap:12px}
+    .testimonial-avatar{width:44px;height:44px;border-radius:50%;background:var(--blue-50);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:16px;color:var(--blue-700)}
+    .testimonial-name{font-family:var(--display);font-weight:600;font-size:15px;color:var(--ink)}
+    .testimonial-meta{font-size:12.5px;color:var(--muted)}
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -91,12 +108,13 @@
       </a>
       <div class="nav-search-wrap">
         <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="nav-search" class="nav-search-input" placeholder="Search hospital or city…" autocomplete="off" />
+        <input type="text" id="nav-search" class="nav-search-input" placeholder="Search hospital, doctor, city, specialization…" autocomplete="off" />
         <div id="nav-results" class="nav-results"></div>
       </div>
       <nav class="nav-links">
         <a href="#how">How it works</a>
         <a href="#pricing">Pricing</a>
+        <a href="/for-hospitals/">For Hospitals</a>
         <a href="/legal/">Legal</a>
         <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
       </nav>
@@ -185,12 +203,12 @@
     <div class="container">
       <div class="section-head">
         <span class="eyebrow eyebrow-center">Find &amp; Book</span>
-        <h2 class="section-title">Search your hospital</h2>
-        <p class="section-sub">Find a hospital, book an appointment, or share the link on WhatsApp.</p>
+        <h2 class="section-title">Search hospitals &amp; doctors</h2>
+        <p class="section-sub">Search by hospital name, doctor name, city, or specialization.</p>
       </div>
       <div class="search-wrap">
         <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" class="search-input" id="hospital-search" placeholder="Type hospital name or city..." autocomplete="off" />
+        <input type="text" class="search-input" id="hospital-search" placeholder="Try 'cardiologist', 'Apollo', or 'Tirupati'..." autocomplete="off" />
       </div>
       <div id="search-results"><div class="sr-hint">Start typing to search verified hospitals</div></div>
     </div>
@@ -317,8 +335,54 @@
     </div>
   </section>
 
+  <!-- TESTIMONIALS -->
+  <section id="reviews" class="section section-cream">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow eyebrow-center">Patient Stories</span>
+        <h2 class="section-title">What patients are saying</h2>
+        <p class="section-sub">Real experiences from patients who booked through HospiJunction.</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"I booked my father's appointment at SVIMS Tirupati in under a minute. We got token #4 and didn't have to wait at all. The ₹20 fee is nothing compared to the time we saved."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">RK</div>
+            <div>
+              <div class="testimonial-name">Rajesh K.</div>
+              <div class="testimonial-meta">Tirupati · Booked for parent</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Finally, a booking app that actually works for small-town hospitals. I shared the WhatsApp link with my family and they could see exactly which hospital I was visiting."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">PS</div>
+            <div>
+              <div class="testimonial-name">Priya S.</div>
+              <div class="testimonial-meta">Tirupati · Regular user</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"The stable token system is brilliant. I reached 15 minutes late but my token was still valid. No arguments, no confusion. Just showed my phone and walked in."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">VR</div>
+            <div>
+              <div class="testimonial-name">Venkat R.</div>
+              <div class="testimonial-meta">Tirupati · First-time user</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- LEGAL -->
-  <section class="section section-cream">
+  <section class="section">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow eyebrow-center">Policies &amp; Legal</span>
@@ -378,6 +442,7 @@
         <h4>Company</h4>
         <a href="/legal/about.html">About</a>
         <a href="/legal/contact.html">Contact</a>
+        <a href="/for-hospitals/">For Hospitals</a>
       </div>
     </div>
     <div class="container footer-bottom">
@@ -396,6 +461,7 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
     let allHospitals = null;
+    let allDoctors = null;
     let searchTimeout = null;
 
     function escH(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
@@ -434,31 +500,71 @@
       return allHospitals;
     }
 
-    function renderResults(hospitals) {
+    async function loadDoctors() {
+      if (allDoctors) return allDoctors;
+      const { data, error } = await sb
+        .from('doctors')
+        .select('id, full_name, specialization, qualification, experience_years, consultation_fee, photo_url, hospital_id')
+        .eq('is_active', true)
+        .order('full_name');
+      if (error) throw error;
+      allDoctors = data || [];
+      return allDoctors;
+    }
+
+    async function loadAll() {
+      await Promise.all([loadHospitals(), loadDoctors()]);
+    }
+
+    function renderResults(hospitals, doctors) {
       const box = document.getElementById('search-results');
-      if (hospitals.length === 0) {
-        box.innerHTML = '<div class="sr-empty">No hospitals found. Try a different name or city.</div>';
+      if (hospitals.length === 0 && doctors.length === 0) {
+        box.innerHTML = '<div class="sr-empty">No hospitals or doctors found. Try a different search.</div>';
         return;
       }
       let html = '';
-      hospitals.forEach(h => {
-        const citySlug = h.city ? slug(h.city) : '';
-        const cityUrl = citySlug ? '/hospitals/' + citySlug + '/' : '/hospitals/';
-        html += '<div class="sr-card">';
-        html += h.logo_url
-          ? '<img src="' + escH(h.logo_url) + '" alt="' + escH(h.name) + '" class="sr-logo" loading="lazy" />'
-          : '<div class="sr-logo-ph">' + initials(h.name) + '</div>';
-        html += '<div class="sr-info"><h3>' + escH(h.name) + '</h3>';
-        html += '<p>' + (h.city ? escH(h.city) : '') + (h.state ? ', ' + escH(h.state) : '');
-        if (h.rating) html += ' · ⭐ ' + h.rating;
-        html += '</p></div>';
-        html += '<div class="sr-actions">';
-        html += '<a href="' + cityUrl + '" class="sr-btn sr-btn-book">View</a>';
-        html += '<a href="' + waUrl(h) + '" target="_blank" rel="noopener" class="sr-btn sr-btn-wa">';
-        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>';
-        html += '<button class="sr-btn sr-btn-copy" onclick="copyLink(this,\'' + escH(h.name).replace(/'/g, "\\'") + '\')">Copy link</button>';
-        html += '</div></div>';
-      });
+      if (hospitals.length > 0) {
+        html += '<div class="sr-section-label">Hospitals (' + hospitals.length + ')</div>';
+        hospitals.forEach(h => {
+          const citySlug = h.city ? slug(h.city) : '';
+          const cityUrl = citySlug ? '/hospitals/' + citySlug + '/' : '/hospitals/';
+          html += '<div class="sr-card">';
+          html += h.logo_url
+            ? '<img src="' + escH(h.logo_url) + '" alt="' + escH(h.name) + '" class="sr-logo" loading="lazy" />'
+            : '<div class="sr-logo-ph">' + initials(h.name) + '</div>';
+          html += '<div class="sr-info"><h3>' + escH(h.name) + '</h3>';
+          html += '<p>' + (h.city ? escH(h.city) : '') + (h.state ? ', ' + escH(h.state) : '');
+          if (h.rating) html += ' · ⭐ ' + h.rating;
+          html += '</p></div>';
+          html += '<div class="sr-actions">';
+          html += '<a href="' + cityUrl + '" class="sr-btn sr-btn-book">View</a>';
+          html += '<a href="' + waUrl(h) + '" target="_blank" rel="noopener" class="sr-btn sr-btn-wa">';
+          html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>';
+          html += '<button class="sr-btn sr-btn-copy" onclick="copyLink(this,\'' + escH(h.name).replace(/'/g, "\\'") + '\')">Copy link</button>';
+          html += '</div></div>';
+        });
+      }
+      if (doctors.length > 0) {
+        html += '<div class="sr-section-label">Doctors (' + doctors.length + ')</div>';
+        doctors.forEach(d => {
+          const hosp = allHospitals ? allHospitals.find(h => h.id === d.hospital_id) : null;
+          const citySlug = hosp && hosp.city ? slug(hosp.city) : '';
+          const cityUrl = citySlug ? '/hospitals/' + citySlug + '/' : '/hospitals/';
+          html += '<div class="sr-card">';
+          html += d.photo_url
+            ? '<img src="' + escH(d.photo_url) + '" alt="' + escH(d.full_name) + '" class="sr-logo" style="border-radius:50%" loading="lazy" />'
+            : '<div class="sr-logo-ph" style="border-radius:50%;background:var(--blue-700);color:#fff">' + initials(d.full_name) + '</div>';
+          html += '<div class="sr-info"><h3>' + escH(d.full_name) + '</h3>';
+          html += '<p class="sr-doc-spec">' + escH(d.specialization) + '</p>';
+          html += '<p>' + (d.qualification ? escH(d.qualification) : '') + (d.experience_years ? ' · ' + d.experience_years + ' yrs exp' : '');
+          if (hosp) html += ' · ' + escH(hosp.name);
+          if (d.consultation_fee != null) html += ' · ₹' + Number(d.consultation_fee).toLocaleString('en-IN');
+          html += '</p></div>';
+          html += '<div class="sr-actions">';
+          html += '<a href="' + cityUrl + '" class="sr-btn sr-btn-book">View Hospital</a>';
+          html += '</div></div>';
+        });
+      }
       box.innerHTML = html;
     }
 
@@ -467,18 +573,22 @@
       clearTimeout(searchTimeout);
       const q = this.value.trim().toLowerCase();
       if (q.length < 2) {
-        document.getElementById('search-results').innerHTML = '<div class="sr-hint">Start typing to search verified hospitals</div>';
+        document.getElementById('search-results').innerHTML = '<div class="sr-hint">Search by hospital name, doctor name, city, or specialization</div>';
         return;
       }
       searchTimeout = setTimeout(async () => {
         try {
-          const list = await loadHospitals();
-          const filtered = list.filter(h =>
+          await loadAll();
+          const filteredH = allHospitals.filter(h =>
             h.name.toLowerCase().includes(q) ||
             (h.city && h.city.toLowerCase().includes(q)) ||
             (h.state && h.state.toLowerCase().includes(q))
           );
-          renderResults(filtered);
+          const filteredD = allDoctors.filter(d =>
+            d.full_name.toLowerCase().includes(q) ||
+            (d.specialization && d.specialization.toLowerCase().includes(q))
+          );
+          renderResults(filteredH, filteredD);
         } catch (e) {
           document.getElementById('search-results').innerHTML = '<div class="sr-empty">Could not search. Try again.</div>';
         }
@@ -496,23 +606,38 @@
       if (q.length < 2) { navResults.classList.remove('active'); return; }
       navTimeout = setTimeout(async () => {
         try {
-          const list = await loadHospitals();
-          const filtered = list.filter(h =>
+          await loadAll();
+          const filteredH = allHospitals.filter(h =>
             h.name.toLowerCase().includes(q) ||
             (h.city && h.city.toLowerCase().includes(q)) ||
             (h.state && h.state.toLowerCase().includes(q))
-          ).slice(0, 6);
-          if (filtered.length === 0) {
-            navResults.innerHTML = '<div class="nr-empty">No hospitals found</div>';
+          ).slice(0, 4);
+          const filteredD = allDoctors.filter(d =>
+            d.full_name.toLowerCase().includes(q) ||
+            (d.specialization && d.specialization.toLowerCase().includes(q))
+          ).slice(0, 4);
+          if (filteredH.length === 0 && filteredD.length === 0) {
+            navResults.innerHTML = '<div class="nr-empty">No results found</div>';
           } else {
-            navResults.innerHTML = filtered.map(h => {
+            let html = '';
+            filteredH.forEach(h => {
               const citySlug = h.city ? slug(h.city) : '';
               const link = citySlug ? '/hospitals/' + citySlug + '/' : '/hospitals/';
-              return '<a href="' + link + '" class="nr-item">'
+              html += '<a href="' + link + '" class="nr-item">'
                 + (h.logo_url ? '<img src="' + escH(h.logo_url) + '" alt="" class="nr-logo" />' : '<div class="nr-logo-ph">' + initials(h.name) + '</div>')
-                + '<div class="nr-info"><h4>' + escH(h.name) + '</h4>'
+                + '<div class="nr-info"><h4>' + escH(h.name) + ' <span class="sr-tag">Hospital</span></h4>'
                 + '<p>' + (h.city ? escH(h.city) : '') + (h.state ? ', ' + escH(h.state) : '') + (h.rating ? ' · ⭐ ' + h.rating : '') + '</p></div></a>';
-            }).join('');
+            });
+            filteredD.forEach(d => {
+              const hosp = allHospitals.find(h => h.id === d.hospital_id);
+              const citySlug = hosp && hosp.city ? slug(hosp.city) : '';
+              const link = citySlug ? '/hospitals/' + citySlug + '/' : '/hospitals/';
+              html += '<a href="' + link + '" class="nr-item">'
+                + (d.photo_url ? '<img src="' + escH(d.photo_url) + '" alt="" class="nr-doc-photo" />' : '<div class="nr-doc-badge">' + initials(d.full_name) + '</div>')
+                + '<div class="nr-info"><h4>' + escH(d.full_name) + ' <span class="sr-tag">Doctor</span></h4>'
+                + '<p>' + escH(d.specialization) + (hosp ? ' · ' + escH(hosp.name) : '') + '</p></div></a>';
+            });
+            navResults.innerHTML = html;
           }
           navResults.classList.add('active');
         } catch(e) {
