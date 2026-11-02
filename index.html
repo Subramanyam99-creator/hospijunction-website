@@ -27,6 +27,27 @@
   <link rel="stylesheet" href="styles.css" />
 
   <style>
+    /* Nav search bar */
+    .nav-search-wrap{position:relative;flex:1;max-width:340px;margin:0 16px}
+    .nav-search-input{width:100%;padding:9px 14px 9px 36px;font-size:14px;font-family:var(--body);border:1.5px solid var(--border-2);border-radius:999px;background:var(--white);color:var(--ink);outline:none;transition:border-color .2s;box-sizing:border-box}
+    .nav-search-input:focus{border-color:var(--blue-700);box-shadow:0 0 0 3px rgba(26,86,181,.1)}
+    .nav-search-input::placeholder{color:var(--muted)}
+    .nav-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;z-index:1}
+    .nav-results{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-sm);box-shadow:0 8px 30px rgba(0,0,0,.12);max-height:400px;overflow-y:auto;z-index:999}
+    .nav-results.active{display:block}
+    .nr-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:background .15s;text-decoration:none;color:var(--ink);border-bottom:1px solid var(--border)}
+    .nr-item:last-child{border-bottom:none}
+    .nr-item:hover{background:var(--blue-50)}
+    .nr-logo{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid var(--border-2);flex-shrink:0}
+    .nr-logo-ph{width:40px;height:40px;border-radius:8px;background:var(--blue-50);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:15px;color:var(--blue-700);flex-shrink:0}
+    .nr-info h4{font-family:var(--display);font-weight:600;font-size:14px;margin:0 0 2px}
+    .nr-info p{font-size:12px;color:var(--muted);margin:0}
+    .nr-empty{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+    .nr-hint{padding:14px 16px;text-align:center;color:var(--muted);font-size:12.5px}
+    @media(max-width:768px){
+      .nav-search-wrap{max-width:100%;order:-1;margin:8px 0 0;flex-basis:100%}
+    }
+
     #find{scroll-margin-top:80px}
     .search-wrap{max-width:600px;margin:0 auto 28px;position:relative}
     .search-input{width:100%;padding:16px 20px 16px 48px;font-size:16px;font-family:var(--body);border:2px solid var(--border-2);border-radius:var(--radius-sm);background:var(--white);color:var(--ink);outline:none;transition:border-color .2s;box-sizing:border-box}
@@ -68,8 +89,12 @@
         <span class="logo-mark">HJ</span>
         <span class="logo-text">HospiJunction</span>
       </a>
+      <div class="nav-search-wrap">
+        <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="nav-search" class="nav-search-input" placeholder="Search hospital or city…" autocomplete="off" />
+        <div id="nav-results" class="nav-results"></div>
+      </div>
       <nav class="nav-links">
-        <a href="#find">Find hospital</a>
         <a href="#how">How it works</a>
         <a href="#pricing">Pricing</a>
         <a href="/legal/">Legal</a>
@@ -378,13 +403,17 @@
     function initials(name) { return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase(); }
 
     function waUrl(h) {
-      const link = 'https://www.hospijunction.com/book/' + slug(h.name) + '/';
-      const msg = 'Book your appointment at *' + h.name + '*' + (h.city ? ', ' + h.city : '') + ' through HospiJunction.\n\n✅ Stable token number\n✅ No queue\n✅ ₹20 flat fee\n\nBook now: ' + link;
+      const citySlug = h.city ? slug(h.city) : '';
+      const link = 'https://www.hospijunction.com/hospitals/' + (citySlug || 'browse') + '/';
+      const msg = 'Book your appointment at *' + h.name + '*' + (h.city ? ', ' + h.city : '') + ' through HospiJunction.\n\n✅ Stable token number\n✅ No queue\n✅ ₹20 flat fee\n\nBook now: ' + link + '\n\nDownload app: https://play.google.com/store/apps/details?id=com.hospijunction.app';
       return 'https://wa.me/?text=' + encodeURIComponent(msg);
     }
 
     function copyLink(btn, name) {
-      const url = 'https://www.hospijunction.com/book/' + slug(name) + '/';
+      // We need the hospital's city — look it up from cached list
+      const h = allHospitals && allHospitals.find(x => x.name === name);
+      const citySlug = h && h.city ? slug(h.city) : '';
+      const url = 'https://www.hospijunction.com/hospitals/' + (citySlug || 'browse') + '/';
       navigator.clipboard.writeText(url).then(() => {
         btn.classList.add('copied');
         btn.textContent = 'Copied!';
@@ -413,8 +442,8 @@
       }
       let html = '';
       hospitals.forEach(h => {
-        const s = slug(h.name);
-        const bookUrl = '/book/?h=' + s;
+        const citySlug = h.city ? slug(h.city) : '';
+        const cityUrl = citySlug ? '/hospitals/' + citySlug + '/' : '/hospitals/';
         html += '<div class="sr-card">';
         html += h.logo_url
           ? '<img src="' + escH(h.logo_url) + '" alt="' + escH(h.name) + '" class="sr-logo" loading="lazy" />'
@@ -424,7 +453,7 @@
         if (h.rating) html += ' · ⭐ ' + h.rating;
         html += '</p></div>';
         html += '<div class="sr-actions">';
-        html += '<a href="' + bookUrl + '" class="sr-btn sr-btn-book">Book</a>';
+        html += '<a href="' + cityUrl + '" class="sr-btn sr-btn-book">View</a>';
         html += '<a href="' + waUrl(h) + '" target="_blank" rel="noopener" class="sr-btn sr-btn-wa">';
         html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>';
         html += '<button class="sr-btn sr-btn-copy" onclick="copyLink(this,\'' + escH(h.name).replace(/'/g, "\\'") + '\')">Copy link</button>';
@@ -433,6 +462,7 @@
       box.innerHTML = html;
     }
 
+    // Main section search
     document.getElementById('hospital-search').addEventListener('input', function() {
       clearTimeout(searchTimeout);
       const q = this.value.trim().toLowerCase();
@@ -453,6 +483,53 @@
           document.getElementById('search-results').innerHTML = '<div class="sr-empty">Could not search. Try again.</div>';
         }
       }, 300);
+    });
+
+    // Nav search bar (dropdown)
+    const navInput = document.getElementById('nav-search');
+    const navResults = document.getElementById('nav-results');
+    let navTimeout;
+
+    navInput.addEventListener('input', function() {
+      clearTimeout(navTimeout);
+      const q = this.value.trim().toLowerCase();
+      if (q.length < 2) { navResults.classList.remove('active'); return; }
+      navTimeout = setTimeout(async () => {
+        try {
+          const list = await loadHospitals();
+          const filtered = list.filter(h =>
+            h.name.toLowerCase().includes(q) ||
+            (h.city && h.city.toLowerCase().includes(q)) ||
+            (h.state && h.state.toLowerCase().includes(q))
+          ).slice(0, 6);
+          if (filtered.length === 0) {
+            navResults.innerHTML = '<div class="nr-empty">No hospitals found</div>';
+          } else {
+            navResults.innerHTML = filtered.map(h => {
+              const citySlug = h.city ? slug(h.city) : '';
+              const link = citySlug ? '/hospitals/' + citySlug + '/' : '/hospitals/';
+              return '<a href="' + link + '" class="nr-item">'
+                + (h.logo_url ? '<img src="' + escH(h.logo_url) + '" alt="" class="nr-logo" />' : '<div class="nr-logo-ph">' + initials(h.name) + '</div>')
+                + '<div class="nr-info"><h4>' + escH(h.name) + '</h4>'
+                + '<p>' + (h.city ? escH(h.city) : '') + (h.state ? ', ' + escH(h.state) : '') + (h.rating ? ' · ⭐ ' + h.rating : '') + '</p></div></a>';
+            }).join('');
+          }
+          navResults.classList.add('active');
+        } catch(e) {
+          navResults.innerHTML = '<div class="nr-empty">Could not search</div>';
+          navResults.classList.add('active');
+        }
+      }, 250);
+    });
+
+    navInput.addEventListener('focus', function() {
+      if (this.value.trim().length >= 2) navResults.classList.add('active');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!navInput.contains(e.target) && !navResults.contains(e.target)) {
+        navResults.classList.remove('active');
+      }
     });
   </script>
 </body>
