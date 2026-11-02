@@ -439,7 +439,7 @@
     );
 
     // Google Sign-Up
-    async function googleSignUp() {
+    window.googleSignUp = async function() {
       const btn = document.getElementById('google-btn');
       btn.disabled = true;
       btn.textContent = 'Connecting...';
@@ -481,7 +481,7 @@
     }
 
     // Email/Password registration
-    async function submitForm(e) {
+    window.submitForm = async function(e) {
       e.preventDefault();
       const btn = document.getElementById('submit-btn');
       const form = document.getElementById('hospital-form');
