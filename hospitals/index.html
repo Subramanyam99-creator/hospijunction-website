@@ -36,6 +36,11 @@
     .city-card .city-stat{display:flex;gap:18px;font-size:13px;color:var(--ink-2)}
     .city-card .city-stat span{display:flex;align-items:center;gap:5px}
     .city-card .city-stat strong{color:var(--blue-900)}
+    .city-logos{display:flex;margin-top:14px}
+    .city-logo{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--white);margin-left:-10px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+    .city-logo:first-child{margin-left:0}
+    .city-logo-placeholder{width:36px;height:36px;border-radius:50%;background:var(--blue-50);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--blue-700);border:2px solid var(--white);margin-left:-10px}
+    .city-logo-placeholder:first-child{margin-left:0}
     .city-loading{text-align:center;padding:60px;color:var(--muted)}
     .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue-700);border-radius:50%;animation:spin .7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
@@ -119,7 +124,7 @@
         // Get all active, verified hospitals grouped by city
         const { data: hospitals, error } = await sb
           .from('hospital_profiles')
-          .select('city, state')
+          .select('name, city, state, logo_url')
           .eq('is_active', true)
           .eq('is_verified', true);
 
@@ -130,8 +135,9 @@
         (hospitals || []).forEach(h => {
           const key = (h.city || '').trim();
           if (!key) return;
-          if (!cityMap[key]) cityMap[key] = { city: key, state: h.state || '', count: 0 };
+          if (!cityMap[key]) cityMap[key] = { city: key, state: h.state || '', count: 0, hospitals: [] };
           cityMap[key].count++;
+          cityMap[key].hospitals.push({ name: h.name, logo_url: h.logo_url });
         });
 
         const cities = Object.values(cityMap).sort((a, b) => b.count - a.count);
@@ -151,6 +157,14 @@
               <div class="city-state">${c.state}</div>
               <div class="city-stat">
                 <span><strong>${c.count}</strong> hospital${c.count > 1 ? 's' : ''}</span>
+              </div>
+              <div class="city-logos">
+                ${c.hospitals.slice(0, 4).map(hp =>
+                  hp.logo_url
+                    ? `<img src="${hp.logo_url}" alt="${hp.name}" class="city-logo" loading="lazy" />`
+                    : `<div class="city-logo-placeholder">${hp.name.substring(0,2).toUpperCase()}</div>`
+                ).join('')}
+                ${c.count > 4 ? `<div class="city-logo-placeholder">+${c.count - 4}</div>` : ''}
               </div>
             </a>`;
         });
