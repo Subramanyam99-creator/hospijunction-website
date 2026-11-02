@@ -810,8 +810,8 @@
           });
 
         if (dbError) {
-          console.error('Supabase insert error:', dbError);
-          throw new Error('Could not save hospital details. Please try again.');
+          console.error('Supabase insert error:', JSON.stringify(dbError));
+          throw new Error('Could not save hospital details: ' + (dbError.message || dbError.details || JSON.stringify(dbError)));
         }
 
         var hospitalId = firebaseUid;
