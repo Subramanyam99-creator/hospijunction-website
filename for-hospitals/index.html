@@ -67,7 +67,7 @@
     .pricing-simple li:last-child{border-bottom:none}
 
     /* Registration form */
-    .reg-form{max-width:600px;margin:8px auto 0;background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:40px}
+    .reg-form{max-width:640px;margin:8px auto 0;background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:40px}
     .reg-form h3{font-family:var(--display);font-weight:600;font-size:22px;color:var(--ink);margin-bottom:6px;text-align:center}
     .reg-form .form-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:28px}
     .form-row{margin-bottom:18px}
@@ -77,11 +77,41 @@
     .form-row textarea{resize:vertical;min-height:80px}
     .form-row-half{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media(max-width:500px){.form-row-half{grid-template-columns:1fr}}
-    .form-submit{width:100%;padding:14px;font-size:16px;font-weight:600;font-family:var(--body);background:var(--blue-700);color:var(--white);border:none;border-radius:var(--radius-sm);cursor:pointer;transition:background .2s}
+    .form-submit{width:100%;padding:14px;font-size:16px;font-weight:600;font-family:var(--body);background:var(--blue-700);color:var(--white);border:none;border-radius:var(--radius-sm);cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
     .form-submit:hover{background:var(--blue-900)}
     .form-submit:disabled{background:var(--muted);cursor:not-allowed}
     .form-success{text-align:center;padding:40px;color:var(--blue-700);font-size:16px;font-weight:600;display:none}
     .form-note{text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px}
+
+    /* Step progress */
+    .step-progress{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:32px}
+    .step-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border-2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);background:var(--white);transition:all .2s;position:relative}
+    .step-dot.active{border-color:var(--blue-700);background:var(--blue-50);color:var(--blue-700)}
+    .step-dot.done{border-color:var(--blue-700);background:var(--blue-700);color:var(--white)}
+    .step-connector{width:40px;height:2px;background:var(--border-2);transition:background .2s}
+    .step-connector.done{background:var(--blue-700)}
+    .step-label{font-size:11px;color:var(--muted);text-align:center;margin-top:4px;font-weight:600}
+    .step-label.active{color:var(--blue-700)}
+    .step-item{display:flex;flex-direction:column;align-items:center;gap:0}
+    .form-step{display:none}
+    .form-step.active{display:block}
+    .step-title{font-family:var(--display);font-weight:600;font-size:18px;color:var(--ink);margin-bottom:4px}
+    .step-sub{font-size:13.5px;color:var(--muted);margin-bottom:22px;line-height:1.5}
+    .form-nav{display:flex;gap:12px;margin-top:24px}
+    .form-nav .btn-back{flex:0 0 auto;padding:14px 24px;font-size:15px;font-weight:600;font-family:var(--body);background:var(--white);color:var(--ink);border:1.5px solid var(--border-2);border-radius:var(--radius-sm);cursor:pointer;transition:border-color .2s}
+    .form-nav .btn-back:hover{border-color:var(--blue-700)}
+
+    /* Hospital type chips */
+    .type-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+    .type-chip{padding:9px 16px;border:1.5px solid var(--border-2);border-radius:20px;font-size:13.5px;font-weight:600;color:var(--muted);background:var(--white);cursor:pointer;transition:all .2s;font-family:var(--body)}
+    .type-chip:hover{border-color:var(--blue-700)}
+    .type-chip.selected{background:var(--blue-700);color:var(--white);border-color:var(--blue-700)}
+
+    /* Password strength */
+    .pw-strength{display:flex;align-items:center;gap:10px;margin-top:6px;margin-bottom:12px}
+    .pw-bars{display:flex;gap:4px;flex:1}
+    .pw-bar{height:4px;flex:1;border-radius:2px;background:var(--border-2);transition:background .2s}
+    .pw-label{font-size:12px;font-weight:700}
 
     /* Google button */
     .btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;font-size:15px;font-weight:600;font-family:var(--body);background:var(--white);color:var(--ink);border:1.5px solid var(--border-2);border-radius:var(--radius-sm);cursor:pointer;transition:border-color .2s,background .2s}
@@ -89,6 +119,16 @@
     .btn-google:disabled{opacity:.6;cursor:not-allowed}
     .form-divider{display:flex;align-items:center;gap:14px;margin:20px 0;color:var(--muted);font-size:13px}
     .form-divider::before,.form-divider::after{content:'';flex:1;height:1px;background:var(--border-2)}
+
+    /* Info box */
+    .info-box{background:var(--blue-50);border:1px solid #bfdbfe;border-radius:var(--radius-sm);padding:16px;margin-top:18px;display:flex;gap:10px;align-items:flex-start}
+    .info-box svg{flex-shrink:0;margin-top:1px}
+    .info-box p{font-size:13.5px;color:#1e40af;line-height:1.5;margin:0}
+
+    /* Legal checkbox */
+    .legal-check{display:flex;align-items:flex-start;gap:10px;margin-top:18px;cursor:pointer}
+    .legal-check input{margin-top:3px;accent-color:var(--blue-700);width:18px;height:18px}
+    .legal-check span{font-size:13.5px;color:var(--muted);line-height:1.5}
 
     /* FAQ */
     .faq-list{max-width:700px;margin:8px auto 0}
@@ -257,94 +297,218 @@
     <div class="container">
       <div class="reg-form">
         <h3>Register your hospital</h3>
-        <p class="form-sub">Fill in the details below and our team will reach out within 24-48 hours.</p>
+        <p class="form-sub">Complete the steps below — our team will verify within 24-48 hours.</p>
 
-        <form id="hospital-form">
-          <button type="button" class="btn-google" id="google-btn">
-            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-            Sign up with Google
-          </button>
-          <div class="form-divider">or register with email</div>
+        <!-- Step Progress Indicator -->
+        <div class="step-progress" id="step-progress">
+          <div class="step-item"><div class="step-dot active" data-step="1">1</div><div class="step-label active">Hospital</div></div>
+          <div class="step-connector"></div>
+          <div class="step-item"><div class="step-dot" data-step="2">2</div><div class="step-label">Admin</div></div>
+          <div class="step-connector"></div>
+          <div class="step-item"><div class="step-dot" data-step="3">3</div><div class="step-label">Login</div></div>
+          <div class="step-connector"></div>
+          <div class="step-item"><div class="step-dot" data-step="4">4</div><div class="step-label">Documents</div></div>
+        </div>
 
-          <div class="form-row">
-            <label for="hospital-name">Hospital / Clinic name *</label>
-            <input type="text" id="hospital-name" name="hospital_name" required placeholder="e.g. Apollo Hospital" />
+        <form id="hospital-form" novalidate>
+
+          <!-- STEP 1: Hospital Info -->
+          <div class="form-step active" id="step-1">
+            <div class="step-title">Hospital Information</div>
+            <div class="step-sub">Tell us about your hospital or clinic.</div>
+
+            <div class="form-row">
+              <label for="hospital-name">Hospital / Clinic name *</label>
+              <input type="text" id="hospital-name" name="hospital_name" required placeholder="e.g. Apollo Hospital" />
+            </div>
+
+            <div class="form-row">
+              <label>Hospital type *</label>
+              <div class="type-chips" id="type-chips">
+                <div class="type-chip" data-value="Government Hospital">Government Hospital</div>
+                <div class="type-chip" data-value="Private Hospital">Private Hospital</div>
+                <div class="type-chip" data-value="Clinic">Clinic</div>
+                <div class="type-chip" data-value="Nursing Home">Nursing Home</div>
+                <div class="type-chip" data-value="Diagnostic Centre">Diagnostic Centre</div>
+                <div class="type-chip" data-value="Speciality Hospital">Speciality Hospital</div>
+              </div>
+              <input type="hidden" id="hospital-type" name="hospital_type" required />
+            </div>
+
+            <div class="form-row">
+              <label for="reg-number">Registration number (MCI / State Council) *</label>
+              <input type="text" id="reg-number" name="registration_number" required placeholder="e.g. AP/2024/12345" />
+            </div>
+
+            <div class="form-row-half">
+              <div class="form-row">
+                <label for="city">City *</label>
+                <input type="text" id="city" name="city" required placeholder="e.g. Tirupati" />
+              </div>
+              <div class="form-row">
+                <label for="state">State *</label>
+                <select id="state" name="state" required>
+                  <option value="">Select state</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-nav">
+              <button type="button" class="form-submit" onclick="goStep(2)">Next — Admin details <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+            </div>
           </div>
 
-          <div class="form-row-half">
+          <!-- STEP 2: Admin Contact -->
+          <div class="form-step" id="step-2">
+            <div class="step-title">Admin Contact</div>
+            <div class="step-sub">Who should we contact for verification and support?</div>
+
             <div class="form-row">
-              <label for="city">City *</label>
-              <input type="text" id="city" name="city" required placeholder="e.g. Tirupati" />
+              <label for="contact-name">Full name *</label>
+              <input type="text" id="contact-name" name="contact_name" required placeholder="e.g. Dr. Ramesh Kumar" />
             </div>
+
             <div class="form-row">
-              <label for="state">State *</label>
-              <input type="text" id="state" name="state" required placeholder="e.g. Andhra Pradesh" />
+              <label for="contact-phone">Mobile number *</label>
+              <div style="display:flex;gap:0">
+                <span style="display:flex;align-items:center;padding:0 14px;background:var(--cream);border:1.5px solid var(--border-2);border-right:0;border-radius:var(--radius-sm) 0 0 var(--radius-sm);font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap">+91</span>
+                <input type="tel" id="contact-phone" name="contact_phone" required placeholder="9876543210" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" style="border-radius:0 var(--radius-sm) var(--radius-sm) 0" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="address">Full address</label>
+              <input type="text" id="address" name="address" placeholder="Street, area, pincode (optional)" />
+            </div>
+
+            <div class="form-nav">
+              <button type="button" class="btn-back" onclick="goStep(1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+              <button type="button" class="form-submit" style="flex:1" onclick="goStep(3)">Next — Create login <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
             </div>
           </div>
 
-          <div class="form-row">
-            <label for="address">Full address *</label>
-            <input type="text" id="address" name="address" required placeholder="Street, area, pincode" />
-          </div>
+          <!-- STEP 3: Login Credentials -->
+          <div class="form-step" id="step-3">
+            <div class="step-title">Create your login</div>
+            <div class="step-sub">This will be your hospital account on HospiJunction — for both the app and admin panel.</div>
 
-          <div class="form-row-half">
-            <div class="form-row">
-              <label for="contact-name">Contact person name *</label>
-              <input type="text" id="contact-name" name="contact_name" required placeholder="Your name" />
-            </div>
-            <div class="form-row">
-              <label for="contact-phone">Phone number *</label>
-              <input type="tel" id="contact-phone" name="contact_phone" required placeholder="e.g. 9876543210" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" />
-            </div>
-          </div>
+            <button type="button" class="btn-google" id="google-btn">
+              <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+              Sign up with Google
+            </button>
+            <div class="form-divider">or create with email &amp; password</div>
 
-          <div class="form-row">
-            <label for="contact-email">Email address *</label>
-            <input type="email" id="contact-email" name="contact_email" required placeholder="hospital@example.com" />
-          </div>
+            <div id="email-fields">
+              <div class="form-row">
+                <label for="contact-email">Email address *</label>
+                <input type="email" id="contact-email" name="contact_email" required placeholder="hospital@example.com" />
+              </div>
 
-          <div class="form-row-half">
-            <div class="form-row">
-              <label for="password">Create password *</label>
-              <input type="password" id="password" name="password" required minlength="6" placeholder="Min 6 characters" />
-            </div>
-            <div class="form-row">
-              <label for="confirm-password">Confirm password *</label>
-              <input type="password" id="confirm-password" name="confirm_password" required minlength="6" placeholder="Re-enter password" />
-            </div>
-          </div>
+              <div class="form-row">
+                <label for="password">Create password *</label>
+                <input type="password" id="password" name="password" required minlength="8" placeholder="Min 8 characters" oninput="updatePwStrength(this.value)" />
+                <div class="pw-strength" id="pw-strength" style="display:none">
+                  <div class="pw-bars"><div class="pw-bar" id="pw-bar-1"></div><div class="pw-bar" id="pw-bar-2"></div><div class="pw-bar" id="pw-bar-3"></div><div class="pw-bar" id="pw-bar-4"></div></div>
+                  <span class="pw-label" id="pw-label"></span>
+                </div>
+              </div>
 
-          <div class="form-row-half">
-            <div class="form-row">
-              <label for="hospital-type">Hospital type</label>
-              <select id="hospital-type" name="hospital_type">
-                <option value="">Select type</option>
-                <option value="Hospital">Hospital</option>
-                <option value="Clinic">Clinic</option>
-                <option value="Nursing Home">Nursing Home</option>
-                <option value="Diagnostic Centre">Diagnostic Centre</option>
-                <option value="Multi-Speciality">Multi-Speciality</option>
-                <option value="Super-Speciality">Super-Speciality</option>
-              </select>
+              <div class="form-row">
+                <label for="confirm-password">Confirm password *</label>
+                <input type="password" id="confirm-password" name="confirm_password" required minlength="8" placeholder="Re-enter password" />
+              </div>
             </div>
-            <div class="form-row">
-              <label for="num-doctors">Number of doctors</label>
-              <input type="number" id="num-doctors" name="num_doctors" placeholder="e.g. 5" min="1" />
+
+            <label class="legal-check">
+              <input type="checkbox" id="agree-check" required />
+              <span>I agree to HospiJunction's <a href="/legal/terms.html" target="_blank" style="color:var(--blue-700);font-weight:600">Terms of Service</a> and <a href="/legal/privacy.html" target="_blank" style="color:var(--blue-700);font-weight:600">Privacy Policy</a></span>
+            </label>
+
+            <div class="form-nav" style="margin-top:24px">
+              <button type="button" class="btn-back" onclick="goStep(2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+              <button type="button" class="form-submit" style="flex:1" onclick="goStep(4)">Next — Documents <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
             </div>
           </div>
 
-          <div class="form-row">
-            <label for="message">Anything else you'd like us to know?</label>
-            <textarea id="message" name="message" placeholder="Specializations, existing software, questions, etc."></textarea>
+          <!-- STEP 4: Documents -->
+          <div class="form-step" id="step-4">
+            <div class="step-title">Upload documents</div>
+            <div class="step-sub">These help us verify your hospital faster. You can also upload later via the app.</div>
+
+            <div class="form-row">
+              <label for="doc-registration">Hospital registration certificate *</label>
+              <input type="file" id="doc-registration" name="doc_registration" accept=".pdf,.jpg,.jpeg,.png" />
+              <span style="font-size:12px;color:var(--muted)">PDF, JPG or PNG — max 5 MB</span>
+            </div>
+
+            <div class="form-row">
+              <label for="doc-license">Medical license *</label>
+              <input type="file" id="doc-license" name="doc_license" accept=".pdf,.jpg,.jpeg,.png" />
+              <span style="font-size:12px;color:var(--muted)">PDF, JPG or PNG — max 5 MB</span>
+            </div>
+
+            <div class="form-row">
+              <label for="doc-id">ID proof (Aadhaar / PAN of owner) *</label>
+              <input type="file" id="doc-id" name="doc_id" accept=".pdf,.jpg,.jpeg,.png" />
+              <span style="font-size:12px;color:var(--muted)">PDF, JPG or PNG — max 5 MB</span>
+            </div>
+
+            <div class="form-row">
+              <label for="doc-tax">GST / Tax certificate (optional)</label>
+              <input type="file" id="doc-tax" name="doc_tax" accept=".pdf,.jpg,.jpeg,.png" />
+              <span style="font-size:12px;color:var(--muted)">PDF, JPG or PNG — max 5 MB</span>
+            </div>
+
+            <div class="info-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <p>Documents speed up verification. If you don't have them right now, you can skip and upload them later from the <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" target="_blank" rel="noopener" style="color:#1e40af;font-weight:600">HospiJunction app</a>.</p>
+            </div>
+
+            <div class="form-nav" style="margin-top:24px">
+              <button type="button" class="btn-back" onclick="goStep(3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+              <button type="button" class="form-submit" style="flex:1" id="submit-btn" onclick="submitForm()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Submit registration
+              </button>
+            </div>
+            <p class="form-note">We'll never share your details with third parties.</p>
           </div>
 
-          <button type="submit" class="form-submit" id="submit-btn">Submit registration</button>
-          <p class="form-note">We'll never share your details with third parties. By registering, you agree to our <a href="/legal/terms.html">Terms</a>.</p>
         </form>
 
         <div class="form-success" id="form-success">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--blue-700);margin-bottom:12px"><circle cx="12" cy="12" r="10"/><polyline points="16 8 10 16 7 13"/></svg>
-          <p>Thank you! Your account has been created.<br />Our team will verify your hospital within 24-48 hours.<br /><br />You can now <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" target="_blank" rel="noopener" style="color:var(--blue-700);font-weight:700">download the app</a> and log in with your email &amp; password.</p>
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--blue-700);margin-bottom:16px"><circle cx="12" cy="12" r="10"/><polyline points="16 8 10 16 7 13"/></svg>
+          <p style="font-size:18px;margin-bottom:8px">Registration successful!</p>
+          <p style="font-size:14px;color:var(--muted);font-weight:400;line-height:1.6">Your hospital account has been created.<br />Our team will verify your details within 24-48 hours.<br /><br />You can now <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" target="_blank" rel="noopener" style="color:var(--blue-700);font-weight:700">download the app</a> and log in with your credentials to manage your hospital.</p>
         </div>
       </div>
     </div>
@@ -423,8 +587,9 @@
     document.getElementById('year').textContent = new Date().getFullYear();
 
     var fb, sb;
+    var currentStep = 1;
+
     try {
-      // Firebase init
       firebase.initializeApp({
         apiKey: "AIzaSyD73bUT1PmaHTlSCMz8hRO3OrAb54PoHi8",
         authDomain: "hospijunction-37aa0.firebaseapp.com",
@@ -437,45 +602,145 @@
     } catch(e) { console.error('Firebase init error:', e); }
 
     try {
-      // Supabase init
       sb = supabase.createClient(
         'https://xamjhwkclcftbyjpzvnq.supabase.co',
         'sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM'
       );
     } catch(e) { console.error('Supabase init error:', e); }
 
-    // Google Sign-Up
+    // ── Hospital type chips ──
+    document.querySelectorAll('.type-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('.type-chip').forEach(function(c){ c.classList.remove('selected'); });
+        chip.classList.add('selected');
+        document.getElementById('hospital-type').value = chip.dataset.value;
+      });
+    });
+
+    // ── Step navigation ──
+    function goStep(step) {
+      // Validate current step before moving forward
+      if (step > currentStep) {
+        var valid = validateStep(currentStep);
+        if (!valid) return;
+      }
+
+      currentStep = step;
+
+      // Update step panels
+      document.querySelectorAll('.form-step').forEach(function(s){ s.classList.remove('active'); });
+      document.getElementById('step-' + step).classList.add('active');
+
+      // Update progress dots
+      var dots = document.querySelectorAll('.step-dot');
+      var connectors = document.querySelectorAll('.step-connector');
+      var labels = document.querySelectorAll('.step-label');
+
+      dots.forEach(function(dot, i) {
+        var n = i + 1;
+        dot.classList.remove('active', 'done');
+        labels[i].classList.remove('active');
+        if (n < step) { dot.classList.add('done'); dot.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'; }
+        else if (n === step) { dot.classList.add('active'); dot.textContent = n; labels[i].classList.add('active'); }
+        else { dot.textContent = n; }
+      });
+      connectors.forEach(function(c, i) {
+        c.classList.toggle('done', i < step - 1);
+      });
+
+      // Scroll to top of form
+      document.getElementById('step-progress').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function validateStep(step) {
+      if (step === 1) {
+        var name = document.getElementById('hospital-name').value.trim();
+        var type = document.getElementById('hospital-type').value;
+        var reg = document.getElementById('reg-number').value.trim();
+        var city = document.getElementById('city').value.trim();
+        var state = document.getElementById('state').value;
+        if (!name) { alert('Please enter your hospital name.'); document.getElementById('hospital-name').focus(); return false; }
+        if (!type) { alert('Please select your hospital type.'); return false; }
+        if (!reg) { alert('Please enter your registration number.'); document.getElementById('reg-number').focus(); return false; }
+        if (!city) { alert('Please enter your city.'); document.getElementById('city').focus(); return false; }
+        if (!state) { alert('Please select your state.'); document.getElementById('state').focus(); return false; }
+        return true;
+      }
+      if (step === 2) {
+        var cname = document.getElementById('contact-name').value.trim();
+        var phone = document.getElementById('contact-phone').value.trim();
+        if (!cname) { alert('Please enter your full name.'); document.getElementById('contact-name').focus(); return false; }
+        if (!/^[6-9][0-9]{9}$/.test(phone)) { alert('Please enter a valid 10-digit Indian mobile number.'); document.getElementById('contact-phone').focus(); return false; }
+        return true;
+      }
+      if (step === 3) {
+        if (!document.getElementById('agree-check').checked) { alert('Please agree to the Terms of Service and Privacy Policy.'); return false; }
+        if (window._googleSignUp) return true;
+        var email = document.getElementById('contact-email').value.trim();
+        var pw = document.getElementById('password').value;
+        var cpw = document.getElementById('confirm-password').value;
+        if (!email) { alert('Please enter your email address.'); document.getElementById('contact-email').focus(); return false; }
+        if (pw.length < 8) { alert('Password must be at least 8 characters.'); document.getElementById('password').focus(); return false; }
+        if (pw !== cpw) { alert('Passwords do not match.'); document.getElementById('confirm-password').focus(); return false; }
+        return true;
+      }
+      return true;
+    }
+
+    // ── Password strength meter ──
+    function updatePwStrength(pw) {
+      var bar = document.getElementById('pw-strength');
+      if (!pw) { bar.style.display = 'none'; return; }
+      bar.style.display = 'flex';
+
+      var score = 0;
+      if (pw.length >= 8) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+      var labels = ['Weak','Fair','Good','Strong'];
+      var colors = ['#ef4444','#f59e0b','#22c55e','#16a34a'];
+      var level = Math.max(0, score - 1);
+      if (score === 0) level = 0;
+
+      for (var i = 1; i <= 4; i++) {
+        document.getElementById('pw-bar-' + i).style.background = i <= score ? colors[level] : 'var(--border-2)';
+      }
+      var lbl = document.getElementById('pw-label');
+      lbl.textContent = labels[level];
+      lbl.style.color = colors[level];
+    }
+
+    // ── Google Sign-Up ──
     async function googleSignUp() {
-      const btn = document.getElementById('google-btn');
+      var btn = document.getElementById('google-btn');
       btn.disabled = true;
       btn.textContent = 'Connecting...';
 
       try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const result = await fb.signInWithPopup(provider);
-        const user = result.user;
+        var provider = new firebase.auth.GoogleAuthProvider();
+        var result = await fb.signInWithPopup(provider);
+        var user = result.user;
 
-        // Pre-fill email and contact name from Google account
+        // Pre-fill email from Google
         document.getElementById('contact-email').value = user.email || '';
-        document.getElementById('contact-name').value = user.displayName || '';
+        // If admin name is empty, fill from Google
+        if (!document.getElementById('contact-name').value.trim()) {
+          document.getElementById('contact-name').value = user.displayName || '';
+        }
 
-        // Store the Firebase UID for later
         window._googleFirebaseUid = user.uid;
         window._googleSignUp = true;
 
-        // Hide password fields (not needed for Google sign-up)
-        document.getElementById('password').closest('.form-row').style.display = 'none';
-        document.getElementById('confirm-password').closest('.form-row').style.display = 'none';
-        document.getElementById('password').removeAttribute('required');
-        document.getElementById('confirm-password').removeAttribute('required');
+        // Hide email/password fields
+        document.getElementById('email-fields').style.display = 'none';
 
-        // Update UI
+        // Update button
         btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Signed in as ' + (user.displayName || user.email);
         btn.style.borderColor = '#16a34a';
         btn.style.color = '#16a34a';
-
-        // Scroll to hospital name field
-        document.getElementById('hospital-name').focus();
+        document.querySelector('.form-divider').style.display = 'none';
 
       } catch (err) {
         btn.disabled = false;
@@ -486,97 +751,124 @@
       }
     }
 
-    // Email/Password registration
-    window.submitForm = async function(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submit-btn');
-      const form = document.getElementById('hospital-form');
-      const data = Object.fromEntries(new FormData(form));
-
-      let firebaseUid;
-
-      if (window._googleSignUp) {
-        // Already signed in with Google
-        firebaseUid = window._googleFirebaseUid;
-        btn.disabled = true;
-        btn.textContent = 'Saving details...';
-      } else {
-        // Validate passwords match
-        if (data.password !== data.confirm_password) {
-          alert('Passwords do not match. Please re-enter.');
-          return false;
-        }
-        if (data.password.length < 6) {
-          alert('Password must be at least 6 characters.');
-          return false;
-        }
-
-        btn.disabled = true;
-        btn.textContent = 'Creating account...';
+    // ── Upload document to Supabase Storage ──
+    async function uploadDoc(fileInput, hospitalId, docType) {
+      if (!fileInput.files || !fileInput.files[0]) return null;
+      var file = fileInput.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error(docType + ' file is too large (max 5 MB).');
       }
+      var ext = file.name.split('.').pop().toLowerCase();
+      var path = hospitalId + '/' + docType + '.' + ext;
+      var { data, error } = await sb.storage.from('hospital-documents').upload(path, file, { upsert: true });
+      if (error) throw new Error('Failed to upload ' + docType + ': ' + error.message);
+      return path;
+    }
+
+    // ── Submit registration ──
+    async function submitForm() {
+      // Validate step 4 (check required docs)
+      if (!validateStep(3)) { goStep(3); return; }
+
+      var btn = document.getElementById('submit-btn');
+      var form = document.getElementById('hospital-form');
+      var data = Object.fromEntries(new FormData(form));
+
+      btn.disabled = true;
+      btn.innerHTML = 'Creating account...';
+
+      var firebaseUid;
 
       try {
-        if (!window._googleSignUp) {
-          // Create Firebase Auth account
-          const userCred = await fb.createUserWithEmailAndPassword(data.contact_email, data.password);
+        // 1. Create Firebase account
+        if (window._googleSignUp) {
+          firebaseUid = window._googleFirebaseUid;
+        } else {
+          var userCred = await fb.createUserWithEmailAndPassword(data.contact_email, data.password);
           firebaseUid = userCred.user.uid;
           await userCred.user.updateProfile({ displayName: data.contact_name });
         }
 
-        btn.textContent = 'Saving details...';
+        btn.innerHTML = 'Saving hospital details...';
 
-        // Step 2: Save registration to Supabase
-        const { error: dbError } = await sb
-          .from('hospital_registrations')
+        // 2. Insert into hospital_profiles
+        var { data: insertedRows, error: dbError } = await sb
+          .from('hospital_profiles')
           .insert({
-            firebase_uid: firebaseUid,
-            hospital_name: data.hospital_name,
+            name: data.hospital_name,
             city: data.city,
             state: data.state,
-            address: data.address,
-            contact_name: data.contact_name,
+            address: data.address || null,
             phone: data.contact_phone,
-            email: data.contact_email,
+            contact_name: data.contact_name,
+            contact_email: data.contact_email || (window._googleSignUp ? document.getElementById('contact-email').value : null),
+            firebase_uid: firebaseUid,
             hospital_type: data.hospital_type || null,
-            num_doctors: data.num_doctors ? parseInt(data.num_doctors) : null,
-            message: data.message || null
-          });
+            registration_number: data.registration_number || null,
+            is_active: false,
+            is_verified: false
+          })
+          .select('id');
 
-        if (dbError) console.error('Supabase insert error:', dbError);
+        if (dbError) {
+          console.error('Supabase insert error:', dbError);
+          throw new Error('Could not save hospital details. Please try again.');
+        }
 
-        // Step 3: Send email notification to admin (fire & forget)
+        var hospitalId = insertedRows && insertedRows[0] ? insertedRows[0].id : firebaseUid;
+
+        // 3. Upload documents (if provided)
+        btn.innerHTML = 'Uploading documents...';
+        var docs = {};
+        try {
+          var regDoc = await uploadDoc(document.getElementById('doc-registration'), hospitalId, 'registration');
+          if (regDoc) docs.registration = regDoc;
+          var licDoc = await uploadDoc(document.getElementById('doc-license'), hospitalId, 'license');
+          if (licDoc) docs.license = licDoc;
+          var idDoc = await uploadDoc(document.getElementById('doc-id'), hospitalId, 'id_proof');
+          if (idDoc) docs.id_proof = idDoc;
+          var taxDoc = await uploadDoc(document.getElementById('doc-tax'), hospitalId, 'tax');
+          if (taxDoc) docs.tax = taxDoc;
+        } catch (uploadErr) {
+          console.warn('Document upload warning:', uploadErr.message);
+          // Don't block registration for doc upload failure
+        }
+
+        // 4. Send email notification to admin
+        var emailBody = {
+          _subject: '🏥 New Hospital Registration: ' + data.hospital_name,
+          'Hospital Name': data.hospital_name,
+          'Type': data.hospital_type || '-',
+          'Registration Number': data.registration_number || '-',
+          'City': data.city,
+          'State': data.state,
+          'Address': data.address || '-',
+          'Contact Person': data.contact_name,
+          'Phone': '+91 ' + data.contact_phone,
+          'Email': data.contact_email || document.getElementById('contact-email').value,
+          'Documents Uploaded': Object.keys(docs).join(', ') || 'None',
+          'Firebase UID': firebaseUid,
+          'Registered At': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+        };
         fetch('https://formsubmit.co/ajax/admin@hospijunction.com', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            _subject: '🏥 New Hospital Registration: ' + data.hospital_name,
-            'Hospital Name': data.hospital_name,
-            'City': data.city,
-            'State': data.state,
-            'Address': data.address,
-            'Contact Person': data.contact_name,
-            'Phone': data.contact_phone,
-            'Email': data.contact_email,
-            'Hospital Type': data.hospital_type || '-',
-            'Number of Doctors': data.num_doctors || '-',
-            'Message': data.message || '-',
-            'Firebase UID': firebaseUid,
-            'Registered At': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
-          })
-        }).catch(() => {}); // don't block on email
+          body: JSON.stringify(emailBody)
+        }).catch(function(){});
 
-        // Success
+        // 5. Show success
         form.style.display = 'none';
+        document.getElementById('step-progress').style.display = 'none';
         document.getElementById('form-success').style.display = 'block';
 
       } catch (err) {
         btn.disabled = false;
-        btn.textContent = 'Submit registration';
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Submit registration';
 
         if (err.code === 'auth/email-already-in-use') {
           alert('This email is already registered. Please log in through the app, or use a different email.');
         } else if (err.code === 'auth/weak-password') {
-          alert('Password is too weak. Please use at least 6 characters.');
+          alert('Password is too weak. Please use at least 8 characters.');
         } else if (err.code === 'auth/invalid-email') {
           alert('Please enter a valid email address.');
         } else {
@@ -584,12 +876,10 @@
           console.error(err);
         }
       }
-      return false;
     }
 
     // Attach event listeners
     document.getElementById('google-btn').addEventListener('click', googleSignUp);
-    document.getElementById('hospital-form').addEventListener('submit', submitForm);
   </script>
 </body>
 </html>
