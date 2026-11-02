@@ -801,6 +801,7 @@
             address: data.address || null,
             phone: data.contact_phone,
             contact_name: data.contact_name,
+            email: data.contact_email || (window._googleSignUp ? document.getElementById('contact-email').value : null),
             contact_email: data.contact_email || (window._googleSignUp ? document.getElementById('contact-email').value : null),
             firebase_uid: firebaseUid,
             hospital_type: data.hospital_type || null,
