@@ -203,7 +203,7 @@
         // Fetch all active verified hospitals and find by slug match
         const { data: hospitals, error } = await sb
           .from('hospital_profiles')
-          .select('id, name, address, city, state, phone, email, hospital_type, consultation_fee, rating, total_reviews, map_link, logo_url, cover_image_url, description, website, operating_hours, pincode')
+          .select('*')
           .eq('is_active', true)
           .eq('is_verified', true);
 
