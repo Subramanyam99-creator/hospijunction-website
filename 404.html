@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    // GitHub Pages SPA routing fallback
+    // Handles /book/hospital-slug/ paths by redirecting to /book/?h=slug
+    var path = window.location.pathname;
+    var bookMatch = path.match(/\/book\/([a-z0-9-]+)/);
+    if (bookMatch) {
+      window.location.replace('/book/?h=' + bookMatch[1]);
+    } else {
+      // For any other 404, redirect to homepage
+      window.location.replace('/');
+    }
+  </script>
+</head>
+<body>
+  <p>Redirecting&hellip;</p>
+</body>
+</html>

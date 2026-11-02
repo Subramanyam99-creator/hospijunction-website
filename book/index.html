@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book an Appointment — HospiJunction</title>
+  <meta name="description" content="Book a doctor appointment at this hospital through HospiJunction. Get a stable token number, skip the queue — all for a flat ₹20 platform fee." />
+  <meta name="theme-color" content="#0F2E5C" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- OG (overwritten by JS for specific hospital) -->
+  <meta property="og:title" content="Book an Appointment — HospiJunction" />
+  <meta property="og:description" content="Book a doctor appointment. Stable token, no queue, ₹20 flat fee." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <style>
+    .book-page{padding:40px 0 60px}
+
+    /* Hospital header */
+    .hosp-header{display:flex;gap:20px;align-items:flex-start;margin-bottom:28px}
+    .hosp-logo{width:80px;height:80px;border-radius:14px;object-fit:cover;border:1px solid var(--border-2);flex-shrink:0}
+    .hosp-logo-placeholder{width:80px;height:80px;border-radius:14px;background:var(--blue-50);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:28px;color:var(--blue-700);flex-shrink:0;border:1px solid var(--border-2)}
+    .hosp-info h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,4vw,32px);color:var(--ink);margin-bottom:6px;letter-spacing:-.01em}
+    .hosp-info .hosp-type{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--blue-50);color:var(--blue-700);margin-bottom:8px}
+
+    /* Details grid */
+    .hosp-details{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px}
+    .detail-item{background:var(--cream);border-radius:var(--radius-sm);padding:16px 18px}
+    .detail-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+    .detail-value{font-size:15px;color:var(--ink);font-weight:500}
+    .detail-value a{color:var(--blue-700);text-decoration:none}.detail-value a:hover{text-decoration:underline}
+
+    /* Cover image */
+    .hosp-cover{width:100%;height:220px;object-fit:cover;border-radius:var(--radius-lg);margin-bottom:28px;border:1px solid var(--border-2)}
+
+    /* CTA */
+    .book-cta{background:var(--blue-900);border-radius:var(--radius-lg);padding:40px 28px;text-align:center;margin-bottom:40px}
+    .book-cta h2{font-family:var(--display);font-weight:600;font-size:clamp(22px,3.5vw,30px);color:var(--white);margin-bottom:10px}
+    .book-cta p{color:rgba(255,255,255,.75);margin-bottom:20px;font-size:15px}
+    .book-cta .btn-book{display:inline-flex;align-items:center;gap:10px;background:var(--white);color:var(--blue-900);font-weight:700;font-size:16px;padding:14px 32px;border-radius:var(--radius-sm);text-decoration:none;transition:background .2s}
+    .book-cta .btn-book:hover{background:var(--cream)}
+    .book-cta .btn-book svg{flex-shrink:0}
+    .book-cta .fee-note{color:rgba(255,255,255,.55);font-size:13px;margin-top:12px}
+
+    /* Doctors */
+    .doctors-section h2{font-family:var(--display);font-weight:600;font-size:20px;color:var(--ink);margin-bottom:16px}
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .doc-card{background:var(--white);border:1px solid var(--border-2);border-radius:var(--radius-sm);padding:20px;display:flex;gap:14px;align-items:flex-start;transition:border-color .2s}
+    .doc-card:hover{border-color:var(--blue-700)}
+    .doc-photo{width:52px;height:52px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border-2)}
+    .doc-photo-placeholder{width:52px;height:52px;border-radius:50%;background:var(--blue-700);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:var(--white);flex-shrink:0}
+    .doc-info{flex:1;min-width:0}
+    .doc-info h3{font-family:var(--display);font-weight:600;font-size:16px;color:var(--ink);margin-bottom:2px}
+    .doc-spec{font-size:13px;color:var(--blue-700);font-weight:500;margin-bottom:6px}
+    .doc-meta{font-size:12.5px;color:var(--muted);line-height:1.5}
+    .doc-fee{font-weight:600;color:var(--ink)}
+
+    /* How it works mini */
+    .how-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:40px}
+    .how-step{text-align:center;padding:24px 18px}
+    .how-num{font-family:var(--display);font-weight:700;font-size:28px;color:var(--blue-700);margin-bottom:6px}
+    .how-step h3{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
+    .how-step p{font-size:13px;color:var(--muted)}
+
+    /* Map */
+    .map-btn{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--blue-700);text-decoration:none;margin-top:6px}
+    .map-btn:hover{color:var(--blue-900)}
+
+    /* Loading / error */
+    .book-loading{text-align:center;padding:80px;color:var(--muted)}
+    .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue-700);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .book-error{text-align:center;padding:80px;color:var(--muted);font-size:16px}
+
+    @media(max-width:600px){
+      .hosp-header{flex-direction:column;align-items:center;text-align:center}
+      .hosp-cover{height:160px}
+    }
+  </style>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <!-- Structured Data (filled by JS) -->
+  <script type="application/ld+json" id="structured-data">{}</script>
+</head>
+<body>
+
+  <div class="brand-line"></div>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">HJ</span>
+        <span class="logo-text">HospiJunction</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/#how">How it works</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/hospitals/">Hospitals</a>
+        <a href="/legal/">Legal</a>
+        <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="book-page">
+    <div class="container" id="book-content">
+      <div class="book-loading"><div class="spin"></div><p style="margin-top:16px">Loading hospital&hellip;</p></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">HJ</span><span class="logo-text">HospiJunction</span></div>
+        <p class="footer-tag">An Indian healthcare booking platform. We are a technology facilitator &mdash; not a healthcare provider. In a medical emergency, call <strong>108</strong>.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><a href="/#how">How it works</a><a href="/#pricing">Pricing</a><a href="/hospitals/">Hospitals</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="/legal/terms.html">Terms</a><a href="/legal/privacy.html">Privacy</a><a href="/legal/refund.html">Refund</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/legal/about.html">About</a><a href="/legal/contact.html">Contact</a></div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; <span id="year">2026</span> HospiJunction. All rights reserved.</span>
+      <span>Made in India</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const SUPABASE_URL  = "https://xamjhwkclcftbyjpzvnq.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+    const APP_URL = "https://play.google.com/store/apps/details?id=com.hospijunction.app";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function getInitials(name) {
+      return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    // Get hospital slug from URL: /book/hospital-slug/ or /book/?h=hospital-slug
+    function getSlug() {
+      const path = window.location.pathname.replace(/\/+$/, '').split('/');
+      // /book/hospital-slug → path = ['', 'book', 'hospital-slug']
+      if (path.length >= 3 && path[2]) return path[2];
+      // fallback to query param
+      return new URLSearchParams(window.location.search).get('h');
+    }
+
+    (async () => {
+      const container = document.getElementById('book-content');
+      const slug = getSlug();
+
+      if (!slug) {
+        container.innerHTML = '<div class="book-error">No hospital specified. Visit <a href="/hospitals/" style="color:var(--blue-700)">hospitals</a> to browse.</div>';
+        return;
+      }
+
+      try {
+        // Fetch all active verified hospitals and find by slug match
+        const { data: hospitals, error } = await sb
+          .from('hospital_profiles')
+          .select('id, name, address, city, state, phone, email, hospital_type, consultation_fee, rating, total_reviews, map_link, logo_url, cover_image_url, description, website, operating_hours, pincode')
+          .eq('is_active', true)
+          .eq('is_verified', true);
+
+        if (error) throw error;
+
+        // Match slug to hospital name
+        const hospital = (hospitals || []).find(h => {
+          const hSlug = h.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          return hSlug === slug;
+        });
+
+        if (!hospital) {
+          container.innerHTML = '<div class="book-error">Hospital not found. It may not be listed yet.<br><a href="/hospitals/" style="color:var(--blue-700);font-weight:600">Browse all hospitals →</a></div>';
+          return;
+        }
+
+        // Fetch doctors
+        const { data: doctors } = await sb
+          .from('doctors')
+          .select('id, full_name, specialization, qualification, experience_years, consultation_fee, languages, photo_url, rating')
+          .eq('hospital_id', hospital.id)
+          .eq('is_active', true)
+          .order('full_name');
+
+        // Update page title and meta
+        document.title = `Book at ${hospital.name} — HospiJunction`;
+        document.querySelector('meta[property="og:title"]').content = `Book at ${hospital.name} — HospiJunction`;
+        document.querySelector('meta[property="og:description"]').content = `Book a doctor appointment at ${hospital.name}, ${hospital.city}. Stable token, no queue, ₹20 flat fee.`;
+        document.querySelector('meta[name="description"]').content = `Book a doctor appointment at ${hospital.name} in ${hospital.city}, ${hospital.state}. Get a stable token number, skip the queue — ₹20 platform fee on HospiJunction.`;
+
+        // Structured data
+        const sd = {
+          "@context": "https://schema.org",
+          "@type": "MedicalOrganization",
+          "name": hospital.name,
+          "description": hospital.description || `Book appointments at ${hospital.name} via HospiJunction`,
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": hospital.address || '',
+            "addressLocality": hospital.city || '',
+            "addressRegion": hospital.state || '',
+            "postalCode": hospital.pincode || '',
+            "addressCountry": "IN"
+          },
+          "telephone": hospital.phone || undefined,
+          "url": `https://www.hospijunction.com/book/${slug}/`,
+          "potentialAction": {
+            "@type": "ReserveAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": APP_URL,
+              "actionPlatform": ["https://schema.org/AndroidPlatform"]
+            },
+            "result": {
+              "@type": "Reservation",
+              "name": "Doctor Appointment"
+            }
+          }
+        };
+        if (hospital.rating) {
+          sd.aggregateRating = {
+            "@type": "AggregateRating",
+            "ratingValue": hospital.rating,
+            "reviewCount": hospital.total_reviews || 1
+          };
+        }
+        if (doctors && doctors.length) {
+          sd.medicalSpecialty = [...new Set(doctors.map(d => d.specialization))];
+        }
+        document.getElementById('structured-data').textContent = JSON.stringify(sd);
+
+        // Build HTML
+        let html = '';
+
+        // Cover image
+        if (hospital.cover_image_url) {
+          html += `<img src="${escapeHtml(hospital.cover_image_url)}" alt="${escapeHtml(hospital.name)}" class="hosp-cover" loading="lazy" />`;
+        }
+
+        // Header: logo + name
+        html += `<div class="hosp-header">`;
+        html += hospital.logo_url
+          ? `<img src="${escapeHtml(hospital.logo_url)}" alt="${escapeHtml(hospital.name)} logo" class="hosp-logo" />`
+          : `<div class="hosp-logo-placeholder">${getInitials(hospital.name)}</div>`;
+        html += `<div class="hosp-info">
+          <h1>${escapeHtml(hospital.name)}</h1>
+          ${hospital.hospital_type ? `<span class="hosp-type">${escapeHtml(hospital.hospital_type)}</span>` : ''}
+          ${hospital.description ? `<p style="font-size:14px;color:var(--muted);margin-top:6px">${escapeHtml(hospital.description)}</p>` : ''}
+        </div></div>`;
+
+        // Details grid
+        html += '<div class="hosp-details">';
+        if (hospital.address) {
+          html += `<div class="detail-item"><div class="detail-label">Address</div><div class="detail-value">${escapeHtml(hospital.address)}${hospital.city ? ', ' + escapeHtml(hospital.city) : ''}${hospital.pincode ? ' - ' + escapeHtml(hospital.pincode) : ''}</div>
+          ${hospital.map_link ? `<a href="${escapeHtml(hospital.map_link)}" target="_blank" rel="noopener" class="map-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7 8-13a8 8 0 00-16 0c0 6 8 13 8 13z"/><circle cx="12" cy="9" r="2.5"/></svg>Get directions</a>` : ''}</div>`;
+        }
+        if (hospital.phone) {
+          html += `<div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value"><a href="tel:${escapeHtml(hospital.phone)}">${escapeHtml(hospital.phone)}</a></div></div>`;
+        }
+        if (hospital.operating_hours) {
+          html += `<div class="detail-item"><div class="detail-label">Hours</div><div class="detail-value">${escapeHtml(hospital.operating_hours)}</div></div>`;
+        }
+        if (hospital.rating) {
+          html += `<div class="detail-item"><div class="detail-label">Rating</div><div class="detail-value">⭐ ${hospital.rating}${hospital.total_reviews ? ' (' + hospital.total_reviews + ' reviews)' : ''}</div></div>`;
+        }
+        html += '</div>';
+
+        // Book CTA
+        html += `
+          <div class="book-cta">
+            <h2>Book your appointment now</h2>
+            <p>Get a stable token number, skip the queue, and walk in at your time.</p>
+            <a href="${APP_URL}" target="_blank" rel="noopener" class="btn-book">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.59.34-1.11.84-1.35L13.69 12l-9.85 9.85c-.5-.24-.84-.76-.84-1.35zm13.81-5.38L6.05 21.34l8.49-8.49 2.27 2.27zm3.35-1.96l-2.91 1.64-2.53-2.53 2.53-2.53 2.91 1.64c.69.39.69 1.39 0 1.78zM6.05 2.66l10.76 6.22-2.27 2.27-8.49-8.49z"/></svg>
+              Download & Book on Google Play
+            </a>
+            <div class="fee-note">₹20 platform fee · Consultation fee paid at hospital</div>
+          </div>`;
+
+        // Doctors
+        if (doctors && doctors.length > 0) {
+          html += `<div class="doctors-section"><h2>Doctors at ${escapeHtml(hospital.name)} (${doctors.length})</h2><div class="doc-grid">`;
+          doctors.forEach(d => {
+            html += `
+              <div class="doc-card">
+                ${d.photo_url
+                  ? `<img src="${escapeHtml(d.photo_url)}" alt="${escapeHtml(d.full_name)}" class="doc-photo" loading="lazy" />`
+                  : `<div class="doc-photo-placeholder">${getInitials(d.full_name)}</div>`}
+                <div class="doc-info">
+                  <h3>${escapeHtml(d.full_name)}</h3>
+                  <div class="doc-spec">${escapeHtml(d.specialization)}</div>
+                  <div class="doc-meta">
+                    ${d.qualification ? escapeHtml(d.qualification) + '<br>' : ''}
+                    ${d.experience_years ? d.experience_years + ' yrs exp · ' : ''}
+                    <span class="doc-fee">${d.consultation_fee != null ? '₹' + Number(d.consultation_fee).toLocaleString('en-IN') : ''}</span>
+                    ${d.languages && d.languages.length ? '<br>' + d.languages.map(l => escapeHtml(l)).join(', ') : ''}
+                    ${d.rating ? '<br>⭐ ' + d.rating : ''}
+                  </div>
+                </div>
+              </div>`;
+          });
+          html += '</div></div>';
+        }
+
+        // How it works mini
+        html += `
+          <div class="how-mini">
+            <div class="how-step">
+              <div class="how-num">01</div>
+              <h3>Download the app</h3>
+              <p>Get HospiJunction from Google Play Store</p>
+            </div>
+            <div class="how-step">
+              <div class="how-num">02</div>
+              <h3>Pick your slot</h3>
+              <p>Choose a doctor and time that suits you</p>
+            </div>
+            <div class="how-step">
+              <div class="how-num">03</div>
+              <h3>Walk in & consult</h3>
+              <p>Show your token, see the doctor, pay at hospital</p>
+            </div>
+          </div>`;
+
+        container.innerHTML = html;
+
+      } catch (err) {
+        container.innerHTML = '<div class="book-error">Could not load hospital details. Please try again later.</div>';
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>
