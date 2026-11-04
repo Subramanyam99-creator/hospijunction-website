@@ -792,10 +792,15 @@
             options: { data: { display_name: data.contact_name, user_type: 'hospital' } }
           });
           if (sbAuthErr) {
-            console.error('Supabase Auth error:', sbAuthErr);
+            console.error('Supabase Auth error:', JSON.stringify(sbAuthErr));
+            alert('Supabase Auth error: ' + (sbAuthErr.message || JSON.stringify(sbAuthErr)));
             throw sbAuthErr;
           }
+          console.log('Supabase Auth success:', JSON.stringify(sbAuth));
           supabaseUid = sbAuth.user ? sbAuth.user.id : null;
+          if (!supabaseUid) {
+            console.warn('Supabase Auth: no user ID returned', JSON.stringify(sbAuth));
+          }
         }
 
         // 2. Create Firebase Auth account (for website/admin)
