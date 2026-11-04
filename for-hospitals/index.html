@@ -780,42 +780,64 @@
       var firebaseUid;
 
       try {
-        // 1. Create Firebase account
+        var userEmail = data.contact_email || (window._googleSignUp ? document.getElementById('contact-email').value : null);
+        var userPassword = data.password;
+
+        // 1. Create Supabase Auth account (so app login works)
+        var supabaseUid;
+        if (!window._googleSignUp) {
+          var { data: sbAuth, error: sbAuthErr } = await sb.auth.signUp({
+            email: userEmail,
+            password: userPassword,
+            options: { data: { display_name: data.contact_name, user_type: 'hospital' } }
+          });
+          if (sbAuthErr) {
+            console.error('Supabase Auth error:', sbAuthErr);
+            throw sbAuthErr;
+          }
+          supabaseUid = sbAuth.user ? sbAuth.user.id : null;
+        }
+
+        // 2. Create Firebase Auth account (for website/admin)
         if (window._googleSignUp) {
           firebaseUid = window._googleFirebaseUid;
         } else {
-          var userCred = await fb.createUserWithEmailAndPassword(data.contact_email, data.password);
+          var userCred = await fb.createUserWithEmailAndPassword(userEmail, userPassword);
           firebaseUid = userCred.user.uid;
           await userCred.user.updateProfile({ displayName: data.contact_name });
         }
 
         btn.innerHTML = 'Saving hospital details...';
 
-        // 2. Insert into hospital_profiles
+        // 3. Insert into hospital_profiles
+        var insertData = {
+          name: data.hospital_name,
+          city: data.city,
+          state: data.state,
+          address: data.address || null,
+          phone: data.contact_phone,
+          contact_name: data.contact_name,
+          email: userEmail,
+          contact_email: userEmail,
+          firebase_uid: firebaseUid,
+          hospital_type: data.hospital_type || null,
+          registration_number: data.registration_number || null,
+          is_active: false,
+          is_verified: false
+        };
+        // Use Supabase Auth UID as the id (matches app behavior)
+        if (supabaseUid) insertData.id = supabaseUid;
+
         var { error: dbError } = await sb
           .from('hospital_profiles')
-          .insert({
-            name: data.hospital_name,
-            city: data.city,
-            state: data.state,
-            address: data.address || null,
-            phone: data.contact_phone,
-            contact_name: data.contact_name,
-            email: data.contact_email || (window._googleSignUp ? document.getElementById('contact-email').value : null),
-            contact_email: data.contact_email || (window._googleSignUp ? document.getElementById('contact-email').value : null),
-            firebase_uid: firebaseUid,
-            hospital_type: data.hospital_type || null,
-            registration_number: data.registration_number || null,
-            is_active: false,
-            is_verified: false
-          });
+          .insert(insertData);
 
         if (dbError) {
           console.error('Supabase insert error:', JSON.stringify(dbError));
           throw new Error('Could not save hospital details: ' + (dbError.message || dbError.details || JSON.stringify(dbError)));
         }
 
-        var hospitalId = firebaseUid;
+        var hospitalId = supabaseUid || firebaseUid;
 
         // 3. Upload documents (if provided)
         btn.innerHTML = 'Uploading documents...';
@@ -865,7 +887,7 @@
         btn.disabled = false;
         btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Submit registration';
 
-        if (err.code === 'auth/email-already-in-use') {
+        if (err.code === 'auth/email-already-in-use' || (err.message && err.message.includes('already been registered'))) {
           alert('This email is already registered. Please log in through the app, or use a different email.');
         } else if (err.code === 'auth/weak-password') {
           alert('Password is too weak. Please use at least 8 characters.');
