@@ -857,8 +857,8 @@
           var taxDoc = await uploadDoc(document.getElementById('doc-tax'), hospitalId, 'tax');
           if (taxDoc) docs.tax = taxDoc;
         } catch (uploadErr) {
-          console.warn('Document upload warning:', uploadErr.message);
-          // Don't block registration for doc upload failure
+          console.error('Document upload error:', uploadErr.message);
+          alert('Documents could not be uploaded: ' + uploadErr.message + '\nYour account was created — you can upload documents later via the app.');
         }
 
         // 4. Send email notification to admin
