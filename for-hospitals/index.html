@@ -847,41 +847,72 @@
         // 3. Upload documents (if provided)
         btn.innerHTML = 'Uploading documents...';
         var docs = {};
+        var docReg = document.getElementById('doc-registration');
+        var docLic = document.getElementById('doc-license');
+        var docId = document.getElementById('doc-id');
+        var docTax = document.getElementById('doc-tax');
+        console.log('Doc files selected:', {
+          registration: docReg.files.length > 0 ? docReg.files[0].name : 'none',
+          license: docLic.files.length > 0 ? docLic.files[0].name : 'none',
+          id_proof: docId.files.length > 0 ? docId.files[0].name : 'none',
+          tax: docTax.files.length > 0 ? docTax.files[0].name : 'none'
+        });
         try {
-          var regDoc = await uploadDoc(document.getElementById('doc-registration'), hospitalId, 'registration');
-          if (regDoc) docs.registration = regDoc;
-          var licDoc = await uploadDoc(document.getElementById('doc-license'), hospitalId, 'license');
-          if (licDoc) docs.license = licDoc;
-          var idDoc = await uploadDoc(document.getElementById('doc-id'), hospitalId, 'id_proof');
-          if (idDoc) docs.id_proof = idDoc;
-          var taxDoc = await uploadDoc(document.getElementById('doc-tax'), hospitalId, 'tax');
-          if (taxDoc) docs.tax = taxDoc;
+          var regDoc = await uploadDoc(docReg, hospitalId, 'registration');
+          if (regDoc) { docs.registration = regDoc; console.log('Uploaded registration:', regDoc); }
+          var licDoc = await uploadDoc(docLic, hospitalId, 'license');
+          if (licDoc) { docs.license = licDoc; console.log('Uploaded license:', licDoc); }
+          var idDoc = await uploadDoc(docId, hospitalId, 'id_proof');
+          if (idDoc) { docs.id_proof = idDoc; console.log('Uploaded id_proof:', idDoc); }
+          var taxDoc = await uploadDoc(docTax, hospitalId, 'tax');
+          if (taxDoc) { docs.tax = taxDoc; console.log('Uploaded tax:', taxDoc); }
+          console.log('All docs result:', docs);
+          if (Object.keys(docs).length === 0) console.warn('No documents were uploaded — no files were selected.');
         } catch (uploadErr) {
           console.error('Document upload error:', uploadErr.message);
           alert('Documents could not be uploaded: ' + uploadErr.message + '\nYour account was created — you can upload documents later via the app.');
         }
 
-        // 4. Send email notification to admin
-        var emailBody = {
-          _subject: '🏥 New Hospital Registration: ' + data.hospital_name,
-          'Hospital Name': data.hospital_name,
-          'Type': data.hospital_type || '-',
-          'Registration Number': data.registration_number || '-',
-          'City': data.city,
-          'State': data.state,
-          'Address': data.address || '-',
-          'Contact Person': data.contact_name,
-          'Phone': '+91 ' + data.contact_phone,
-          'Email': data.contact_email || document.getElementById('contact-email').value,
-          'Documents Uploaded': Object.keys(docs).join(', ') || 'None',
-          'Firebase UID': firebaseUid,
-          'Registered At': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
-        };
-        fetch('https://formsubmit.co/ajax/admin@hospijunction.com', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify(emailBody)
-        }).catch(function(){});
+        // 4. Send email notification to admin (via hidden iframe to avoid CORS)
+        try {
+          var iframe = document.createElement('iframe');
+          iframe.name = 'formsubmit-iframe';
+          iframe.style.display = 'none';
+          document.body.appendChild(iframe);
+
+          var emailForm = document.createElement('form');
+          emailForm.method = 'POST';
+          emailForm.action = 'https://formsubmit.co/admin@hospijunction.com';
+          emailForm.target = 'formsubmit-iframe';
+          emailForm.style.display = 'none';
+
+          var fields = {
+            _subject: '🏥 New Hospital Registration: ' + data.hospital_name,
+            _captcha: 'false',
+            _template: 'table',
+            'Hospital Name': data.hospital_name,
+            'Type': data.hospital_type || '-',
+            'Registration Number': data.registration_number || '-',
+            'City': data.city,
+            'State': data.state,
+            'Address': data.address || '-',
+            'Contact Person': data.contact_name,
+            'Phone': '+91 ' + data.contact_phone,
+            'Email': userEmail,
+            'Documents Uploaded': Object.keys(docs).join(', ') || 'None',
+            'Registered At': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+          };
+          for (var key in fields) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = fields[key];
+            emailForm.appendChild(input);
+          }
+          document.body.appendChild(emailForm);
+          emailForm.submit();
+          setTimeout(function(){ iframe.remove(); emailForm.remove(); }, 5000);
+        } catch(e) { console.warn('Email notification failed:', e); }
 
         // 5. Show success
         form.style.display = 'none';
