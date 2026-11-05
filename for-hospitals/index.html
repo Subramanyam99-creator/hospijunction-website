@@ -333,6 +333,7 @@
                 <div class="type-chip" data-value="Speciality Hospital">Speciality Hospital</div>
               </div>
               <input type="hidden" id="hospital-type" name="hospital_type" required />
+            <input type="hidden" id="state-code" name="state_code" />
             </div>
 
             <div class="form-row">
@@ -608,6 +609,20 @@
       );
     } catch(e) { console.error('Supabase init error:', e); }
 
+    // ── State code mapping (for GST) ──
+    var stateCodes = {
+      'Andhra Pradesh':'AP','Arunachal Pradesh':'AR','Assam':'AS','Bihar':'BR',
+      'Chhattisgarh':'CG','Delhi':'DL','Goa':'GA','Gujarat':'GJ','Haryana':'HR',
+      'Himachal Pradesh':'HP','Jharkhand':'JH','Karnataka':'KA','Kerala':'KL',
+      'Madhya Pradesh':'MP','Maharashtra':'MH','Manipur':'MN','Meghalaya':'ML',
+      'Mizoram':'MZ','Nagaland':'NL','Odisha':'OD','Punjab':'PB','Rajasthan':'RJ',
+      'Sikkim':'SK','Tamil Nadu':'TN','Telangana':'TS','Tripura':'TR',
+      'Uttar Pradesh':'UP','Uttarakhand':'UK','West Bengal':'WB'
+    };
+    document.getElementById('state').addEventListener('change', function() {
+      document.getElementById('state-code').value = stateCodes[this.value] || '';
+    });
+
     // ── Hospital type chips ──
     document.querySelectorAll('.type-chip').forEach(function(chip) {
       chip.addEventListener('click', function() {
@@ -833,9 +848,11 @@
           name: data.hospital_name,
           city: data.city,
           state: data.state,
+          state_code: data.state_code || null,
           address: data.address || null,
           phone: data.contact_phone,
           contact_name: data.contact_name,
+          admin_name: data.contact_name,
           email: userEmail,
           contact_email: userEmail,
           firebase_uid: firebaseUid,
@@ -881,7 +898,12 @@
           var taxDoc = await uploadDoc(docTax, hospitalId, 'tax');
           if (taxDoc) { docs.tax = taxDoc; console.log('Uploaded tax:', taxDoc); }
           console.log('All docs result:', docs);
-          if (Object.keys(docs).length === 0) console.warn('No documents were uploaded — no files were selected.');
+          if (Object.keys(docs).length > 0) {
+            // Update documents_submitted_at timestamp
+            await sb.from('hospital_profiles').update({ documents_submitted_at: new Date().toISOString() }).eq('id', hospitalId);
+          } else {
+            console.warn('No documents were uploaded — no files were selected.');
+          }
         } catch (uploadErr) {
           console.error('Document upload error:', uploadErr.message);
           alert('Documents could not be uploaded: ' + uploadErr.message + '\nYour account was created — you can upload documents later via the app.');
