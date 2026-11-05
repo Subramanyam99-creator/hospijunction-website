@@ -27,6 +27,9 @@
   <link rel="stylesheet" href="styles.css" />
 
   <style>
+    /* Highlighted nav button */
+    .nav-highlight{background:var(--blue-700) !important;color:var(--white) !important;padding:8px 18px !important;border-radius:8px;font-weight:600 !important;transition:background .2s}
+    .nav-highlight:hover{background:var(--blue-900) !important}
     /* Nav search bar */
     .nav-search-wrap{position:relative;flex:1;max-width:340px;margin:0 16px}
     .nav-search-input{width:100%;padding:9px 14px 9px 36px;font-size:14px;font-family:var(--body);border:1.5px solid var(--border-2);border-radius:999px;background:var(--white);color:var(--ink);outline:none;transition:border-color .2s;box-sizing:border-box}
@@ -112,10 +115,8 @@
         <div id="nav-results" class="nav-results"></div>
       </div>
       <nav class="nav-links">
-        <a href="#how">How it works</a>
-        <a href="#pricing">Pricing</a>
-        <a href="/for-hospitals/">For Hospitals</a>
-        <a href="/legal/">Legal</a>
+        <a href="/hospitals/">Hospitals</a>
+        <a href="/for-hospitals/" class="nav-highlight">For Hospitals</a>
         <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
       </nav>
     </div>
