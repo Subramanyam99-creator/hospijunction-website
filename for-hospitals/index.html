@@ -916,46 +916,7 @@
           alert('Documents could not be uploaded: ' + uploadErr.message + '\nYour account was created — you can upload documents later via the app.');
         }
 
-        // 4. Send email notification to admin (via hidden iframe to avoid CORS)
-        try {
-          var iframe = document.createElement('iframe');
-          iframe.name = 'formsubmit-iframe';
-          iframe.style.display = 'none';
-          document.body.appendChild(iframe);
-
-          var emailForm = document.createElement('form');
-          emailForm.method = 'POST';
-          emailForm.action = 'https://formsubmit.co/admin@hospijunction.com';
-          emailForm.target = 'formsubmit-iframe';
-          emailForm.style.display = 'none';
-
-          var fields = {
-            _subject: '🏥 New Hospital Registration: ' + data.hospital_name,
-            _captcha: 'false',
-            _template: 'table',
-            'Hospital Name': data.hospital_name,
-            'Type': data.hospital_type || '-',
-            'Registration Number': data.registration_number || '-',
-            'City': data.city,
-            'State': data.state,
-            'Address': data.address || '-',
-            'Contact Person': data.contact_name,
-            'Phone': '+91 ' + data.contact_phone,
-            'Email': userEmail,
-            'Documents Uploaded': Object.keys(docs).join(', ') || 'None',
-            'Registered At': new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
-          };
-          for (var key in fields) {
-            var input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = fields[key];
-            emailForm.appendChild(input);
-          }
-          document.body.appendChild(emailForm);
-          emailForm.submit();
-          setTimeout(function(){ iframe.remove(); emailForm.remove(); }, 5000);
-        } catch(e) { console.warn('Email notification failed:', e); }
+        // 4. Admin email is sent automatically via database trigger (pg_net + FormSubmit)
 
         // 5. Show success
         form.style.display = 'none';
