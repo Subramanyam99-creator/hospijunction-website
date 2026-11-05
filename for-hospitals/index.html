@@ -762,6 +762,20 @@
       var path = hospitalId + '/' + docType + '.' + ext;
       var { data, error } = await sb.storage.from('hospital-documents').upload(path, file, { upsert: true });
       if (error) throw new Error('Failed to upload ' + docType + ': ' + error.message);
+
+      // Insert record into hospital_documents table
+      var { error: dbErr } = await sb.from('hospital_documents').insert({
+        hospital_id: hospitalId,
+        file_name: file.name,
+        storage_path: path,
+        file_type: ext,
+        mime_type: file.type,
+        size_bytes: file.size,
+        document_type: docType,
+        notes: null
+      });
+      if (dbErr) console.warn('Could not save document record:', dbErr.message);
+
       return path;
     }
 
