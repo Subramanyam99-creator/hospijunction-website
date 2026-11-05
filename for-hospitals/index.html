@@ -155,7 +155,7 @@
       </a>
       <nav class="nav-links">
         <a href="/hospitals/">Hospitals</a>
-        <a href="/for-hospitals/" class="nav-highlight">For Hospitals</a>
+        <a href="/for-hospitals/" class="nav-highlight">Register Hospital</a>
         <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
       </nav>
     </div>
@@ -507,10 +507,16 @@
 
         </form>
 
-        <div class="form-success" id="form-success">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--blue-700);margin-bottom:16px"><circle cx="12" cy="12" r="10"/><polyline points="16 8 10 16 7 13"/></svg>
-          <p style="font-size:18px;margin-bottom:8px">Registration successful!</p>
-          <p style="font-size:14px;color:var(--muted);font-weight:400;line-height:1.6">Your hospital account has been created.<br />Our team will verify your details within 24-48 hours.<br /><br />You can now <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" target="_blank" rel="noopener" style="color:var(--blue-700);font-weight:700">download the app</a> and log in with your credentials to manage your hospital.</p>
+        <div class="form-success" id="form-success" style="display:none;text-align:center;padding:50px 20px">
+          <div style="width:72px;height:72px;border-radius:50%;background:var(--blue-50);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--blue-700)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3 style="font-family:var(--display);font-weight:700;font-size:24px;color:var(--ink);margin-bottom:10px">Registration successful!</h3>
+          <p style="font-size:15px;color:var(--muted);font-weight:400;line-height:1.7;max-width:420px;margin:0 auto">Your hospital account has been created.<br />Our team will verify your details within 24-48 hours.</p>
+          <div style="margin-top:28px;display:flex;flex-direction:column;gap:12px;align-items:center">
+            <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" target="_blank" rel="noopener" class="btn btn-primary" style="display:inline-block;padding:14px 32px;font-size:15px">Download the app & log in</a>
+            <span style="font-size:13px;color:var(--muted)">Use the same email & password you just registered with</span>
+          </div>
         </div>
       </div>
     </div>
