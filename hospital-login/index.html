@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Login — HospiJunction</title>
+  <meta name="description" content="Log in to your hospital dashboard on HospiJunction. Manage appointments, doctors, and queue." />
+  <meta name="theme-color" content="#0F2E5C" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <style>
+    .nav-highlight{background:var(--blue-700)!important;color:var(--white)!important;padding:8px 18px!important;border-radius:8px;font-weight:600!important;transition:background .2s}
+    .nav-highlight:hover{background:var(--blue-900)!important}
+
+    .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--cream);padding:40px 20px}
+    .login-card{background:var(--white);border-radius:16px;box-shadow:0 8px 32px rgba(15,46,92,.1);padding:48px 40px;width:100%;max-width:420px}
+    .login-logo{text-align:center;margin-bottom:32px}
+    .login-logo .logo-mark{font-size:28px;padding:10px 16px}
+    .login-logo h2{font-family:var(--display);font-weight:700;font-size:24px;color:var(--ink);margin-top:16px}
+    .login-logo p{font-size:14px;color:var(--muted);margin-top:6px}
+
+    .login-form .field{margin-bottom:20px}
+    .login-form label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+    .login-form input{width:100%;padding:12px 14px;border:1.5px solid var(--border-2);border-radius:8px;font-size:15px;font-family:var(--body);transition:border-color .2s;box-sizing:border-box}
+    .login-form input:focus{outline:none;border-color:var(--blue-700)}
+
+    .login-btn{width:100%;padding:14px;background:var(--blue-700);color:var(--white);border:none;border-radius:8px;font-size:15px;font-weight:600;font-family:var(--body);cursor:pointer;transition:background .2s;margin-top:8px}
+    .login-btn:hover{background:var(--blue-900)}
+    .login-btn:disabled{opacity:.6;cursor:not-allowed}
+
+    .divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--muted);font-size:13px}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-2)}
+
+    .google-btn{width:100%;padding:12px;background:var(--white);color:var(--ink);border:1.5px solid var(--border-2);border-radius:8px;font-size:14px;font-weight:600;font-family:var(--body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color .2s}
+    .google-btn:hover{border-color:var(--blue-700)}
+    .google-btn img{width:20px;height:20px}
+
+    .login-footer{text-align:center;margin-top:24px;font-size:13px;color:var(--muted)}
+    .login-footer a{color:var(--blue-700);font-weight:600}
+
+    .login-error{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
+
+    .forgot-link{font-size:13px;color:var(--blue-700);font-weight:500;text-decoration:none;float:right;margin-top:-4px}
+    .forgot-link:hover{text-decoration:underline}
+
+    @media(max-width:480px){
+      .login-card{padding:36px 24px}
+    }
+  </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <div class="brand-line"></div>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-mark">HJ</span>
+        <span class="logo-text">HospiJunction</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/hospitals/">Hospitals</a>
+        <a href="/for-hospitals/" class="nav-highlight">Register Hospital</a>
+        <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-mark">HJ</span>
+        <h2>Hospital Login</h2>
+        <p>Access your hospital dashboard</p>
+      </div>
+
+      <div class="login-error" id="login-error"></div>
+
+      <form class="login-form" id="login-form" onsubmit="return handleLogin(event)">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="admin@hospital.com" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot password?</a>
+          <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="login-btn" id="login-btn">Log in</button>
+      </form>
+
+      <div class="divider">or</div>
+
+      <button class="google-btn" onclick="handleGoogleLogin()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+        Continue with Google
+      </button>
+
+      <div class="login-footer">
+        <p>Don't have an account? <a href="/for-hospitals/">Register your hospital</a></p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD73bUT1PmaHTlSCMz8hRO3OrAb54PoHi8",
+      authDomain: "hospijunction-37aa0.firebaseapp.com",
+      projectId: "hospijunction-37aa0",
+      storageBucket: "hospijunction-37aa0.firebasestorage.app",
+      messagingSenderId: "792451871538",
+      appId: "1:792451871538:web:03d2c719f73ec6d3af9d2b"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Check if already logged in
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        // Verify this user is a hospital
+        const valid = await verifyHospitalUser(user);
+        if (valid) {
+          window.location.href = '/hospital-dashboard/';
+        }
+      }
+    });
+
+    // Supabase for verifying hospital
+    const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+
+    async function verifyHospitalUser(user) {
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/hospital_profiles?or=(firebase_uid.eq.${user.uid},email.eq.${encodeURIComponent(user.email)})&select=id,name,is_verified,is_active&limit=1`,
+          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
+        );
+        const data = await res.json();
+        return data && data.length > 0;
+      } catch (e) {
+        console.error('Verify error:', e);
+        return false;
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('login-error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('login-error').style.display = 'none';
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideError();
+      const btn = document.getElementById('login-btn');
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+
+      try {
+        const result = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const valid = await verifyHospitalUser(result.user);
+        if (!valid) {
+          await firebase.auth().signOut();
+          showError('No hospital account found for this email. Please register first.');
+          btn.disabled = false;
+          btn.textContent = 'Log in';
+          return;
+        }
+        // Store basic info for dashboard
+        sessionStorage.setItem('hj_hospital_user', JSON.stringify({
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName
+        }));
+        window.location.href = '/hospital-dashboard/';
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Log in';
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          showError('Invalid email or password. Please try again.');
+        } else if (err.code === 'auth/too-many-requests') {
+          showError('Too many attempts. Please wait a few minutes and try again.');
+        } else {
+          showError('Login failed: ' + err.message);
+        }
+      }
+    }
+
+    async function handleGoogleLogin() {
+      hideError();
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await firebase.auth().signInWithPopup(provider);
+        const valid = await verifyHospitalUser(result.user);
+        if (!valid) {
+          await firebase.auth().signOut();
+          showError('No hospital account found for this Google account. Please register first.');
+          return;
+        }
+        sessionStorage.setItem('hj_hospital_user', JSON.stringify({
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName
+        }));
+        window.location.href = '/hospital-dashboard/';
+      } catch (err) {
+        if (err.code !== 'auth/popup-closed-by-user') {
+          showError('Google login failed: ' + err.message);
+        }
+      }
+    }
+
+    async function handleForgotPassword(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      if (!email) {
+        showError('Please enter your email address first, then click "Forgot password?"');
+        return;
+      }
+      hideError();
+      try {
+        await firebase.auth().sendPasswordResetEmail(email);
+        const el = document.getElementById('login-error');
+        el.style.display = 'block';
+        el.style.background = '#F0FDF4';
+        el.style.borderColor = '#BBF7D0';
+        el.style.color = '#166534';
+        el.textContent = 'Password reset email sent to ' + email + '. Check your inbox.';
+      } catch (err) {
+        if (err.code === 'auth/user-not-found') {
+          showError('No account found with this email.');
+        } else {
+          showError('Could not send reset email: ' + err.message);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

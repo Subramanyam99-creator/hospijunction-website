@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Dashboard — HospiJunction</title>
+  <meta name="theme-color" content="#0F2E5C" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{--blue-900:#0F2E5C;--blue-700:#1A56B5;--blue-50:#EFF6FF;--cream:#FAF6EE;--white:#FFFFFF;--ink:#1A1A2E;--ink-2:#4A4A5A;--muted:#7A7A8A;--border:#E5E7EB;--border-2:#F0F0F5;--green:#16A34A;--green-bg:#F0FDF4;--red:#DC2626;--red-bg:#FEF2F2;--orange:#EA580C;--orange-bg:#FFF7ED;--radius:8px;--display:'Fraunces',serif;--body:'DM Sans',sans-serif}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:var(--body);background:#F5F6FA;color:var(--ink);font-size:14px}
+
+    /* Layout */
+    .dash{display:flex;min-height:100vh}
+    .sidebar{width:260px;background:var(--blue-900);color:var(--white);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
+    .sidebar-header{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
+    .sidebar-header .logo-mark{display:inline-block;background:var(--white);color:var(--blue-900);font-family:var(--display);font-weight:800;padding:6px 10px;border-radius:6px;font-size:16px;margin-right:8px}
+    .sidebar-header .logo-text{font-family:var(--display);font-weight:600;font-size:17px}
+    .sidebar-hospital{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
+    .sidebar-hospital h3{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sidebar-hospital .status{font-size:11px;margin-top:4px;display:inline-block;padding:2px 8px;border-radius:999px;font-weight:600}
+    .status-verified{background:rgba(22,163,74,.2);color:#4ADE80}
+    .status-pending{background:rgba(234,179,8,.2);color:#FACC15}
+    .sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:12px 20px;color:rgba(255,255,255,.7);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .15s;text-decoration:none;border:none;background:none;width:100%;text-align:left}
+    .nav-item:hover{background:rgba(255,255,255,.08);color:var(--white)}
+    .nav-item.active{background:rgba(255,255,255,.12);color:var(--white);font-weight:600;border-right:3px solid var(--white)}
+    .nav-item svg{width:20px;height:20px;flex-shrink:0;opacity:.7}
+    .nav-item.active svg{opacity:1}
+    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1)}
+    .logout-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.8);border-radius:8px;cursor:pointer;font-size:13px;font-family:var(--body);width:100%;transition:background .2s}
+    .logout-btn:hover{background:rgba(255,255,255,.15);color:var(--white)}
+
+    .main{flex:1;margin-left:260px;min-height:100vh}
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar h1{font-family:var(--display);font-weight:600;font-size:20px;color:var(--ink)}
+    .topbar-right{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--muted)}
+    .mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px}
+    .content{padding:28px 32px}
+
+    /* Cards */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+    .stat-card{background:var(--white);border-radius:12px;padding:20px;border:1px solid var(--border)}
+    .stat-card .stat-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .stat-card .stat-value{font-family:var(--display);font-weight:700;font-size:28px;color:var(--ink);margin-top:6px}
+    .stat-card .stat-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+    .card{background:var(--white);border-radius:12px;border:1px solid var(--border);margin-bottom:20px}
+    .card-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card-header h2{font-family:var(--display);font-weight:600;font-size:17px}
+    .card-body{padding:22px}
+
+    /* Tables */
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:10px 14px;border-bottom:2px solid var(--border)}
+    td{padding:12px 14px;border-bottom:1px solid var(--border-2);font-size:13.5px;vertical-align:middle}
+    tr:hover td{background:var(--blue-50)}
+
+    /* Badges */
+    .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+    .badge-booked{background:var(--blue-50);color:var(--blue-700)}
+    .badge-confirmed{background:var(--blue-50);color:var(--blue-700)}
+    .badge-checked-in{background:var(--orange-bg);color:var(--orange)}
+    .badge-in-progress{background:var(--orange-bg);color:var(--orange)}
+    .badge-completed{background:var(--green-bg);color:var(--green)}
+    .badge-cancelled{background:var(--red-bg);color:var(--red)}
+    .badge-no-show{background:var(--red-bg);color:var(--red)}
+
+    /* Buttons */
+    .btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--body);cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+    .btn-primary{background:var(--blue-700);color:var(--white)}.btn-primary:hover{background:var(--blue-900)}
+    .btn-success{background:var(--green);color:var(--white)}.btn-success:hover{background:#15803D}
+    .btn-danger{background:var(--red);color:var(--white)}.btn-danger:hover{background:#B91C1C}
+    .btn-outline{background:var(--white);color:var(--ink);border:1.5px solid var(--border)}.btn-outline:hover{border-color:var(--blue-700);color:var(--blue-700)}
+    .btn-sm{padding:6px 12px;font-size:12px}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+
+    /* Forms */
+    .form-group{margin-bottom:18px}
+    .form-group label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+    .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--body)}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--blue-700)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+    /* Sections */
+    .section-page{display:none}
+    .section-page.active{display:block}
+
+    /* Filter bar */
+    .filter-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;align-items:center}
+    .filter-row input,.filter-row select{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--body)}
+
+    /* Empty state */
+    .empty-state{text-align:center;padding:48px;color:var(--muted)}
+    .empty-state svg{margin-bottom:16px;opacity:.4}
+    .empty-state h3{font-family:var(--display);font-size:18px;color:var(--ink);margin-bottom:8px}
+
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--white);border-radius:16px;padding:32px;width:90%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .modal h2{font-family:var(--display);font-weight:600;font-size:20px;margin-bottom:20px}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;border-radius:10px;font-size:14px;font-weight:600;color:var(--white);z-index:999;transform:translateY(100px);opacity:0;transition:all .3s}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast-success{background:var(--green)}
+    .toast-error{background:var(--red)}
+
+    /* Loading */
+    .loading{text-align:center;padding:40px;color:var(--muted)}
+    .spin{display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--blue-700);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Responsive */
+    @media(max-width:900px){
+      .stats-row{grid-template-columns:repeat(2,1fr)}
+      .form-row{grid-template-columns:1fr}
+    }
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.open{transform:translateX(0)}
+      .main{margin-left:0}
+      .topbar{padding:14px 20px}
+      .content{padding:20px}
+      .mobile-toggle{display:block}
+      .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+      .sidebar-overlay.open{display:block}
+    }
+    @media(max-width:480px){
+      .stats-row{grid-template-columns:1fr}
+    }
+  </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <div class="dash">
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" style="text-decoration:none;color:var(--white)">
+          <span class="logo-mark">HJ</span>
+          <span class="logo-text">HospiJunction</span>
+        </a>
+      </div>
+      <div class="sidebar-hospital" id="sidebar-hospital">
+        <h3 id="hospital-name-sidebar">Loading...</h3>
+        <span class="status status-pending" id="hospital-status-badge">Pending</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-page="overview" onclick="showPage('overview',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Overview
+        </button>
+        <button class="nav-item" data-page="appointments" onclick="showPage('appointments',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Appointments
+        </button>
+        <button class="nav-item" data-page="queue" onclick="showPage('queue',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Queue
+        </button>
+        <button class="nav-item" data-page="doctors" onclick="showPage('doctors',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Doctors
+        </button>
+        <button class="nav-item" data-page="profile" onclick="showPage('profile',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Hospital Profile
+        </button>
+        <button class="nav-item" data-page="export" onclick="showPage('export',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Data
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="handleLogout()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Log out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="mobile-toggle" onclick="toggleSidebar()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 id="page-title">Overview</h1>
+        </div>
+        <div class="topbar-right">
+          <span id="today-date"></span>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- ==================== OVERVIEW ==================== -->
+        <div class="section-page active" id="page-overview">
+          <div class="stats-row" id="overview-stats">
+            <div class="stat-card"><div class="stat-label">Today's Appointments</div><div class="stat-value" id="stat-today">-</div></div>
+            <div class="stat-card"><div class="stat-label">In Queue</div><div class="stat-value" id="stat-queue">-</div></div>
+            <div class="stat-card"><div class="stat-label">Completed Today</div><div class="stat-value" id="stat-completed">-</div></div>
+            <div class="stat-card"><div class="stat-label">Active Doctors</div><div class="stat-value" id="stat-doctors">-</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h2>Today's Appointments</h2></div>
+            <div class="card-body" id="overview-appointments"><div class="loading"><div class="spin"></div></div></div>
+          </div>
+        </div>
+
+        <!-- ==================== APPOINTMENTS ==================== -->
+        <div class="section-page" id="page-appointments">
+          <div class="filter-row">
+            <input type="date" id="appt-date-filter" onchange="loadAppointments()" />
+            <select id="appt-status-filter" onchange="loadAppointments()">
+              <option value="">All Statuses</option>
+              <option value="booked">Booked</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="checked_in">Checked In</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="no_show">No Show</option>
+            </select>
+            <select id="appt-doctor-filter" onchange="loadAppointments()">
+              <option value="">All Doctors</option>
+            </select>
+          </div>
+          <div class="card">
+            <div class="card-body" id="appointments-list"><div class="loading"><div class="spin"></div></div></div>
+          </div>
+        </div>
+
+        <!-- ==================== QUEUE ==================== -->
+        <div class="section-page" id="page-queue">
+          <div class="filter-row">
+            <select id="queue-doctor-filter" onchange="loadQueue()">
+              <option value="">All Doctors</option>
+            </select>
+            <button class="btn btn-outline" onclick="loadQueue()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div class="card">
+            <div class="card-header"><h2>Live Queue — Today</h2></div>
+            <div class="card-body" id="queue-list"><div class="loading"><div class="spin"></div></div></div>
+          </div>
+        </div>
+
+        <!-- ==================== DOCTORS ==================== -->
+        <div class="section-page" id="page-doctors">
+          <div style="margin-bottom:20px">
+            <button class="btn btn-primary" onclick="openDoctorModal()">+ Add Doctor</button>
+          </div>
+          <div id="doctors-list"><div class="loading"><div class="spin"></div></div></div>
+        </div>
+
+        <!-- ==================== PROFILE ==================== -->
+        <div class="section-page" id="page-profile">
+          <div class="card">
+            <div class="card-header"><h2>Hospital Details</h2><button class="btn btn-primary btn-sm" onclick="saveProfile()" id="save-profile-btn">Save Changes</button></div>
+            <div class="card-body" id="profile-form-area"><div class="loading"><div class="spin"></div></div></div>
+          </div>
+        </div>
+
+        <!-- ==================== EXPORT ==================== -->
+        <div class="section-page" id="page-export">
+          <div class="card">
+            <div class="card-header"><h2>Export Patient Data</h2></div>
+            <div class="card-body">
+              <p style="color:var(--muted);margin-bottom:20px">Download appointment and patient data as Excel files for your records.</p>
+              <div class="form-row" style="margin-bottom:20px">
+                <div class="form-group">
+                  <label>From Date</label>
+                  <input type="date" id="export-from" />
+                </div>
+                <div class="form-group">
+                  <label>To Date</label>
+                  <input type="date" id="export-to" />
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="exportData('custom')">Download Custom Range</button>
+                <button class="btn btn-outline" onclick="exportData('week')">This Week</button>
+                <button class="btn btn-outline" onclick="exportData('month')">This Month</button>
+                <button class="btn btn-outline" onclick="exportData('all')">All Time</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Doctor Modal -->
+  <div class="modal-overlay" id="doctor-modal">
+    <div class="modal">
+      <h2 id="doctor-modal-title">Add Doctor</h2>
+      <input type="hidden" id="doc-edit-id" />
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" id="doc-name" placeholder="Dr. Name" required /></div>
+        <div class="form-group"><label>Specialization *</label><input type="text" id="doc-spec" placeholder="e.g. General Medicine" required /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Qualification</label><input type="text" id="doc-qual" placeholder="e.g. MBBS, MD" /></div>
+        <div class="form-group"><label>Experience (years)</label><input type="number" id="doc-exp" placeholder="0" min="0" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Registration Number</label><input type="text" id="doc-reg" placeholder="Medical reg. no." /></div>
+        <div class="form-group"><label>Consultation Fee (₹)</label><input type="number" id="doc-fee" placeholder="500" min="0" /></div>
+      </div>
+      <div class="form-group"><label>Languages</label><input type="text" id="doc-lang" placeholder="English, Hindi, Telugu (comma separated)" /></div>
+      <div class="form-group"><label>Bio</label><textarea id="doc-bio" rows="3" placeholder="Short bio..."></textarea></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeDoctorModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDoctor()" id="save-doc-btn">Save Doctor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ====== Config ======
+    const firebaseConfig = {
+      apiKey: "AIzaSyD73bUT1PmaHTlSCMz8hRO3OrAb54PoHi8",
+      authDomain: "hospijunction-37aa0.firebaseapp.com",
+      projectId: "hospijunction-37aa0",
+      storageBucket: "hospijunction-37aa0.firebasestorage.app",
+      messagingSenderId: "792451871538",
+      appId: "1:792451871538:web:03d2c719f73ec6d3af9d2b"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let hospitalData = null;
+    let doctorsList = [];
+
+    // ====== Auth ======
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = '/hospital-login/';
+        return;
+      }
+      await loadHospitalData(user);
+    });
+
+    async function loadHospitalData(user) {
+      try {
+        const { data, error } = await sb
+          .from('hospital_profiles')
+          .select('*')
+          .or(`firebase_uid.eq.${user.uid},email.eq.${user.email}`)
+          .limit(1)
+          .single();
+
+        if (error || !data) {
+          showToast('No hospital found for this account', 'error');
+          setTimeout(() => { firebase.auth().signOut(); window.location.href = '/hospital-login/'; }, 2000);
+          return;
+        }
+
+        hospitalData = data;
+        document.getElementById('hospital-name-sidebar').textContent = data.name || 'Hospital';
+        const badge = document.getElementById('hospital-status-badge');
+        if (data.is_verified) {
+          badge.textContent = 'Verified';
+          badge.className = 'status status-verified';
+        } else {
+          badge.textContent = 'Pending Verification';
+          badge.className = 'status status-pending';
+        }
+
+        // Load initial data
+        await loadDoctors();
+        loadOverview();
+        populateDoctorFilters();
+
+        // Set today's date
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('appt-date-filter').value = today;
+        document.getElementById('export-to').value = today;
+        const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+        document.getElementById('export-from').value = weekAgo.toISOString().split('T')[0];
+
+      } catch (err) {
+        console.error('Load error:', err);
+        showToast('Error loading hospital data', 'error');
+      }
+    }
+
+    // ====== Navigation ======
+    function showPage(page, btn) {
+      document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const titles = { overview: 'Overview', appointments: 'Appointments', queue: 'Queue', doctors: 'Doctors', profile: 'Hospital Profile', export: 'Export Data' };
+      document.getElementById('page-title').textContent = titles[page] || page;
+
+      // Load page data
+      if (page === 'overview') loadOverview();
+      else if (page === 'appointments') loadAppointments();
+      else if (page === 'queue') loadQueue();
+      else if (page === 'doctors') loadDoctors().then(renderDoctors);
+      else if (page === 'profile') renderProfile();
+
+      // Close mobile sidebar
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebar-overlay').classList.remove('open');
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebar-overlay').classList.toggle('open');
+    }
+
+    // ====== Overview ======
+    async function loadOverview() {
+      if (!hospitalData) return;
+      const today = new Date().toISOString().split('T')[0];
+
+      try {
+        const { data: appts } = await sb
+          .from('appointments')
+          .select('id, patient_id, doctor_id, slot_time, status, queue_number, symptoms, checked_in_at, started_at, completed_at')
+          .eq('hospital_id', hospitalData.id)
+          .eq('appointment_date', today)
+          .order('queue_number', { ascending: true });
+
+        const list = appts || [];
+        document.getElementById('stat-today').textContent = list.length;
+        document.getElementById('stat-queue').textContent = list.filter(a => a.status === 'checked_in' || a.status === 'confirmed' || a.status === 'booked').length;
+        document.getElementById('stat-completed').textContent = list.filter(a => a.status === 'completed').length;
+        document.getElementById('stat-doctors').textContent = doctorsList.filter(d => d.is_active).length;
+
+        renderAppointmentTable(list, 'overview-appointments');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ====== Appointments ======
+    async function loadAppointments() {
+      if (!hospitalData) return;
+      const date = document.getElementById('appt-date-filter').value;
+      const status = document.getElementById('appt-status-filter').value;
+      const doctorId = document.getElementById('appt-doctor-filter').value;
+
+      let query = sb
+        .from('appointments')
+        .select('id, patient_id, doctor_id, appointment_date, slot_time, status, queue_number, symptoms, notes, consultation_fee, checked_in_at, started_at, completed_at, cancelled_by, cancel_reason, created_at')
+        .eq('hospital_id', hospitalData.id)
+        .order('appointment_date', { ascending: false })
+        .order('slot_time', { ascending: true })
+        .limit(100);
+
+      if (date) query = query.eq('appointment_date', date);
+      if (status) query = query.eq('status', status);
+      if (doctorId) query = query.eq('doctor_id', doctorId);
+
+      const { data: appts } = await query;
+      renderAppointmentTable(appts || [], 'appointments-list', true);
+    }
+
+    function renderAppointmentTable(appts, containerId, showDate = false) {
+      const container = document.getElementById(containerId);
+      if (appts.length === 0) {
+        container.innerHTML = '<div class="empty-state"><h3>No appointments found</h3><p>Appointments will appear here when patients book.</p></div>';
+        return;
+      }
+
+      const doctorMap = {};
+      doctorsList.forEach(d => { doctorMap[d.id] = d.full_name; });
+
+      let html = '<div class="table-wrap"><table><thead><tr>';
+      html += '<th>Q#</th>';
+      if (showDate) html += '<th>Date</th>';
+      html += '<th>Time</th><th>Doctor</th><th>Status</th><th>Actions</th>';
+      html += '</tr></thead><tbody>';
+
+      appts.forEach(a => {
+        const statusClass = 'badge-' + (a.status || '').replace('_', '-');
+        html += '<tr>';
+        html += `<td><strong>${a.queue_number || '-'}</strong></td>`;
+        if (showDate) html += `<td>${a.appointment_date || '-'}</td>`;
+        html += `<td>${a.slot_time || '-'}</td>`;
+        html += `<td>${doctorMap[a.doctor_id] || '-'}</td>`;
+        html += `<td><span class="badge ${statusClass}">${(a.status || '').replace('_', ' ')}</span></td>`;
+        html += '<td>';
+        if (a.status === 'booked' || a.status === 'confirmed') {
+          html += `<button class="btn btn-sm btn-success" onclick="updateApptStatus('${a.id}','checked_in')">Check In</button> `;
+          html += `<button class="btn btn-sm btn-danger" onclick="updateApptStatus('${a.id}','cancelled')">Cancel</button>`;
+        } else if (a.status === 'checked_in') {
+          html += `<button class="btn btn-sm btn-primary" onclick="updateApptStatus('${a.id}','in_progress')">Start</button>`;
+        } else if (a.status === 'in_progress') {
+          html += `<button class="btn btn-sm btn-success" onclick="updateApptStatus('${a.id}','completed')">Complete</button>`;
+        }
+        html += '</td></tr>';
+      });
+
+      html += '</tbody></table></div>';
+      container.innerHTML = html;
+    }
+
+    async function updateApptStatus(id, status) {
+      const updates = { status };
+      const now = new Date().toISOString();
+      if (status === 'checked_in') updates.checked_in_at = now;
+      else if (status === 'in_progress') updates.started_at = now;
+      else if (status === 'completed') updates.completed_at = now;
+      else if (status === 'cancelled') updates.cancelled_by = 'hospital';
+
+      const { error } = await sb.from('appointments').update(updates).eq('id', id);
+      if (error) {
+        showToast('Failed to update: ' + error.message, 'error');
+      } else {
+        showToast('Appointment updated', 'success');
+        // Refresh current page
+        const activePage = document.querySelector('.nav-item.active');
+        if (activePage) {
+          const page = activePage.dataset.page;
+          if (page === 'overview') loadOverview();
+          else if (page === 'appointments') loadAppointments();
+          else if (page === 'queue') loadQueue();
+        }
+      }
+    }
+
+    // ====== Queue ======
+    async function loadQueue() {
+      if (!hospitalData) return;
+      const today = new Date().toISOString().split('T')[0];
+      const doctorId = document.getElementById('queue-doctor-filter').value;
+
+      let query = sb
+        .from('appointments')
+        .select('id, patient_id, doctor_id, slot_time, status, queue_number, symptoms, checked_in_at, started_at')
+        .eq('hospital_id', hospitalData.id)
+        .eq('appointment_date', today)
+        .in('status', ['booked', 'confirmed', 'checked_in', 'in_progress'])
+        .order('queue_number', { ascending: true });
+
+      if (doctorId) query = query.eq('doctor_id', doctorId);
+
+      const { data: appts } = await query;
+      const container = document.getElementById('queue-list');
+
+      if (!appts || appts.length === 0) {
+        container.innerHTML = '<div class="empty-state"><h3>Queue is empty</h3><p>No active appointments in today\'s queue.</p></div>';
+        return;
+      }
+
+      const doctorMap = {};
+      doctorsList.forEach(d => { doctorMap[d.id] = d.full_name; });
+
+      let html = '<div class="table-wrap"><table><thead><tr><th>Q#</th><th>Time</th><th>Doctor</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+
+      appts.forEach(a => {
+        const statusClass = 'badge-' + (a.status || '').replace('_', '-');
+        let actions = '';
+        if (a.status === 'booked' || a.status === 'confirmed') {
+          actions = `<button class="btn btn-sm btn-success" onclick="updateApptStatus('${a.id}','checked_in')">Check In</button>`;
+        } else if (a.status === 'checked_in') {
+          actions = `<button class="btn btn-sm btn-primary" onclick="updateApptStatus('${a.id}','in_progress')">Start</button>`;
+        } else if (a.status === 'in_progress') {
+          actions = `<button class="btn btn-sm btn-success" onclick="updateApptStatus('${a.id}','completed')">Complete</button>`;
+        }
+
+        html += `<tr>
+          <td><strong style="font-size:18px;color:var(--blue-700)">${a.queue_number || '-'}</strong></td>
+          <td>${a.slot_time || '-'}</td>
+          <td>${doctorMap[a.doctor_id] || '-'}</td>
+          <td><span class="badge ${statusClass}">${(a.status || '').replace('_', ' ')}</span></td>
+          <td>${actions}</td>
+        </tr>`;
+      });
+
+      html += '</tbody></table></div>';
+      container.innerHTML = html;
+    }
+
+    // ====== Doctors ======
+    async function loadDoctors() {
+      if (!hospitalData) return;
+      const { data } = await sb
+        .from('doctors')
+        .select('*')
+        .eq('hospital_id', hospitalData.id)
+        .order('full_name');
+      doctorsList = data || [];
+      return doctorsList;
+    }
+
+    function renderDoctors() {
+      const container = document.getElementById('doctors-list');
+      if (doctorsList.length === 0) {
+        container.innerHTML = '<div class="empty-state"><h3>No doctors added</h3><p>Add your first doctor to start accepting appointments.</p></div>';
+        return;
+      }
+
+      let html = '';
+      doctorsList.forEach(d => {
+        const isOnLeave = d.leave_from && d.leave_to && new Date() >= new Date(d.leave_from) && new Date() <= new Date(d.leave_to);
+        html += `<div class="card" style="margin-bottom:16px">
+          <div class="card-body" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+            <div style="width:56px;height:56px;border-radius:50%;background:var(--blue-50);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:20px;color:var(--blue-700);flex-shrink:0">
+              ${d.photo_url ? `<img src="${d.photo_url}" style="width:56px;height:56px;border-radius:50%;object-fit:cover" />` : d.full_name.split(' ').map(w => w[0]).join('').substring(0, 2)}
+            </div>
+            <div style="flex:1;min-width:200px">
+              <h3 style="font-family:var(--display);font-weight:600;font-size:16px;margin-bottom:4px">${escapeHtml(d.full_name)}</h3>
+              <div style="font-size:13px;color:var(--blue-700);font-weight:500">${escapeHtml(d.specialization || '')}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">
+                ${d.qualification || ''} ${d.experience_years ? '· ' + d.experience_years + ' yrs exp' : ''}
+                ${d.consultation_fee ? ' · ₹' + d.consultation_fee : ''}
+              </div>
+              ${isOnLeave ? `<div style="margin-top:6px"><span class="badge badge-cancelled">On Leave: ${d.leave_reason || ''}</span></div>` : ''}
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span class="badge ${d.is_active ? 'badge-completed' : 'badge-cancelled'}">${d.is_active ? 'Active' : 'Inactive'}</span>
+              <button class="btn btn-sm btn-outline" onclick="editDoctor('${d.id}')">Edit</button>
+              <button class="btn btn-sm ${d.is_active ? 'btn-danger' : 'btn-success'}" onclick="toggleDoctorActive('${d.id}', ${!d.is_active})">${d.is_active ? 'Deactivate' : 'Activate'}</button>
+            </div>
+          </div>
+        </div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function openDoctorModal(doc = null) {
+      document.getElementById('doctor-modal-title').textContent = doc ? 'Edit Doctor' : 'Add Doctor';
+      document.getElementById('doc-edit-id').value = doc ? doc.id : '';
+      document.getElementById('doc-name').value = doc ? doc.full_name : '';
+      document.getElementById('doc-spec').value = doc ? (doc.specialization || '') : '';
+      document.getElementById('doc-qual').value = doc ? (doc.qualification || '') : '';
+      document.getElementById('doc-exp').value = doc ? (doc.experience_years || '') : '';
+      document.getElementById('doc-reg').value = doc ? (doc.registration_number || '') : '';
+      document.getElementById('doc-fee').value = doc ? (doc.consultation_fee || '') : '';
+      document.getElementById('doc-lang').value = doc && doc.languages ? doc.languages.join(', ') : '';
+      document.getElementById('doc-bio').value = doc ? (doc.bio || '') : '';
+      document.getElementById('doctor-modal').classList.add('open');
+    }
+
+    function closeDoctorModal() {
+      document.getElementById('doctor-modal').classList.remove('open');
+    }
+
+    function editDoctor(id) {
+      const doc = doctorsList.find(d => d.id === id);
+      if (doc) openDoctorModal(doc);
+    }
+
+    async function saveDoctor() {
+      const id = document.getElementById('doc-edit-id').value;
+      const name = document.getElementById('doc-name').value.trim();
+      const spec = document.getElementById('doc-spec').value.trim();
+      if (!name || !spec) { showToast('Name and specialization are required', 'error'); return; }
+
+      const langStr = document.getElementById('doc-lang').value;
+      const languages = langStr ? langStr.split(',').map(l => l.trim()).filter(Boolean) : [];
+
+      const docData = {
+        hospital_id: hospitalData.id,
+        full_name: name,
+        specialization: spec,
+        qualification: document.getElementById('doc-qual').value.trim() || null,
+        experience_years: document.getElementById('doc-exp').value ? parseInt(document.getElementById('doc-exp').value) : null,
+        registration_number: document.getElementById('doc-reg').value.trim() || null,
+        consultation_fee: document.getElementById('doc-fee').value ? parseInt(document.getElementById('doc-fee').value) : null,
+        languages: languages.length ? languages : null,
+        bio: document.getElementById('doc-bio').value.trim() || null,
+      };
+
+      const btn = document.getElementById('save-doc-btn');
+      btn.disabled = true;
+
+      try {
+        if (id) {
+          const { error } = await sb.from('doctors').update(docData).eq('id', id);
+          if (error) throw error;
+          showToast('Doctor updated', 'success');
+        } else {
+          docData.is_active = true;
+          const { error } = await sb.from('doctors').insert(docData);
+          if (error) throw error;
+          showToast('Doctor added', 'success');
+        }
+        closeDoctorModal();
+        await loadDoctors();
+        renderDoctors();
+        populateDoctorFilters();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+      btn.disabled = false;
+    }
+
+    async function toggleDoctorActive(id, active) {
+      const { error } = await sb.from('doctors').update({ is_active: active }).eq('id', id);
+      if (error) {
+        showToast('Error: ' + error.message, 'error');
+      } else {
+        showToast(active ? 'Doctor activated' : 'Doctor deactivated', 'success');
+        await loadDoctors();
+        renderDoctors();
+      }
+    }
+
+    function populateDoctorFilters() {
+      ['appt-doctor-filter', 'queue-doctor-filter'].forEach(filterId => {
+        const el = document.getElementById(filterId);
+        const val = el.value;
+        el.innerHTML = '<option value="">All Doctors</option>';
+        doctorsList.forEach(d => {
+          el.innerHTML += `<option value="${d.id}">${escapeHtml(d.full_name)}</option>`;
+        });
+        el.value = val;
+      });
+    }
+
+    // ====== Profile ======
+    function renderProfile() {
+      if (!hospitalData) return;
+      const d = hospitalData;
+      const container = document.getElementById('profile-form-area');
+      container.innerHTML = `
+        <div class="form-row">
+          <div class="form-group"><label>Hospital Name</label><input type="text" id="prof-name" value="${escapeHtml(d.name || '')}" /></div>
+          <div class="form-group"><label>Hospital Type</label>
+            <select id="prof-type">
+              <option value="">Select</option>
+              ${['Government Hospital','Private Hospital','Clinic','Nursing Home','Diagnostic Centre','Speciality Hospital'].map(t =>
+                `<option value="${t}" ${d.hospital_type === t ? 'selected' : ''}>${t}</option>`
+              ).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Registration Number</label><input type="text" id="prof-reg" value="${escapeHtml(d.registration_number || '')}" /></div>
+          <div class="form-group"><label>Phone</label><input type="tel" id="prof-phone" value="${escapeHtml(d.phone || '')}" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Email</label><input type="email" id="prof-email" value="${escapeHtml(d.email || '')}" /></div>
+          <div class="form-group"><label>Consultation Fee (₹)</label><input type="number" id="prof-fee" value="${d.consultation_fee || ''}" min="0" /></div>
+        </div>
+        <div class="form-group"><label>Address</label><input type="text" id="prof-address" value="${escapeHtml(d.address || '')}" /></div>
+        <div class="form-row">
+          <div class="form-group"><label>City</label><input type="text" id="prof-city" value="${escapeHtml(d.city || '')}" /></div>
+          <div class="form-group"><label>State</label><input type="text" id="prof-state" value="${escapeHtml(d.state || '')}" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Pincode</label><input type="text" id="prof-pincode" value="${escapeHtml(d.pincode || '')}" /></div>
+          <div class="form-group"><label>Beds</label><input type="number" id="prof-beds" value="${d.beds || ''}" min="0" /></div>
+        </div>
+        <div class="form-group"><label>Google Maps Link</label><input type="url" id="prof-map" value="${escapeHtml(d.map_link || '')}" placeholder="https://maps.google.com/..." /></div>
+        <div class="form-group"><label>About / Description</label><textarea id="prof-about" rows="4">${escapeHtml(d.about || d.description || '')}</textarea></div>
+      `;
+    }
+
+    async function saveProfile() {
+      if (!hospitalData) return;
+      const btn = document.getElementById('save-profile-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      const updates = {
+        name: document.getElementById('prof-name').value.trim(),
+        hospital_type: document.getElementById('prof-type').value,
+        registration_number: document.getElementById('prof-reg').value.trim(),
+        phone: document.getElementById('prof-phone').value.trim(),
+        email: document.getElementById('prof-email').value.trim(),
+        consultation_fee: document.getElementById('prof-fee').value ? parseInt(document.getElementById('prof-fee').value) : null,
+        address: document.getElementById('prof-address').value.trim(),
+        city: document.getElementById('prof-city').value.trim(),
+        state: document.getElementById('prof-state').value.trim(),
+        pincode: document.getElementById('prof-pincode').value.trim(),
+        beds: document.getElementById('prof-beds').value ? parseInt(document.getElementById('prof-beds').value) : null,
+        map_link: document.getElementById('prof-map').value.trim(),
+        about: document.getElementById('prof-about').value.trim(),
+        description: document.getElementById('prof-about').value.trim(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await sb.from('hospital_profiles').update(updates).eq('id', hospitalData.id);
+      btn.disabled = false;
+      btn.textContent = 'Save Changes';
+
+      if (error) {
+        showToast('Error saving: ' + error.message, 'error');
+      } else {
+        Object.assign(hospitalData, updates);
+        document.getElementById('hospital-name-sidebar').textContent = updates.name;
+        showToast('Profile saved successfully', 'success');
+      }
+    }
+
+    // ====== Export ======
+    async function exportData(range) {
+      if (!hospitalData) return;
+      let fromDate, toDate;
+      const today = new Date();
+
+      if (range === 'week') {
+        fromDate = new Date(today); fromDate.setDate(today.getDate() - 7);
+        toDate = today;
+      } else if (range === 'month') {
+        fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        toDate = today;
+      } else if (range === 'all') {
+        fromDate = new Date('2024-01-01');
+        toDate = today;
+      } else {
+        fromDate = new Date(document.getElementById('export-from').value);
+        toDate = new Date(document.getElementById('export-to').value);
+        if (isNaN(fromDate) || isNaN(toDate)) { showToast('Please select valid dates', 'error'); return; }
+      }
+
+      const from = fromDate.toISOString().split('T')[0];
+      const to = toDate.toISOString().split('T')[0];
+
+      showToast('Preparing export...', 'success');
+
+      try {
+        // Fetch appointments with patient details
+        const { data: appts, error } = await sb
+          .from('appointments')
+          .select('id, patient_id, doctor_id, appointment_date, slot_time, status, queue_number, symptoms, notes, consultation_fee, checked_in_at, completed_at, cancel_reason, created_at')
+          .eq('hospital_id', hospitalData.id)
+          .gte('appointment_date', from)
+          .lte('appointment_date', to)
+          .order('appointment_date', { ascending: false })
+          .order('slot_time', { ascending: true });
+
+        if (error) throw error;
+        if (!appts || appts.length === 0) { showToast('No data found for this period', 'error'); return; }
+
+        // Get patient details
+        const patientIds = [...new Set(appts.map(a => a.patient_id).filter(Boolean))];
+        let patientMap = {};
+        if (patientIds.length > 0) {
+          const { data: patients } = await sb
+            .from('patient_profiles')
+            .select('id, full_name, phone, email, gender, age')
+            .in('id', patientIds);
+          (patients || []).forEach(p => { patientMap[p.id] = p; });
+        }
+
+        const doctorMap = {};
+        doctorsList.forEach(d => { doctorMap[d.id] = d; });
+
+        // Build Excel data
+        const rows = appts.map(a => {
+          const patient = patientMap[a.patient_id] || {};
+          const doctor = doctorMap[a.doctor_id] || {};
+          return {
+            'Date': a.appointment_date,
+            'Time': a.slot_time || '',
+            'Queue #': a.queue_number || '',
+            'Patient Name': patient.full_name || '',
+            'Patient Phone': patient.phone || '',
+            'Patient Email': patient.email || '',
+            'Gender': patient.gender || '',
+            'Age': patient.age || '',
+            'Doctor': doctor.full_name || '',
+            'Specialization': doctor.specialization || '',
+            'Status': (a.status || '').replace('_', ' '),
+            'Symptoms': a.symptoms || '',
+            'Notes': a.notes || '',
+            'Fee (₹)': a.consultation_fee || '',
+            'Cancel Reason': a.cancel_reason || '',
+            'Booked At': a.created_at ? new Date(a.created_at).toLocaleString('en-IN') : '',
+          };
+        });
+
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Appointments');
+
+        // Auto-width columns
+        const colWidths = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k] || '').length)) }));
+        ws['!cols'] = colWidths;
+
+        const fileName = `HospiJunction_${hospitalData.name.replace(/[^a-zA-Z0-9]/g, '_')}_${from}_to_${to}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        showToast('Excel file downloaded!', 'success');
+
+      } catch (err) {
+        showToast('Export failed: ' + err.message, 'error');
+        console.error(err);
+      }
+    }
+
+    // ====== Utilities ======
+    function escapeHtml(s) {
+      if (!s) return '';
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast toast-' + type + ' show';
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function handleLogout() {
+      firebase.auth().signOut().then(() => {
+        sessionStorage.removeItem('hj_hospital_user');
+        window.location.href = '/hospital-login/';
+      });
+    }
+  </script>
+</body>
+</html>
