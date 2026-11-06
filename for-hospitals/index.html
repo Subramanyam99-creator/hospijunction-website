@@ -918,10 +918,28 @@
 
         // 4. Admin email is sent automatically via database trigger (pg_net + FormSubmit)
 
-        // 5. Show success
+        // 5. Show success — hide everything except nav and success message
         form.style.display = 'none';
         document.getElementById('step-progress').style.display = 'none';
-        document.getElementById('form-success').style.display = 'block';
+
+        const successEl = document.getElementById('form-success');
+        successEl.style.display = 'flex';
+        successEl.style.flexDirection = 'column';
+        successEl.style.alignItems = 'center';
+        successEl.style.justifyContent = 'center';
+        successEl.style.minHeight = '70vh';
+
+        // Hide hero, stats, benefits, FAQ, footer
+        document.querySelector('.h-hero').style.display = 'none';
+        document.querySelector('.stats-bar').style.display = 'none';
+        const allSections = document.querySelectorAll('.section');
+        allSections.forEach(s => {
+          if (!s.querySelector('#form-success')) s.style.display = 'none';
+        });
+        document.querySelector('.footer').style.display = 'none';
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
       } catch (err) {
         btn.disabled = false;
