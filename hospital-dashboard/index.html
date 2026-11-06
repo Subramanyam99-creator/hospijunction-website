@@ -139,7 +139,7 @@
     }
   </style>
 
-  <!-- Firebase -->
+  <!-- Firebase (for Google sign-in logout) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <!-- Supabase -->
@@ -346,15 +346,12 @@
 
   <script>
     // ====== Config ======
-    const firebaseConfig = {
+    // Firebase (for Google logout)
+    firebase.initializeApp({
       apiKey: "AIzaSyD73bUT1PmaHTlSCMz8hRO3OrAb54PoHi8",
       authDomain: "hospijunction-37aa0.firebaseapp.com",
-      projectId: "hospijunction-37aa0",
-      storageBucket: "hospijunction-37aa0.firebasestorage.app",
-      messagingSenderId: "792451871538",
-      appId: "1:792451871538:web:03d2c719f73ec6d3af9d2b"
-    };
-    firebase.initializeApp(firebaseConfig);
+      projectId: "hospijunction-37aa0"
+    });
 
     const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
     const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
@@ -364,26 +361,42 @@
     let doctorsList = [];
 
     // ====== Auth ======
-    firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        window.location.href = '/hospital-login/';
+    (async () => {
+      // Check Supabase session first (email/password login)
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        await loadHospitalData({ id: session.user.id, email: session.user.email, method: 'supabase' });
         return;
       }
-      await loadHospitalData(user);
-    });
+      // Check sessionStorage (Google login via Firebase)
+      const stored = sessionStorage.getItem('hj_hospital_user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.auth_method === 'google' && parsed.hospital_id) {
+          await loadHospitalData({ id: parsed.uid, email: parsed.email, hospital_id: parsed.hospital_id, method: 'google' });
+          return;
+        }
+      }
+      // Not logged in
+      window.location.href = '/hospital-login/';
+    })();
 
     async function loadHospitalData(user) {
       try {
-        const { data, error } = await sb
-          .from('hospital_profiles')
-          .select('*')
-          .or(`firebase_uid.eq.${user.uid},email.eq.${user.email}`)
-          .limit(1)
-          .single();
+        let query;
+        if (user.hospital_id) {
+          // Google login — we already know the hospital_id
+          query = sb.from('hospital_profiles').select('*').eq('id', user.hospital_id).single();
+        } else {
+          // Supabase login — match by auth UID or email
+          query = sb.from('hospital_profiles').select('*').or(`id.eq.${user.id},email.eq.${user.email}`).limit(1).single();
+        }
+
+        const { data, error } = await query;
 
         if (error || !data) {
           showToast('No hospital found for this account', 'error');
-          setTimeout(() => { firebase.auth().signOut(); window.location.href = '/hospital-login/'; }, 2000);
+          setTimeout(() => { sb.auth.signOut(); sessionStorage.removeItem('hj_hospital_user'); window.location.href = '/hospital-login/'; }, 2000);
           return;
         }
 
@@ -936,10 +949,11 @@
     }
 
     function handleLogout() {
-      firebase.auth().signOut().then(() => {
-        sessionStorage.removeItem('hj_hospital_user');
-        window.location.href = '/hospital-login/';
-      });
+      // Sign out of both Supabase and Firebase
+      sb.auth.signOut();
+      firebase.auth().signOut();
+      sessionStorage.removeItem('hj_hospital_user');
+      window.location.href = '/hospital-login/';
     }
   </script>
 </body>

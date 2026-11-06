@@ -36,17 +36,17 @@
     .login-btn:hover{background:var(--blue-900)}
     .login-btn:disabled{opacity:.6;cursor:not-allowed}
 
+    .login-footer{text-align:center;margin-top:24px;font-size:13px;color:var(--muted)}
+    .login-footer a{color:var(--blue-700);font-weight:600}
+
+    .login-error{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
+
     .divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--muted);font-size:13px}
     .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-2)}
 
     .google-btn{width:100%;padding:12px;background:var(--white);color:var(--ink);border:1.5px solid var(--border-2);border-radius:8px;font-size:14px;font-weight:600;font-family:var(--body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color .2s}
     .google-btn:hover{border-color:var(--blue-700)}
     .google-btn img{width:20px;height:20px}
-
-    .login-footer{text-align:center;margin-top:24px;font-size:13px;color:var(--muted)}
-    .login-footer a{color:var(--blue-700);font-weight:600}
-
-    .login-error{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
 
     .forgot-link{font-size:13px;color:var(--blue-700);font-weight:500;text-decoration:none;float:right;margin-top:-4px}
     .forgot-link:hover{text-decoration:underline}
@@ -56,9 +56,11 @@
     }
   </style>
 
-  <!-- Firebase -->
+  <!-- Firebase (for Google sign-in) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -73,6 +75,7 @@
       <nav class="nav-links">
         <a href="/hospitals/">Hospitals</a>
         <a href="/for-hospitals/" class="nav-highlight">Register Hospital</a>
+        <a href="/hospital-login/">Hospital Login</a>
         <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
       </nav>
     </div>
@@ -115,7 +118,7 @@
   </section>
 
   <script>
-    // Firebase config
+    // Firebase (only for Google sign-in)
     const firebaseConfig = {
       apiKey: "AIzaSyD73bUT1PmaHTlSCMz8hRO3OrAb54PoHi8",
       authDomain: "hospijunction-37aa0.firebaseapp.com",
@@ -126,29 +129,42 @@
     };
     firebase.initializeApp(firebaseConfig);
 
+    // Supabase (for email/password login + hospital verification)
+    const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
     // Check if already logged in
-    firebase.auth().onAuthStateChanged(async (user) => {
-      if (user) {
-        // Verify this user is a hospital
-        const valid = await verifyHospitalUser(user);
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        const valid = await verifyHospitalUser(session.user);
         if (valid) {
           window.location.href = '/hospital-dashboard/';
         }
       }
-    });
-
-    // Supabase for verifying hospital
-    const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
-    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+    })();
 
     async function verifyHospitalUser(user) {
       try {
+        // Check by Supabase Auth UID (id column) or by email
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/hospital_profiles?or=(firebase_uid.eq.${user.uid},email.eq.${encodeURIComponent(user.email)})&select=id,name,is_verified,is_active&limit=1`,
+          `${SUPABASE_URL}/rest/v1/hospital_profiles?or=(id.eq.${user.id},email.eq.${encodeURIComponent(user.email)})&select=id,name,is_verified,is_active&limit=1`,
           { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
         );
         const data = await res.json();
-        return data && data.length > 0;
+        if (data && data.length > 0) {
+          // Store hospital info for dashboard
+          sessionStorage.setItem('hj_hospital_user', JSON.stringify({
+            uid: user.id,
+            email: user.email,
+            hospital_id: data[0].id,
+            hospital_name: data[0].name,
+            is_verified: data[0].is_verified
+          }));
+          return true;
+        }
+        return false;
       } catch (e) {
         console.error('Verify error:', e);
         return false;
@@ -159,6 +175,9 @@
       const el = document.getElementById('login-error');
       el.textContent = msg;
       el.style.display = 'block';
+      el.style.background = '#FEF2F2';
+      el.style.borderColor = '#FECACA';
+      el.style.color = '#991B1B';
     }
 
     function hideError() {
@@ -176,32 +195,39 @@
       btn.textContent = 'Logging in...';
 
       try {
-        const result = await firebase.auth().signInWithEmailAndPassword(email, password);
-        const valid = await verifyHospitalUser(result.user);
+        const { data, error } = await sb.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          btn.disabled = false;
+          btn.textContent = 'Log in';
+          if (error.message.includes('Invalid login credentials')) {
+            showError('Invalid email or password. Please try again.');
+          } else if (error.message.includes('Email not confirmed')) {
+            showError('Please confirm your email first. Check your inbox for a verification link.');
+          } else {
+            showError('Login failed: ' + error.message);
+          }
+          return;
+        }
+
+        // Verify this user is a hospital
+        const valid = await verifyHospitalUser(data.user);
         if (!valid) {
-          await firebase.auth().signOut();
+          await sb.auth.signOut();
           showError('No hospital account found for this email. Please register first.');
           btn.disabled = false;
           btn.textContent = 'Log in';
           return;
         }
-        // Store basic info for dashboard
-        sessionStorage.setItem('hj_hospital_user', JSON.stringify({
-          uid: result.user.uid,
-          email: result.user.email,
-          displayName: result.user.displayName
-        }));
+
         window.location.href = '/hospital-dashboard/';
       } catch (err) {
         btn.disabled = false;
         btn.textContent = 'Log in';
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-          showError('Invalid email or password. Please try again.');
-        } else if (err.code === 'auth/too-many-requests') {
-          showError('Too many attempts. Please wait a few minutes and try again.');
-        } else {
-          showError('Login failed: ' + err.message);
-        }
+        showError('Login failed: ' + err.message);
       }
     }
 
@@ -210,17 +236,31 @@
       try {
         const provider = new firebase.auth.GoogleAuthProvider();
         const result = await firebase.auth().signInWithPopup(provider);
-        const valid = await verifyHospitalUser(result.user);
-        if (!valid) {
+        const googleEmail = result.user.email;
+
+        // Verify this Google account has a hospital in Supabase
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/hospital_profiles?or=(firebase_uid.eq.${result.user.uid},email.eq.${encodeURIComponent(googleEmail)})&select=id,name,is_verified,is_active&limit=1`,
+          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
+        );
+        const hospitals = await res.json();
+
+        if (!hospitals || hospitals.length === 0) {
           await firebase.auth().signOut();
           showError('No hospital account found for this Google account. Please register first.');
           return;
         }
+
+        // Store hospital info for dashboard
         sessionStorage.setItem('hj_hospital_user', JSON.stringify({
           uid: result.user.uid,
-          email: result.user.email,
-          displayName: result.user.displayName
+          email: googleEmail,
+          hospital_id: hospitals[0].id,
+          hospital_name: hospitals[0].name,
+          is_verified: hospitals[0].is_verified,
+          auth_method: 'google'
         }));
+
         window.location.href = '/hospital-dashboard/';
       } catch (err) {
         if (err.code !== 'auth/popup-closed-by-user') {
@@ -238,7 +278,13 @@
       }
       hideError();
       try {
-        await firebase.auth().sendPasswordResetEmail(email);
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+          redirectTo: 'https://www.hospijunction.com/hospital-login/'
+        });
+        if (error) {
+          showError('Could not send reset email: ' + error.message);
+          return;
+        }
         const el = document.getElementById('login-error');
         el.style.display = 'block';
         el.style.background = '#F0FDF4';
@@ -246,11 +292,7 @@
         el.style.color = '#166534';
         el.textContent = 'Password reset email sent to ' + email + '. Check your inbox.';
       } catch (err) {
-        if (err.code === 'auth/user-not-found') {
-          showError('No account found with this email.');
-        } else {
-          showError('Could not send reset email: ' + err.message);
-        }
+        showError('Could not send reset email: ' + err.message);
       }
     }
   </script>
