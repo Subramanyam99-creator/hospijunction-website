@@ -565,8 +565,6 @@
       if (email !== ADMIN_EMAIL) { errEl.textContent = 'Access denied. Admin only.'; errEl.style.display = 'block'; return; }
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) { errEl.textContent = 'Invalid credentials: ' + error.message; errEl.style.display = 'block'; return; }
-      adminKey = prompt('Enter admin delete key:') || '';
-      sessionStorage.setItem('hj_admin_key', adminKey);
       showDashboard();
     }
 
