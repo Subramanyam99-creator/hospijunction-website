@@ -17,8 +17,21 @@
   <link rel="stylesheet" href="/styles.css" />
 
   <style>
-    .nav-highlight{background:var(--blue-700)!important;color:var(--white)!important;padding:8px 18px!important;border-radius:8px;font-weight:600!important;transition:background .2s}
-    .nav-highlight:hover{background:var(--blue-900)!important}
+    .nav-hospital-wrap{position:relative}
+    .nav-hospital-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:999px;background:linear-gradient(135deg,var(--blue-700),var(--blue-900));color:#fff!important;font-weight:600;font-size:14px;cursor:pointer;border:none;font-family:var(--body);transition:all .25s;box-shadow:0 2px 8px rgba(26,86,181,.25)}
+    .nav-hospital-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,86,181,.35)}
+    .nav-hospital-btn svg{width:14px;height:14px;transition:transform .2s}
+    .nav-hospital-wrap.open .nav-hospital-btn svg{transform:rotate(180deg)}
+    .nav-hospital-dd{position:absolute;top:calc(100% + 8px);right:0;background:var(--white);border-radius:12px;box-shadow:0 8px 30px rgba(15,46,92,.15);border:1px solid var(--border-2);min-width:210px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s;z-index:100;overflow:hidden}
+    .nav-hospital-wrap.open .nav-hospital-dd{opacity:1;visibility:visible;transform:translateY(0)}
+    .nav-hospital-dd a{display:flex;align-items:center;gap:12px;padding:14px 18px;color:var(--ink);font-size:14px;font-weight:500;transition:background .15s;text-decoration:none}
+    .nav-hospital-dd a:hover{background:var(--blue-50)}
+    .nav-hospital-dd a .dd-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .nav-hospital-dd a:first-child .dd-icon{background:#EFF6FF;color:var(--blue-700)}
+    .nav-hospital-dd a:last-child .dd-icon{background:#F0FDF4;color:#16A34A}
+    .nav-hospital-dd .dd-text{display:flex;flex-direction:column}
+    .nav-hospital-dd .dd-label{font-weight:600;font-size:13px}
+    .nav-hospital-dd .dd-sub{font-size:11px;color:var(--muted);margin-top:1px}
 
     .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--cream);padding:40px 20px}
     .login-card{background:var(--white);border-radius:16px;box-shadow:0 8px 32px rgba(15,46,92,.1);padding:48px 40px;width:100%;max-width:420px}
@@ -78,8 +91,15 @@
       </a>
       <nav class="nav-links">
         <a href="/hospitals/">Hospitals</a>
-        <a href="/for-hospitals/" class="nav-highlight">Register Hospital</a>
-        <a href="/hospital-login/">Hospital Login</a>
+        <div class="nav-hospital-wrap" id="nav-hosp-wrap">
+          <button class="nav-hospital-btn" onclick="document.getElementById('nav-hosp-wrap').classList.toggle('open')">
+            For Hospitals <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
+          </button>
+          <div class="nav-hospital-dd">
+            <a href="/for-hospitals/"><span class="dd-icon">+</span><span class="dd-text"><span class="dd-label">Register Hospital</span><span class="dd-sub">List your hospital on HospiJunction</span></span></a>
+            <a href="/hospital-login/"><span class="dd-icon">&#10140;</span><span class="dd-text"><span class="dd-label">Hospital Login</span><span class="dd-sub">Access your dashboard</span></span></a>
+          </div>
+        </div>
         <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="nav-download" target="_blank" rel="noopener">Get the app</a>
       </nav>
     </div>
@@ -316,6 +336,7 @@
         showError('Could not send reset email: ' + err.message);
       }
     }
+    document.addEventListener('click', e => { const w = document.getElementById('nav-hosp-wrap'); if (w && !w.contains(e.target)) w.classList.remove('open'); });
   </script>
 </body>
 </html>
