@@ -948,11 +948,11 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    function handleLogout() {
-      // Sign out of both Supabase and Firebase
-      sb.auth.signOut();
-      firebase.auth().signOut();
+    async function handleLogout() {
+      // Sign out of both Supabase and Firebase — await before redirecting
       sessionStorage.removeItem('hj_hospital_user');
+      await sb.auth.signOut();
+      await firebase.auth().signOut();
       window.location.href = '/hospital-login/';
     }
   </script>
