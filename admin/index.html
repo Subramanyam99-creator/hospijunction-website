@@ -3,795 +3,325 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HospiJunction Admin</title>
+  <title>Admin — HospiJunction</title>
   <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0F2E5C" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <!-- JSZip + SheetJS for downloads -->
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- React -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <style>
-    :root{--blue-900:#0F2E5C;--blue-700:#1A56B5;--blue-100:#D6E4F7;--blue-50:#EEF3FB;--cream:#FAF6EE;--ink:#0B1929;--ink-2:#2C3E50;--muted:#5C6B7E;--border:#E5DDD0;--border-2:#ECE6D9;--white:#FFFFFF;--positive:#047857;--positive-bg:#ECFDF5;--amber:#B45309;--amber-bg:#FFFBEB;--red:#DC2626;--red-bg:#FEF2F2;--display:'Fraunces',Georgia,serif;--body:'DM Sans',-apple-system,sans-serif;--sidebar-w:240px}
-    *{box-sizing:border-box;margin:0;padding:0}html,body,#root{height:100%}
-    body{font-family:var(--body);font-size:14px;color:var(--ink-2);background:#F4F2ED;-webkit-font-smoothing:antialiased}
-    a{color:var(--blue-700);text-decoration:none}button{cursor:pointer;font-family:var(--body)}
-    .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--blue-900)}
-    .login-card{background:var(--white);border-radius:18px;padding:48px 40px;width:380px;max-width:90vw;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3)}
-    .login-logo{font-family:var(--display);font-size:28px;font-weight:700;color:var(--blue-900);margin-bottom:6px}
-    .login-sub{color:var(--muted);font-size:14px;margin-bottom:32px}
-    .login-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 28px;background:var(--blue-900);color:var(--white);border:none;border-radius:12px;font-size:15px;font-weight:600;transition:background .2s;width:100%;justify-content:center}
-    .login-btn:hover{background:var(--blue-700)}.login-btn:disabled{opacity:.6}
-    .login-error{color:var(--red);font-size:13px;margin-top:16px;background:var(--red-bg);padding:10px 14px;border-radius:8px}
-    .login-input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--body);margin-bottom:12px;outline:none;transition:border-color .2s}
-    .login-input:focus{border-color:var(--blue-700)}
-    .login-label{display:block;text-align:left;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
-    .layout{display:flex;height:100vh}
-    .sidebar{width:var(--sidebar-w);background:var(--blue-900);color:var(--white);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
-    .sb-logo{padding:22px 20px;font-family:var(--display);font-size:18px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
-    .sb-mark{width:30px;height:30px;border-radius:8px;background:var(--white);color:var(--blue-900);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
-    .sb-nav{flex:1;padding:16px 0}
-    .sb-item{display:flex;align-items:center;gap:12px;padding:11px 20px;color:rgba(255,255,255,.65);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left}
-    .sb-item:hover{color:var(--white);background:rgba(255,255,255,.08)}
-    .sb-item.active{color:var(--white);background:rgba(255,255,255,.14);border-right:3px solid var(--white)}
-    .sb-item svg{width:18px;height:18px;opacity:.7;flex-shrink:0}.sb-item.active svg{opacity:1}
-    .sb-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:rgba(255,255,255,.45)}
-    .sb-user{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:8px}
-    .sb-logout{background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;padding:0}.sb-logout:hover{color:var(--white)}
-    .main{flex:1;overflow-y:auto}
-    .topbar{padding:20px 32px;background:var(--white);border-bottom:1px solid var(--border-2);display:flex;align-items:center;justify-content:space-between}
-    .topbar-title{font-family:var(--display);font-size:22px;font-weight:600;color:var(--ink)}
-    .content{padding:28px 32px}
-    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:28px}
-    .stat-card{background:var(--white);border:1px solid var(--border-2);border-radius:14px;padding:22px 24px}
-    .stat-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
-    .stat-value{font-family:var(--display);font-size:32px;font-weight:600;color:var(--ink);line-height:1.1}
-    .stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
-    .card{background:var(--white);border:1px solid var(--border-2);border-radius:14px;overflow:hidden}
-    .card-header{padding:18px 22px;border-bottom:1px solid var(--border-2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-    .card-title{font-family:var(--display);font-size:17px;font-weight:600;color:var(--ink)}
-    .search-input{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:240px;outline:none;font-family:var(--body)}.search-input:focus{border-color:var(--blue-700)}
-    .filter-row{display:flex;gap:8px;flex-wrap:wrap}
-    .filter-btn{padding:6px 14px;border-radius:999px;border:1.5px solid var(--border);background:var(--white);font-size:12px;font-weight:600;color:var(--ink-2);transition:all .15s}
-    .filter-btn:hover{border-color:var(--blue-900)}.filter-btn.active{background:var(--blue-900);color:var(--white);border-color:var(--blue-900)}
+    :root{--blue-900:#0F2E5C;--blue-700:#1A56B5;--blue-50:#EFF6FF;--cream:#FAF6EE;--white:#FFFFFF;--ink:#1A1A2E;--muted:#7A7A8A;--border:#E5E7EB;--green:#16A34A;--red:#DC2626;--orange:#EA580C;--radius:8px;--display:'Fraunces',serif;--body:'DM Sans',sans-serif}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:var(--body);background:#F5F6FA;color:var(--ink);font-size:14px}
+
+    .admin-header{background:var(--blue-900);color:var(--white);padding:20px 32px;display:flex;align-items:center;justify-content:space-between}
+    .admin-header h1{font-family:var(--display);font-weight:600;font-size:20px;display:flex;align-items:center;gap:12px}
+    .admin-header .logo-mark{display:inline-block;background:var(--white);color:var(--blue-900);font-family:var(--display);font-weight:800;padding:5px 9px;border-radius:6px;font-size:14px}
+    .admin-header .logout-btn{background:rgba(255,255,255,.12);border:none;color:var(--white);padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--body);font-size:13px}
+    .admin-header .logout-btn:hover{background:rgba(255,255,255,.2)}
+
+    .container{max-width:1200px;margin:0 auto;padding:28px 24px}
+
+    .login-wrap{min-height:80vh;display:flex;align-items:center;justify-content:center}
+    .login-card{background:var(--white);border-radius:12px;padding:40px;max-width:380px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+    .login-card h2{font-family:var(--display);font-weight:600;font-size:22px;margin-bottom:20px;text-align:center}
+    .login-card label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+    .login-card input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--body);margin-bottom:16px;box-sizing:border-box}
+    .login-card input:focus{outline:none;border-color:var(--blue-700)}
+    .login-card button{width:100%;padding:12px;background:var(--blue-700);color:var(--white);border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--body)}
+    .login-card button:hover{background:var(--blue-900)}
+    .login-card .error{color:var(--red);font-size:13px;margin-bottom:12px;display:none}
+
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+    .stat-card{background:var(--white);border-radius:12px;padding:20px;border:1px solid var(--border)}
+    .stat-card .stat-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .stat-card .stat-value{font-family:var(--display);font-weight:700;font-size:28px;margin-top:6px}
+
+    .card{background:var(--white);border-radius:12px;border:1px solid var(--border);margin-bottom:20px}
+    .card-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .card-header h2{font-family:var(--display);font-weight:600;font-size:17px}
+    .card-body{padding:0}
+    .table-wrap{overflow-x:auto}
     table{width:100%;border-collapse:collapse}
-    th{text-align:left;padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:#FAFAF7;border-bottom:1px solid var(--border-2)}
-    td{padding:12px 16px;font-size:13.5px;border-bottom:1px solid var(--border-2);vertical-align:middle}
-    tr:last-child td{border-bottom:none}tr:hover td{background:var(--blue-50)}
-    .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-    .badge-green{background:var(--positive-bg);color:var(--positive)}.badge-amber{background:var(--amber-bg);color:var(--amber)}
-    .badge-red{background:var(--red-bg);color:var(--red)}.badge-blue{background:var(--blue-50);color:var(--blue-700)}.badge-gray{background:#F1F1EF;color:var(--muted)}
-    .btn-sm{padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--white);color:var(--ink-2);transition:all .15s}
-    .btn-sm:hover{border-color:var(--blue-900);color:var(--blue-900)}
-    .btn-sm.primary{background:var(--blue-900);color:var(--white);border-color:var(--blue-900)}.btn-sm.primary:hover{background:var(--blue-700)}
-    .btn-sm.danger{color:var(--red);border-color:var(--red)}.btn-sm.danger:hover{background:var(--red);color:var(--white)}
-    .btn-sm.success{color:var(--positive);border-color:var(--positive)}.btn-sm.success:hover{background:var(--positive);color:var(--white)}
-    .modal-overlay{position:fixed;inset:0;background:rgba(11,25,41,.5);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-    .modal{background:var(--white);border-radius:18px;padding:32px;width:600px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.2)}
-    .modal-title{font-family:var(--display);font-size:22px;font-weight:600;color:var(--ink);margin-bottom:20px}
-    .detail-row{display:flex;padding:10px 0;border-bottom:1px solid var(--border-2)}
-    .detail-label{width:160px;flex-shrink:0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-top:2px}
-    .detail-value{font-size:14px;color:var(--ink);flex:1}
-    .loading{text-align:center;padding:60px;color:var(--muted)}
-    .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue-700);border-radius:50%;animation:spin .7s linear infinite}
+    th{background:#F9FAFB;padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap}
+    td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;white-space:nowrap}
+    tr:hover td{background:#FAFBFC}
+    .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
+    .badge-green{background:#F0FDF4;color:var(--green)}
+    .badge-orange{background:#FFF7ED;color:var(--orange)}
+    .btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--body);transition:all .15s}
+    .btn-red{background:#FEF2F2;color:var(--red);border:1px solid #FECACA}
+    .btn-red:hover{background:var(--red);color:var(--white)}
+    .btn-green{background:#F0FDF4;color:var(--green);border:1px solid #BBF7D0}
+    .btn-green:hover{background:var(--green);color:var(--white)}
+
+    .search-bar{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--body);min-width:220px}
+    .search-bar:focus{outline:none;border-color:var(--blue-700)}
+
+    .toast{position:fixed;bottom:24px;right:24px;padding:14px 22px;border-radius:10px;color:var(--white);font-size:13px;font-weight:500;transform:translateY(100px);opacity:0;transition:all .3s;z-index:999}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast-success{background:var(--green)}
+    .toast-error{background:var(--red)}
+    .toast-info{background:var(--blue-700)}
+
+    .empty{text-align:center;padding:40px;color:var(--muted)}
+    .spin{display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--blue-700);border-radius:50%;animation:spin .6s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .empty{text-align:center;padding:48px;color:var(--muted);font-size:14px}
-    .pagination{padding:14px 22px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border-2);font-size:13px;color:var(--muted)}
-    .page-btns{display:flex;gap:6px}
-    .page-btn{padding:6px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;font-weight:600;color:var(--ink-2)}
-    .page-btn:disabled{opacity:.4;cursor:default}
-    @media(max-width:768px){.sidebar{width:60px}.sb-logo span:last-child,.sb-item span,.sb-footer,.sb-user{display:none}.sb-logo{justify-content:center;padding:16px}.sb-item{justify-content:center;padding:14px}.content{padding:20px 16px}.topbar{padding:16px}.search-input{width:160px}}
+
+    @media(max-width:768px){
+      .admin-header{padding:16px 20px}
+      .container{padding:20px 16px}
+      .card-header{flex-direction:column;align-items:flex-start}
+    }
   </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-/* =========================================================
-   CONFIG
-   ========================================================= */
-const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
-const ADMIN_EMAIL = "admin@hospijunction.com";
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const { useState, useEffect, useCallback } = React;
-
-/* =========================================================
-   ICONS
-   ========================================================= */
-const Icon = ({ name }) => {
-  const d = {
-    dashboard:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>,
-    hospital:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/><path d="M9 21v-4h6v4"/><path d="M10 9h4"/><path d="M12 7v4"/></svg>,
-    doctor:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-    patient:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>,
-    calendar:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>,
-    payment:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>,
-    refund:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>,
-    gst:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h6"/></svg>,
-  };
-  return d[name]||null;
-};
-
-/* =========================================================
-   HELPERS
-   ========================================================= */
-const fmt = {
-  date: d => d ? new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—',
-  time: t => t ? t.slice(0,5) : '—',
-  money: n => n!=null ? `₹${Number(n).toLocaleString('en-IN')}` : '—',
-  ago: d => { if(!d) return '—'; const m=Math.floor((Date.now()-new Date(d).getTime())/60000); if(m<60) return `${m}m ago`; const h=Math.floor(m/60); if(h<24) return `${h}h ago`; return `${Math.floor(h/24)}d ago`; },
-};
-const statusBadge = s => {
-  const m={confirmed:'badge-blue',booked:'badge-blue',completed:'badge-green',cancelled:'badge-red',checked_in:'badge-amber',in_progress:'badge-amber',no_show:'badge-gray',paid:'badge-green',captured:'badge-green',pending:'badge-amber',failed:'badge-red',refunded:'badge-amber',created:'badge-gray',processing:'badge-amber'};
-  return <span className={`badge ${m[(s||'').toLowerCase()]||'badge-gray'}`}>{s||'—'}</span>;
-};
-const PAGE_SIZE = 20;
-
-/* =========================================================
-   LOGIN
-   ========================================================= */
-function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [pass, setPass] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handle = async e => {
-    e.preventDefault(); setError('');
-    if (email.toLowerCase() !== ADMIN_EMAIL) { setError('Access denied. Admin accounts only.'); return; }
-    setLoading(true);
-    const { error: err } = await sb.auth.signInWithPassword({ email, password: pass });
-    if (err) setError(err.message);
-    setLoading(false);
-  };
-
-  return (
-    <div className="login-wrap">
-      <form className="login-card" onSubmit={handle}>
-        <div className="login-logo">HJ Admin</div>
-        <div className="login-sub">HospiJunction Super Admin Panel</div>
-        <label className="login-label">Email</label>
-        <input className="login-input" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="admin@hospijunction.com" required />
-        <label className="login-label">Password</label>
-        <input className="login-input" type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••" required />
-        <button className="login-btn" disabled={loading}>{loading ? 'Signing in…' : 'Sign in'}</button>
-        {error && <div className="login-error">{error}</div>}
-      </form>
+  <!-- Login Screen -->
+  <div id="login-screen">
+    <div class="admin-header">
+      <h1><span class="logo-mark">HJ</span> Admin Panel</h1>
     </div>
-  );
-}
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
-const PAGES = [
-  {id:'dashboard',label:'Dashboard',icon:'dashboard'},
-  {id:'hospitals',label:'Hospitals',icon:'hospital'},
-  {id:'doctors',label:'Doctors',icon:'doctor'},
-  {id:'patients',label:'Patients',icon:'patient'},
-  {id:'appointments',label:'Appointments',icon:'calendar'},
-  {id:'payments',label:'Payments',icon:'payment'},
-  {id:'refunds',label:'Refunds',icon:'refund'},
-  {id:'gst',label:'GST & Invoices',icon:'gst'},
-];
-function Sidebar({ page, setPage, user }) {
-  const logout = async () => { await sb.auth.signOut(); };
-  return (
-    <div className="sidebar">
-      <div className="sb-logo"><span className="sb-mark">HJ</span><span>Admin</span></div>
-      <nav className="sb-nav">
-        {PAGES.map(p=><button key={p.id} className={`sb-item ${page===p.id?'active':''}`} onClick={()=>setPage(p.id)}><Icon name={p.icon}/><span>{p.label}</span></button>)}
-      </nav>
-      <div className="sb-footer">
-        <div className="sb-user">{user?.email}</div>
-        <button className="sb-logout" onClick={logout}>Sign out</button>
+    <div class="login-wrap">
+      <div class="login-card">
+        <h2>Admin Login</h2>
+        <div class="error" id="login-error"></div>
+        <label>Email</label>
+        <input type="email" id="admin-email" placeholder="admin@hospijunction.com" />
+        <label>Password</label>
+        <input type="password" id="admin-password" placeholder="Password" />
+        <button onclick="adminLogin()">Log in</button>
       </div>
     </div>
-  );
-}
+  </div>
 
-/* =========================================================
-   DATA HOOK
-   ========================================================= */
-function useQuery(table, opts={}) {
-  const { select='*', order='created_at', ascending=false, page=0, pageSize=PAGE_SIZE, filters=[], search, searchCols=[] } = opts;
-  const [data, setData] = useState([]);
-  const [count, setCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  <!-- Admin Dashboard -->
+  <div id="admin-dashboard" style="display:none">
+    <div class="admin-header">
+      <h1><span class="logo-mark">HJ</span> Admin Panel</h1>
+      <button class="logout-btn" onclick="adminLogout()">Logout</button>
+    </div>
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    let q = sb.from(table).select(select, {count:'exact'});
-    filters.forEach(([col,op,val]) => { q = q[op](col,val); });
-    if (search && searchCols.length) q = q.or(searchCols.map(c=>`${c}.ilike.%${search}%`).join(','));
-    q = q.order(order,{ascending}).range(page*pageSize,(page+1)*pageSize-1);
-    const {data:rows,count:total,error} = await q;
-    if(!error){setData(rows||[]);setCount(total||0);}
-    setLoading(false);
-  },[table,select,order,ascending,page,pageSize,JSON.stringify(filters),search]);
+    <div class="container">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Hospitals</div><div class="stat-value" id="stat-total">-</div></div>
+        <div class="stat-card"><div class="stat-label">Verified</div><div class="stat-value" id="stat-verified" style="color:var(--green)">-</div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" id="stat-pending" style="color:var(--orange)">-</div></div>
+        <div class="stat-card"><div class="stat-label">Total Patients</div><div class="stat-value" id="stat-patients">-</div></div>
+        <div class="stat-card"><div class="stat-label">Total Appointments</div><div class="stat-value" id="stat-appointments">-</div></div>
+      </div>
 
-  useEffect(()=>{load();},[load]);
-  return {data,count,loading,reload:load};
-}
+      <!-- Hospitals -->
+      <div class="card">
+        <div class="card-header">
+          <h2>All Hospitals</h2>
+          <input type="text" class="search-bar" id="search-input" placeholder="Search by name, email, city..." oninput="filterHospitals()" />
+        </div>
+        <div class="card-body"><div class="table-wrap">
+          <table>
+            <thead><tr><th>Hospital</th><th>Email</th><th>City</th><th>Phone</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
+            <tbody id="hospitals-table"><tr><td colspan="7" class="empty"><div class="spin"></div></td></tr></tbody>
+          </table>
+        </div></div>
+      </div>
 
-/* =========================================================
-   DETAIL MODAL
-   ========================================================= */
-function DetailModal({title,rows,onClose,children}) {
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={e=>e.stopPropagation()}>
-        <div className="modal-title">{title}</div>
-        {rows && rows.map(([l,v],i)=><div className="detail-row" key={i}><div className="detail-label">{l}</div><div className="detail-value">{v??'—'}</div></div>)}
-        {children}
-        <div style={{marginTop:20,textAlign:'right'}}><button className="btn-sm" onClick={onClose}>Close</button></div>
+      <!-- Patients -->
+      <div class="card">
+        <div class="card-header">
+          <h2>All Patients</h2>
+          <input type="text" class="search-bar" id="patient-search" placeholder="Search patients..." oninput="filterPatients()" />
+        </div>
+        <div class="card-body"><div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Gender</th><th>Registered</th><th>Actions</th></tr></thead>
+            <tbody id="patients-table"><tr><td colspan="7" class="empty"><div class="spin"></div></td></tr></tbody>
+          </table>
+        </div></div>
       </div>
     </div>
-  );
-}
+  </div>
 
-/* =========================================================
-   PAGINATION
-   ========================================================= */
-function Pager({page,setPage,count}) {
-  if (count<=PAGE_SIZE) return null;
-  return (
-    <div className="pagination">
-      <span>Showing {page*PAGE_SIZE+1}–{Math.min((page+1)*PAGE_SIZE,count)} of {count}</span>
-      <div className="page-btns">
-        <button className="page-btn" disabled={page===0} onClick={()=>setPage(p=>p-1)}>Prev</button>
-        <button className="page-btn" disabled={(page+1)*PAGE_SIZE>=count} onClick={()=>setPage(p=>p+1)}>Next</button>
-      </div>
-    </div>
-  );
-}
+  <div class="toast" id="toast"></div>
 
-/* =========================================================
-   DASHBOARD
-   ========================================================= */
-function DashboardPage() {
-  const [stats,setStats] = useState({});
-  const [recent,setRecent] = useState([]);
-  const [loading,setLoading] = useState(true);
+  <script>
+    const SUPABASE_URL = "https://xamjhwkclcftbyjpzvnq.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const ADMIN_EMAIL = "admin@hospijunction.com";
 
-  useEffect(()=>{
-    (async()=>{
-      const [h,d,p,a,pay] = await Promise.all([
-        sb.from('hospital_profiles').select('*',{count:'exact',head:true}),
-        sb.from('doctors').select('*',{count:'exact',head:true}),
-        sb.from('patient_profiles').select('*',{count:'exact',head:true}),
-        sb.from('appointments').select('*',{count:'exact',head:true}),
-        sb.from('payments').select('amount,status').eq('status','captured'),
-      ]);
-      const revenue = (pay.data||[]).reduce((s,r)=>s+Number(r.amount||0),0);
-      setStats({hospitals:h.count||0,doctors:d.count||0,patients:p.count||0,appointments:a.count||0,revenue});
-      const {data:ra} = await sb.from('appointments').select('*,patient:patient_profiles(full_name),hospital:hospital_profiles(name),doctor:doctors(full_name)').order('created_at',{ascending:false}).limit(8);
-      setRecent(ra||[]);
-      setLoading(false);
+    let allHospitals = [];
+    let allPatients = [];
+    let adminKey = '';
+
+    // Auto-login check
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session && session.user.email === ADMIN_EMAIL) {
+        adminKey = sessionStorage.getItem('hj_admin_key') || '';
+        showDashboard();
+      }
     })();
-  },[]);
 
-  if(loading) return <div className="loading"><div className="spin"/></div>;
-  return (
-    <>
-      <div className="stats">
-        <div className="stat-card"><div className="stat-label">Hospitals</div><div className="stat-value">{stats.hospitals}</div></div>
-        <div className="stat-card"><div className="stat-label">Doctors</div><div className="stat-value">{stats.doctors}</div></div>
-        <div className="stat-card"><div className="stat-label">Patients</div><div className="stat-value">{stats.patients}</div></div>
-        <div className="stat-card"><div className="stat-label">Bookings</div><div className="stat-value">{stats.appointments}</div></div>
-        <div className="stat-card"><div className="stat-label">Revenue</div><div className="stat-value">{fmt.money(stats.revenue)}</div><div className="stat-sub">Platform fees collected</div></div>
-      </div>
-      <div className="card">
-        <div className="card-header"><div className="card-title">Recent Appointments</div></div>
-        {recent.length===0 ? <div className="empty">No appointments yet</div> : (
-          <table><thead><tr><th>Patient</th><th>Hospital</th><th>Doctor</th><th>Date</th><th>Status</th><th>Created</th></tr></thead><tbody>
-            {recent.map(r=><tr key={r.id}><td>{r.patient?.full_name||'—'}</td><td>{r.hospital?.name||'—'}</td><td>{r.doctor?.full_name||'—'}</td><td>{fmt.date(r.appointment_date)} {fmt.time(r.slot_time)}</td><td>{statusBadge(r.status)}</td><td>{fmt.ago(r.created_at)}</td></tr>)}
-          </tbody></table>
-        )}
-      </div>
-    </>
-  );
-}
+    async function adminLogin() {
+      const email = document.getElementById('admin-email').value.trim();
+      const password = document.getElementById('admin-password').value;
+      const errEl = document.getElementById('login-error');
 
-/* =========================================================
-   HOSPITALS
-   ========================================================= */
-function HospitalsPage() {
-  const [search,setSearch]=useState('');const [page,setPage]=useState(0);
-  const [detail,setDetail]=useState(null);const [filter,setFilter]=useState('all');
-  const [docs,setDocs]=useState([]);const [docsLoading,setDocsLoading]=useState(false);
+      if (email !== ADMIN_EMAIL) {
+        errEl.textContent = 'Access denied. Admin only.';
+        errEl.style.display = 'block';
+        return;
+      }
 
-  const filters=[];
-  if(filter==='verified') filters.push(['is_verified','eq',true]);
-  if(filter==='unverified') filters.push(['is_verified','eq',false]);
-  if(filter==='inactive') filters.push(['is_active','eq',false]);
-  const {data,count,loading,reload} = useQuery('hospital_profiles',{order:'created_at',page,search,searchCols:['name','city','phone'],filters});
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        errEl.textContent = 'Invalid credentials: ' + error.message;
+        errEl.style.display = 'block';
+        return;
+      }
 
-  const toggle = async(id,field,val)=>{await sb.from('hospital_profiles').update({[field]:val}).eq('id',id);reload();};
-
-  const viewHospital = async (h) => {
-    setDetail(h);
-    setDocsLoading(true);
-    const {data:docRows} = await sb.from('hospital_documents').select('*').eq('hospital_id',h.id).order('uploaded_at',{ascending:false});
-    const docsWithUrls = await Promise.all((docRows||[]).map(async d => {
-      const {data:urlData} = await sb.storage.from('hospital-documents').createSignedUrl(d.storage_path, 3600);
-      return {...d, signedUrl: urlData?.signedUrl || null};
-    }));
-    setDocs(docsWithUrls);
-    setDocsLoading(false);
-  };
-
-  return (
-    <>
-      <div className="card">
-        <div className="card-header">
-          <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
-            <div className="card-title">Hospitals ({count})</div>
-            <div className="filter-row">
-              {['all','verified','unverified','inactive'].map(f=><button key={f} className={`filter-btn ${filter===f?'active':''}`} onClick={()=>{setFilter(f);setPage(0);}}>{f.charAt(0).toUpperCase()+f.slice(1)}</button>)}
-            </div>
-          </div>
-          <input className="search-input" placeholder="Search hospitals…" value={search} onChange={e=>{setSearch(e.target.value);setPage(0);}}/>
-        </div>
-        {loading?<div className="loading"><div className="spin"/></div>:data.length===0?<div className="empty">No hospitals found</div>:(
-          <table><thead><tr><th>Name</th><th>City</th><th>Phone</th><th>Type</th><th>Verified</th><th>Active</th><th>Actions</th></tr></thead><tbody>
-            {data.map(h=><tr key={h.id}>
-              <td style={{fontWeight:600,color:'var(--ink)'}}>{h.name}</td>
-              <td>{h.city}, {h.state}</td><td>{h.phone}</td><td>{h.hospital_type||'—'}</td>
-              <td>{h.is_verified?<span className="badge badge-green">Verified</span>:<span className="badge badge-amber">Pending</span>}</td>
-              <td>{h.is_active?<span className="badge badge-green">Active</span>:<span className="badge badge-red">Inactive</span>}</td>
-              <td style={{display:'flex',gap:6}}>
-                <button className="btn-sm" onClick={()=>viewHospital(h)}>View</button>
-                {!h.is_verified&&<button className="btn-sm success" onClick={()=>toggle(h.id,'is_verified',true)}>Verify</button>}
-                <button className={`btn-sm ${h.is_active?'danger':'success'}`} onClick={()=>toggle(h.id,'is_active',!h.is_active)}>{h.is_active?'Deactivate':'Activate'}</button>
-              </td>
-            </tr>)}
-          </tbody></table>
-        )}
-        <Pager page={page} setPage={setPage} count={count}/>
-      </div>
-      {detail&&<DetailModal title={detail.name} onClose={()=>{setDetail(null);setDocs([]);}} rows={[
-        ['City',`${detail.city}, ${detail.state}`],['Address',detail.address],['Phone',detail.phone],['Email',detail.email],
-        ['Type',detail.hospital_type],['Registration #',detail.registration_number],
-        ['Admin',`${detail.admin_name||'—'} (${detail.admin_role||'—'})`],['Beds',detail.beds],
-        ['Consultation Fee',fmt.money(detail.consultation_fee)],
-        ['Rating',detail.rating?`${detail.rating} (${detail.total_reviews} reviews)`:'—'],
-        ['Verified',detail.is_verified?'Yes':'No'],['Active',detail.is_active?'Yes':'No'],
-        ['Verification Notes',detail.verification_notes||'—'],
-        ['Docs Submitted',fmt.date(detail.documents_submitted_at)],
-        ['Map',detail.map_link?<a href={detail.map_link} target="_blank" rel="noopener">Open map</a>:'—'],
-        ['Created',fmt.date(detail.created_at)],
-      ]}>
-        <div style={{fontFamily:'var(--display)',fontWeight:600,fontSize:16,marginTop:24,marginBottom:12,color:'var(--ink)'}}>Documents ({docs.length})</div>
-        {docsLoading ? <div className="loading"><div className="spin"/></div> : docs.length===0 ? <div style={{color:'var(--muted)',fontSize:13}}>No documents uploaded</div> : (
-          <div style={{display:'flex',flexDirection:'column',gap:10}}>
-            {docs.map(d=>(
-              <div key={d.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'var(--blue-50)',borderRadius:10,border:'1px solid var(--border-2)'}}>
-                <div>
-                  <div style={{fontWeight:600,fontSize:13,color:'var(--ink)'}}>{d.document_type}</div>
-                  <div style={{fontSize:12,color:'var(--muted)'}}>{d.file_name} · {d.size_bytes ? `${(d.size_bytes/1024).toFixed(0)} KB` : '—'} · {fmt.date(d.uploaded_at)}</div>
-                  {d.notes && <div style={{fontSize:12,color:'var(--ink-2)',marginTop:2}}>{d.notes}</div>}
-                </div>
-                <div style={{display:'flex',gap:6}}>
-                  {d.signedUrl ? <a href={d.signedUrl} target="_blank" rel="noopener" className="btn-sm primary" style={{textDecoration:'none'}}>View</a> : <span style={{fontSize:11,color:'var(--red)'}}>URL failed</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </DetailModal>}
-    </>
-  );
-}
-
-/* =========================================================
-   DOCTORS
-   ========================================================= */
-function DoctorsPage() {
-  const [search,setSearch]=useState('');const [page,setPage]=useState(0);const [detail,setDetail]=useState(null);
-  const {data,count,loading,reload} = useQuery('doctors',{select:'*,hospital:hospital_profiles(name,city)',order:'created_at',page,search,searchCols:['full_name','specialization']});
-  const toggle = async(id,val)=>{await sb.from('doctors').update({is_active:val}).eq('id',id);reload();};
-
-  return (
-    <>
-      <div className="card">
-        <div className="card-header">
-          <div className="card-title">Doctors ({count})</div>
-          <input className="search-input" placeholder="Search name or specialization…" value={search} onChange={e=>{setSearch(e.target.value);setPage(0);}}/>
-        </div>
-        {loading?<div className="loading"><div className="spin"/></div>:data.length===0?<div className="empty">No doctors found</div>:(
-          <table><thead><tr><th>Name</th><th>Specialization</th><th>Hospital</th><th>Fee</th><th>Exp</th><th>Active</th><th>Actions</th></tr></thead><tbody>
-            {data.map(d=><tr key={d.id}>
-              <td style={{fontWeight:600,color:'var(--ink)'}}>{d.full_name}</td>
-              <td>{d.specialization}</td>
-              <td>{d.hospital?.name||'—'}<br/><span style={{fontSize:11,color:'var(--muted)'}}>{d.hospital?.city}</span></td>
-              <td>{fmt.money(d.consultation_fee)}</td>
-              <td>{d.experience_years?`${d.experience_years}y`:'—'}</td>
-              <td>{d.is_active?<span className="badge badge-green">Active</span>:<span className="badge badge-red">Inactive</span>}</td>
-              <td style={{display:'flex',gap:6}}>
-                <button className="btn-sm" onClick={()=>setDetail(d)}>View</button>
-                <button className={`btn-sm ${d.is_active?'danger':'success'}`} onClick={()=>toggle(d.id,!d.is_active)}>{d.is_active?'Deactivate':'Activate'}</button>
-              </td>
-            </tr>)}
-          </tbody></table>
-        )}
-        <Pager page={page} setPage={setPage} count={count}/>
-      </div>
-      {detail&&<DetailModal title={detail.full_name} onClose={()=>setDetail(null)} rows={[
-        ['Hospital',detail.hospital?.name],['Specialization',detail.specialization],['Qualification',detail.qualification],
-        ['Experience',detail.experience_years?`${detail.experience_years} years`:'—'],['Registration #',detail.registration_number],
-        ['Fee',fmt.money(detail.consultation_fee)],['Languages',(detail.languages||[]).join(', ')||'—'],
-        ['Rating',detail.rating?`${detail.rating} (${detail.total_reviews} reviews)`:'—'],['Bio',detail.bio||'—'],
-        ['On Leave',detail.leave_from?`${fmt.date(detail.leave_from)} → ${fmt.date(detail.leave_to)} — ${detail.leave_reason||''}`:'No'],
-        ['Active',detail.is_active?'Yes':'No'],['Created',fmt.date(detail.created_at)],
-      ]}/>}
-    </>
-  );
-}
-
-/* =========================================================
-   PATIENTS
-   ========================================================= */
-function PatientsPage() {
-  const [search,setSearch]=useState('');const [page,setPage]=useState(0);const [detail,setDetail]=useState(null);const [appts,setAppts]=useState([]);
-  const {data,count,loading} = useQuery('patient_profiles',{order:'created_at',page,search,searchCols:['full_name','phone','email']});
-
-  const view = async p=>{
-    setDetail(p);
-    const {data:a} = await sb.from('appointments').select('*,hospital:hospital_profiles(name),doctor:doctors(full_name)').eq('patient_id',p.id).order('appointment_date',{ascending:false}).limit(10);
-    setAppts(a||[]);
-  };
-
-  return (
-    <>
-      <div className="card">
-        <div className="card-header">
-          <div className="card-title">Patients ({count})</div>
-          <input className="search-input" placeholder="Search name, phone, email…" value={search} onChange={e=>{setSearch(e.target.value);setPage(0);}}/>
-        </div>
-        {loading?<div className="loading"><div className="spin"/></div>:data.length===0?<div className="empty">No patients found</div>:(
-          <table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>Gender</th><th>Age</th><th>Joined</th><th></th></tr></thead><tbody>
-            {data.map(p=><tr key={p.id}>
-              <td style={{fontWeight:600,color:'var(--ink)'}}>{p.full_name}</td><td>{p.phone||'—'}</td><td>{p.email||'—'}</td>
-              <td>{p.preferred_city||'—'}</td><td>{p.gender||'—'}</td><td>{p.age??'—'}</td><td>{fmt.date(p.created_at)}</td>
-              <td><button className="btn-sm" onClick={()=>view(p)}>View</button></td>
-            </tr>)}
-          </tbody></table>
-        )}
-        <Pager page={page} setPage={setPage} count={count}/>
-      </div>
-      {detail&&<DetailModal title={detail.full_name} onClose={()=>{setDetail(null);setAppts([]);}} rows={[
-        ['Phone',detail.phone],['Email',detail.email],['Gender',detail.gender],['Age',detail.age],
-        ['Blood Group',detail.blood_group],['City',detail.preferred_city],['State',detail.state],
-        ['Address',detail.address],['Emergency',detail.emergency_contact],['Joined',fmt.date(detail.created_at)],
-      ]}>
-        {appts.length>0&&<>
-          <div style={{fontFamily:'var(--display)',fontWeight:600,fontSize:16,marginTop:24,marginBottom:12,color:'var(--ink)'}}>Recent Appointments</div>
-          <table><thead><tr><th>Date</th><th>Hospital</th><th>Doctor</th><th>Status</th></tr></thead><tbody>
-            {appts.map(a=><tr key={a.id}><td>{fmt.date(a.appointment_date)}</td><td>{a.hospital?.name}</td><td>{a.doctor?.full_name}</td><td>{statusBadge(a.status)}</td></tr>)}
-          </tbody></table>
-        </>}
-      </DetailModal>}
-    </>
-  );
-}
-
-/* =========================================================
-   APPOINTMENTS
-   ========================================================= */
-function AppointmentsPage() {
-  const [page,setPage]=useState(0);const [filter,setFilter]=useState('all');
-  const filters=[];if(filter!=='all') filters.push(['status','eq',filter]);
-  const {data,count,loading} = useQuery('appointments',{select:'*,patient:patient_profiles(full_name,phone),hospital:hospital_profiles(name),doctor:doctors(full_name)',order:'created_at',page,filters});
-
-  return (
-    <div className="card">
-      <div className="card-header">
-        <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
-          <div className="card-title">Appointments ({count})</div>
-          <div className="filter-row">
-            {['all','booked','confirmed','checked_in','in_progress','completed','cancelled','no_show'].map(f=><button key={f} className={`filter-btn ${filter===f?'active':''}`} onClick={()=>{setFilter(f);setPage(0);}}>{f==='all'?'All':f.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</button>)}
-          </div>
-        </div>
-      </div>
-      {loading?<div className="loading"><div className="spin"/></div>:data.length===0?<div className="empty">No appointments found</div>:(
-        <table><thead><tr><th>Patient</th><th>Hospital</th><th>Doctor</th><th>Date</th><th>Slot</th><th>Token</th><th>Fee</th><th>Status</th></tr></thead><tbody>
-          {data.map(a=><tr key={a.id}>
-            <td><div style={{fontWeight:600,color:'var(--ink)'}}>{a.patient?.full_name||'—'}</div><div style={{fontSize:11,color:'var(--muted)'}}>{a.patient?.phone}</div></td>
-            <td>{a.hospital?.name||'—'}</td><td>{a.doctor?.full_name||'—'}</td>
-            <td>{fmt.date(a.appointment_date)}</td><td>{fmt.time(a.slot_time)}</td>
-            <td style={{fontFamily:'var(--display)',fontWeight:700,color:'var(--blue-900)'}}>#{a.queue_number||'—'}</td>
-            <td>{fmt.money(a.consultation_fee)}</td><td>{statusBadge(a.status)}</td>
-          </tr>)}
-        </tbody></table>
-      )}
-      <Pager page={page} setPage={setPage} count={count}/>
-    </div>
-  );
-}
-
-/* =========================================================
-   PAYMENTS
-   ========================================================= */
-function PaymentsPage() {
-  const [page,setPage]=useState(0);const [filter,setFilter]=useState('all');
-  const filters=[];if(filter!=='all') filters.push(['status','eq',filter]);
-  const {data,count,loading} = useQuery('payments',{select:'*,patient:patient_profiles(full_name)',order:'created_at',page,filters});
-
-  return (
-    <div className="card">
-      <div className="card-header">
-        <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
-          <div className="card-title">Payments ({count})</div>
-          <div className="filter-row">
-            {['all','captured','pending','failed','refunded'].map(f=><button key={f} className={`filter-btn ${filter===f?'active':''}`} onClick={()=>{setFilter(f);setPage(0);}}>{f==='all'?'All':f.charAt(0).toUpperCase()+f.slice(1)}</button>)}
-          </div>
-        </div>
-      </div>
-      {loading?<div className="loading"><div className="spin"/></div>:data.length===0?<div className="empty">No payments found</div>:(
-        <table><thead><tr><th>Patient</th><th>Amount</th><th>Status</th><th>Method</th><th>Gateway ID</th><th>Paid</th><th>Refund</th></tr></thead><tbody>
-          {data.map(p=><tr key={p.id}>
-            <td style={{fontWeight:500}}>{p.patient?.full_name||'—'}</td>
-            <td style={{fontWeight:600}}>{fmt.money(p.amount)}</td><td>{statusBadge(p.status)}</td>
-            <td>{p.payment_method||'—'}</td>
-            <td style={{fontSize:11,fontFamily:'monospace'}}>{p.gateway_payment_id||'—'}</td>
-            <td>{fmt.date(p.paid_at)}</td>
-            <td>{p.refund_amount?<span className="badge badge-amber">{fmt.money(p.refund_amount)}</span>:'—'}</td>
-          </tr>)}
-        </tbody></table>
-      )}
-      <Pager page={page} setPage={setPage} count={count}/>
-    </div>
-  );
-}
-
-/* =========================================================
-   REFUNDS
-   ========================================================= */
-function RefundsPage() {
-  const [page,setPage]=useState(0);const [filter,setFilter]=useState('all');
-  const filters=[];if(filter!=='all') filters.push(['status','eq',filter]);
-  const {data,count,loading} = useQuery('refund_requests',{order:'created_at',page,filters});
-
-  return (
-    <div className="card">
-      <div className="card-header">
-        <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
-          <div className="card-title">Refund Requests ({count})</div>
-          <div className="filter-row">
-            {['all','pending','processing','completed','failed'].map(f=><button key={f} className={`filter-btn ${filter===f?'active':''}`} onClick={()=>{setFilter(f);setPage(0);}}>{f==='all'?'All':f.charAt(0).toUpperCase()+f.slice(1)}</button>)}
-          </div>
-        </div>
-      </div>
-      {loading?<div className="loading"><div className="spin"/></div>:data.length===0?<div className="empty">No refund requests</div>:(
-        <table><thead><tr><th>Amount</th><th>Status</th><th>Cancelled by</th><th>Reason</th><th>Attempts</th><th>Error</th><th>Requested</th></tr></thead><tbody>
-          {data.map(r=><tr key={r.id}>
-            <td style={{fontWeight:600}}>{fmt.money(r.amount)}</td><td>{statusBadge(r.status)}</td>
-            <td>{r.cancelled_by||'—'}</td>
-            <td style={{maxWidth:200,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{r.cancel_reason||'—'}</td>
-            <td>{r.attempt_count}</td>
-            <td style={{fontSize:11,color:'var(--red)',maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{r.last_error||'—'}</td>
-            <td>{fmt.date(r.created_at)}</td>
-          </tr>)}
-        </tbody></table>
-      )}
-      <Pager page={page} setPage={setPage} count={count}/>
-    </div>
-  );
-}
-
-/* =========================================================
-   GST & INVOICES
-   ========================================================= */
-function GSTPage() {
-  const now = new Date();
-  const [month,setMonth] = useState(now.getMonth());
-  const [year,setYear] = useState(now.getFullYear());
-  const [page,setPage] = useState(0);
-  const [filter,setFilter] = useState('all');
-  const [detail,setDetail] = useState(null);
-  const [downloading,setDownloading] = useState(false);
-  const [downloadMsg,setDownloadMsg] = useState('');
-
-  const monthStart = `${year}-${String(month+1).padStart(2,'0')}-01`;
-  const nextMonth = month===11 ? `${year+1}-01-01` : `${year}-${String(month+2).padStart(2,'0')}-01`;
-
-  const filters = [['invoice_date','gte',monthStart],['invoice_date','lt',nextMonth]];
-  if (filter!=='all') filters.push(['invoice_type','eq',filter]);
-
-  const {data,count,loading} = useQuery('gst_invoices',{order:'invoice_date',ascending:false,page,filters,pageSize:PAGE_SIZE});
-
-  const [monthStats,setMonthStats] = useState({total:0,taxable:0,gst:0,count:0,credits:0});
-  useEffect(()=>{
-    (async()=>{
-      const {data:all} = await sb.from('gst_invoices').select('invoice_type,taxable_value,cgst_amount,sgst_amount,igst_amount,total_amount')
-        .gte('invoice_date',monthStart).lt('invoice_date',nextMonth);
-      if(!all) return;
-      const invoices = all.filter(i=>i.invoice_type==='invoice'||i.invoice_type==='tax_invoice');
-      const credits = all.filter(i=>i.invoice_type==='credit_note');
-      setMonthStats({
-        count:invoices.length, credits:credits.length,
-        taxable:invoices.reduce((s,r)=>s+Number(r.taxable_value||0),0),
-        gst:invoices.reduce((s,r)=>s+Number(r.cgst_amount||0)+Number(r.sgst_amount||0)+Number(r.igst_amount||0),0),
-        total:invoices.reduce((s,r)=>s+Number(r.total_amount||0),0),
-      });
-    })();
-  },[monthStart,nextMonth]);
-
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-  const viewPdf = async inv => {
-    if(!inv.pdf_storage_path){alert('No PDF available for this invoice');return;}
-    const {data:urlData} = await sb.storage.from('gst-invoices').createSignedUrl(inv.pdf_storage_path,3600);
-    if(urlData?.signedUrl) window.open(urlData.signedUrl,'_blank');
-    else alert('Could not generate PDF link');
-  };
-
-  const downloadExcel = async () => {
-    setDownloading(true);setDownloadMsg('Fetching invoices…');
-    const {data:all} = await sb.from('gst_invoices').select('*').gte('invoice_date',monthStart).lt('invoice_date',nextMonth).order('invoice_date',{ascending:true});
-    if(!all||all.length===0){setDownloading(false);setDownloadMsg('');alert('No invoices for this month');return;}
-    setDownloadMsg('Generating Excel…');
-    const rows = all.map(inv=>({
-      'Invoice #':inv.invoice_number,'Date':inv.invoice_date,'Type':inv.invoice_type,
-      'Financial Year':inv.financial_year,'Buyer Name':inv.buyer_name,'Buyer State':inv.buyer_state,
-      'Buyer State Code':inv.buyer_state_code,'Buyer Email':inv.buyer_email,'Buyer Phone':inv.buyer_phone,
-      'HSN/SAC':inv.hsn_sac_code,'Description':inv.description,'Place of Supply':inv.place_of_supply_state_code,
-      'Taxable Value':Number(inv.taxable_value),'CGST Rate %':Number(inv.cgst_rate),'CGST Amount':Number(inv.cgst_amount),
-      'SGST Rate %':Number(inv.sgst_rate),'SGST Amount':Number(inv.sgst_amount),
-      'IGST Rate %':Number(inv.igst_rate),'IGST Amount':Number(inv.igst_amount),
-      'Total Amount':Number(inv.total_amount),'Reverse Charge':inv.reverse_charge?'Yes':'No',
-    }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = Object.keys(rows[0]).map(k=>({wch:Math.max(k.length,...rows.map(r=>String(r[k]||'').length))+2}));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,`${monthNames[month]} ${year}`);
-    XLSX.writeFile(wb,`HospiJunction_GST_${monthNames[month]}_${year}.xlsx`);
-    setDownloading(false);setDownloadMsg('');
-  };
-
-  const downloadZip = async () => {
-    setDownloading(true);setDownloadMsg('Fetching invoice list…');
-    const {data:all} = await sb.from('gst_invoices').select('invoice_number,invoice_type,invoice_date,pdf_storage_path')
-      .gte('invoice_date',monthStart).lt('invoice_date',nextMonth).order('invoice_date',{ascending:true});
-    const withPdfs = (all||[]).filter(i=>i.pdf_storage_path);
-    if(withPdfs.length===0){setDownloading(false);setDownloadMsg('');alert('No PDFs available for this month');return;}
-    const zip = new JSZip();
-    let done = 0;
-    for(const inv of withPdfs){
-      done++;setDownloadMsg(`Downloading PDF ${done}/${withPdfs.length}…`);
-      try{
-        const {data:urlData} = await sb.storage.from('gst-invoices').createSignedUrl(inv.pdf_storage_path,300);
-        if(urlData?.signedUrl){const resp=await fetch(urlData.signedUrl);if(resp.ok){const blob=await resp.blob();zip.file(`${inv.invoice_number}_${inv.invoice_type}.pdf`,blob);}}
-      }catch(e){console.error('Failed to fetch',inv.invoice_number,e);}
+      adminKey = prompt('Enter admin delete key (for delete operations):') || '';
+      sessionStorage.setItem('hj_admin_key', adminKey);
+      showDashboard();
     }
-    setDownloadMsg('Creating ZIP file…');
-    const zipBlob = await zip.generateAsync({type:'blob'});
-    const url = URL.createObjectURL(zipBlob);
-    const a = document.createElement('a');a.href=url;a.download=`HospiJunction_Invoices_${monthNames[month]}_${year}.zip`;a.click();
-    URL.revokeObjectURL(url);setDownloading(false);setDownloadMsg('');
-  };
 
-  const downloadAll = async () => { await downloadExcel(); await downloadZip(); };
+    function showDashboard() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-dashboard').style.display = 'block';
+      loadAdminData();
+    }
 
-  return (
-    <>
-      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:20,flexWrap:'wrap'}}>
-        <select value={month} onChange={e=>{setMonth(Number(e.target.value));setPage(0);}}
-          style={{padding:'8px 14px',borderRadius:8,border:'1.5px solid var(--border)',fontFamily:'var(--body)',fontSize:14,fontWeight:600}}>
-          {monthNames.map((m,i)=><option key={i} value={i}>{m}</option>)}
-        </select>
-        <select value={year} onChange={e=>{setYear(Number(e.target.value));setPage(0);}}
-          style={{padding:'8px 14px',borderRadius:8,border:'1.5px solid var(--border)',fontFamily:'var(--body)',fontSize:14,fontWeight:600}}>
-          {[2024,2025,2026,2027].map(y=><option key={y} value={y}>{y}</option>)}
-        </select>
-        <div style={{flex:1}}/>
-        <button className="btn-sm primary" onClick={downloadExcel} disabled={downloading} style={{padding:'8px 16px'}}>📊 Excel</button>
-        <button className="btn-sm primary" onClick={downloadZip} disabled={downloading} style={{padding:'8px 16px'}}>📁 PDFs ZIP</button>
-        <button className="btn-sm" onClick={downloadAll} disabled={downloading} style={{padding:'8px 16px',background:'var(--positive)',color:'var(--white)',borderColor:'var(--positive)'}}>⬇ Download All</button>
-      </div>
-      {downloading&&<div style={{padding:'14px 20px',background:'var(--blue-50)',borderRadius:10,marginBottom:18,fontSize:13,color:'var(--blue-900)',display:'flex',alignItems:'center',gap:10}}><div className="spin" style={{width:18,height:18,borderWidth:2}}/> {downloadMsg}</div>}
-      <div className="stats">
-        <div className="stat-card"><div className="stat-label">Invoices</div><div className="stat-value">{monthStats.count}</div></div>
-        <div className="stat-card"><div className="stat-label">Credit Notes</div><div className="stat-value">{monthStats.credits}</div></div>
-        <div className="stat-card"><div className="stat-label">Taxable Value</div><div className="stat-value">{fmt.money(monthStats.taxable)}</div></div>
-        <div className="stat-card"><div className="stat-label">GST Collected</div><div className="stat-value">{fmt.money(monthStats.gst)}</div></div>
-        <div className="stat-card"><div className="stat-label">Total Billed</div><div className="stat-value">{fmt.money(monthStats.total)}</div></div>
-      </div>
-      <div className="card">
-        <div className="card-header">
-          <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
-            <div className="card-title">{monthNames[month]} {year} Invoices ({count})</div>
-            <div className="filter-row">
-              {['all','tax_invoice','invoice','credit_note'].map(f=><button key={f} className={`filter-btn ${filter===f?'active':''}`} onClick={()=>{setFilter(f);setPage(0);}}>
-                {f==='all'?'All':f==='tax_invoice'?'Tax Invoice':f==='credit_note'?'Credit Note':'Invoice'}
-              </button>)}
-            </div>
-          </div>
-        </div>
-        {loading?<div className="loading"><div className="spin"/></div>:data.length===0?<div className="empty">No invoices for this period</div>:(
-          <table><thead><tr><th>Invoice #</th><th>Date</th><th>Type</th><th>Buyer</th><th>Taxable</th><th>CGST</th><th>SGST</th><th>IGST</th><th>Total</th><th>Actions</th></tr></thead><tbody>
-            {data.map(inv=><tr key={inv.id}>
-              <td style={{fontWeight:600,color:'var(--ink)',fontFamily:'monospace',fontSize:12}}>{inv.invoice_number}</td>
-              <td>{fmt.date(inv.invoice_date)}</td>
-              <td>{inv.invoice_type==='credit_note'?<span className="badge badge-amber">Credit Note</span>:<span className="badge badge-blue">Invoice</span>}</td>
-              <td><div style={{fontWeight:500}}>{inv.buyer_name}</div><div style={{fontSize:11,color:'var(--muted)'}}>{inv.buyer_state}</div></td>
-              <td>{fmt.money(inv.taxable_value)}</td><td>{fmt.money(inv.cgst_amount)}</td><td>{fmt.money(inv.sgst_amount)}</td><td>{fmt.money(inv.igst_amount)}</td>
-              <td style={{fontWeight:600}}>{fmt.money(inv.total_amount)}</td>
-              <td style={{display:'flex',gap:6}}>
-                <button className="btn-sm" onClick={()=>setDetail(inv)}>Details</button>
-                <button className="btn-sm primary" onClick={()=>viewPdf(inv)}>PDF</button>
-              </td>
-            </tr>)}
-          </tbody></table>
-        )}
-        <Pager page={page} setPage={setPage} count={count}/>
-      </div>
-      {detail&&<DetailModal title={`Invoice ${detail.invoice_number}`} onClose={()=>setDetail(null)} rows={[
-        ['Invoice #',detail.invoice_number],['Date',fmt.date(detail.invoice_date)],['Type',detail.invoice_type],
-        ['Financial Year',detail.financial_year],['HSN/SAC',detail.hsn_sac_code],['Description',detail.description],
-        ['—',''],
-        ['Seller',detail.seller_name],['Seller GSTIN',detail.seller_gstin],['Seller CIN',detail.seller_cin],
-        ['Seller Address',detail.seller_address],['Seller State Code',detail.seller_state_code],
-        ['—',''],
-        ['Buyer',detail.buyer_name],['Buyer State',`${detail.buyer_state} (${detail.buyer_state_code})`],
-        ['Buyer Email',detail.buyer_email],['Buyer Phone',detail.buyer_phone],
-        ['Place of Supply',detail.place_of_supply_state_code],
-        ['—',''],
-        ['Taxable Value',fmt.money(detail.taxable_value)],
-        ['CGST',`${detail.cgst_rate}% → ${fmt.money(detail.cgst_amount)}`],
-        ['SGST',`${detail.sgst_rate}% → ${fmt.money(detail.sgst_amount)}`],
-        ['IGST',`${detail.igst_rate}% → ${fmt.money(detail.igst_amount)}`],
-        ['Total',fmt.money(detail.total_amount)],
-        ['Reverse Charge',detail.reverse_charge?'Yes':'No'],
-      ]}/>}
-    </>
-  );
-}
+    async function adminLogout() {
+      await sb.auth.signOut();
+      adminKey = '';
+      sessionStorage.removeItem('hj_admin_key');
+      document.getElementById('login-screen').style.display = 'block';
+      document.getElementById('admin-dashboard').style.display = 'none';
+    }
 
-/* =========================================================
-   APP
-   ========================================================= */
-function App() {
-  const [user,setUser]=useState(null);const [checking,setChecking]=useState(true);const [page,setPage]=useState('dashboard');
+    async function loadAdminData() {
+      const { data: hospitals } = await sb.from('hospital_profiles')
+        .select('id, name, email, phone, city, state, is_verified, is_active, created_at, firebase_uid')
+        .order('created_at', { ascending: false });
+      allHospitals = hospitals || [];
 
-  useEffect(()=>{
-    sb.auth.getSession().then(({data:{session}})=>{
-      if(session?.user?.email?.toLowerCase()===ADMIN_EMAIL) setUser(session.user);
-      setChecking(false);
-    });
-    const {data:{subscription}} = sb.auth.onAuthStateChange((_,session)=>{
-      if(session?.user?.email?.toLowerCase()===ADMIN_EMAIL) setUser(session.user);
-      else setUser(null);
-    });
-    return ()=>subscription.unsubscribe();
-  },[]);
+      const { data: patients } = await sb.from('patient_profiles')
+        .select('id, full_name, email, phone, preferred_city, gender, created_at')
+        .order('created_at', { ascending: false });
+      allPatients = patients || [];
 
-  if(checking) return <div className="login-wrap"><div className="spin"/></div>;
-  if(!user) return <LoginPage/>;
+      const { count: apptCount } = await sb.from('appointments')
+        .select('id', { count: 'exact', head: true });
 
-  const PageComponent = {dashboard:DashboardPage,hospitals:HospitalsPage,doctors:DoctorsPage,patients:PatientsPage,appointments:AppointmentsPage,payments:PaymentsPage,refunds:RefundsPage,gst:GSTPage}[page]||DashboardPage;
-  const pageLabel = PAGES.find(p=>p.id===page)?.label||'Dashboard';
+      document.getElementById('stat-total').textContent = allHospitals.length;
+      document.getElementById('stat-verified').textContent = allHospitals.filter(h => h.is_verified).length;
+      document.getElementById('stat-pending').textContent = allHospitals.filter(h => !h.is_verified).length;
+      document.getElementById('stat-patients').textContent = allPatients.length;
+      document.getElementById('stat-appointments').textContent = apptCount || 0;
 
-  return (
-    <div className="layout">
-      <Sidebar page={page} setPage={setPage} user={user}/>
-      <div className="main">
-        <div className="topbar"><div className="topbar-title">{pageLabel}</div></div>
-        <div className="content"><PageComponent/></div>
-      </div>
-    </div>
-  );
-}
+      renderHospitals(allHospitals);
+      renderPatients(allPatients);
+    }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-</script>
+    function renderHospitals(list) {
+      const tbody = document.getElementById('hospitals-table');
+      if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No hospitals found</td></tr>'; return; }
+      tbody.innerHTML = list.map(h => `<tr>
+        <td><strong>${esc(h.name || '-')}</strong></td>
+        <td>${esc(h.email || '-')}</td>
+        <td>${esc(h.city || '-')}, ${esc(h.state || '')}</td>
+        <td>${esc(h.phone || '-')}</td>
+        <td>${h.is_verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-orange">Pending</span>'}</td>
+        <td>${h.created_at ? new Date(h.created_at).toLocaleDateString('en-IN') : '-'}</td>
+        <td>
+          ${!h.is_verified ? `<button class="btn btn-green" onclick="verifyHospital('${h.id}')">Verify</button> ` : ''}
+          <button class="btn btn-red" onclick="deleteHospital('${h.id}','${esc(h.email||'')}','${esc(h.name||'')}')">Delete</button>
+        </td>
+      </tr>`).join('');
+    }
+
+    function renderPatients(list) {
+      const tbody = document.getElementById('patients-table');
+      if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No patients found</td></tr>'; return; }
+      tbody.innerHTML = list.map(p => `<tr>
+        <td><strong>${esc(p.full_name || '-')}</strong></td>
+        <td>${esc(p.email || '-')}</td>
+        <td>${esc(p.phone || '-')}</td>
+        <td>${esc(p.preferred_city || '-')}</td>
+        <td>${esc(p.gender || '-')}</td>
+        <td>${p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN') : '-'}</td>
+        <td><button class="btn btn-red" onclick="deletePatient('${p.id}','${esc(p.full_name||'')}')">Delete</button></td>
+      </tr>`).join('');
+    }
+
+    function filterHospitals() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      renderHospitals(allHospitals.filter(h =>
+        (h.name||'').toLowerCase().includes(q) || (h.email||'').toLowerCase().includes(q) ||
+        (h.city||'').toLowerCase().includes(q) || (h.phone||'').includes(q)));
+    }
+
+    function filterPatients() {
+      const q = document.getElementById('patient-search').value.toLowerCase();
+      renderPatients(allPatients.filter(p =>
+        (p.full_name||'').toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q) ||
+        (p.phone||'').includes(q) || (p.preferred_city||'').toLowerCase().includes(q)));
+    }
+
+    async function verifyHospital(id) {
+      if (!confirm('Mark this hospital as verified?')) return;
+      const { error } = await sb.from('hospital_profiles').update({ is_verified: true }).eq('id', id);
+      if (error) { showToast('Failed: ' + error.message, 'error'); }
+      else { showToast('Hospital verified!', 'success'); loadAdminData(); }
+    }
+
+    async function deleteHospital(id, email, name) {
+      if (!confirm(`Delete hospital "${name}" (${email})?\n\nThis removes from database, Supabase Auth, and Firebase Auth. Cannot be undone.`)) return;
+      if (prompt('Type DELETE to confirm:') !== 'DELETE') return;
+
+      if (!adminKey) {
+        adminKey = prompt('Enter admin delete key:') || '';
+        sessionStorage.setItem('hj_admin_key', adminKey);
+      }
+
+      showToast('Deleting hospital...', 'info');
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/delete-hospital`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hospital_id: id, email, admin_key: adminKey })
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          showToast('Hospital deleted from all systems', 'success');
+          loadAdminData();
+        } else {
+          showToast('Failed: ' + (result.error || JSON.stringify(result)), 'error');
+        }
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+
+    async function deletePatient(id, name) {
+      if (!confirm(`Delete patient "${name}"? Cannot be undone.`)) return;
+      if (prompt('Type DELETE to confirm:') !== 'DELETE') return;
+
+      const { error } = await sb.from('patient_profiles').delete().eq('id', id);
+      if (error) { showToast('Failed: ' + error.message, 'error'); }
+      else { showToast('Patient deleted', 'success'); loadAdminData(); }
+    }
+
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast toast-' + type + ' show';
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+  </script>
 </body>
 </html>

@@ -309,6 +309,15 @@
               </div>
             </div>
           </div>
+
+          <!-- Delete Account -->
+          <div class="card" style="margin-top:24px;border-color:#FECACA">
+            <div class="card-header" style="border-color:#FECACA"><h2 style="color:#DC2626">Danger Zone</h2></div>
+            <div class="card-body">
+              <p style="color:var(--muted);margin-bottom:16px">Permanently delete your hospital account, including all doctors, appointments, and data. This action <strong>cannot be undone</strong>.</p>
+              <button class="btn" style="background:#DC2626;color:#fff;border:none" onclick="handleDeleteAccount()">Delete My Account</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -946,6 +955,42 @@
       toast.textContent = msg;
       toast.className = 'toast toast-' + type + ' show';
       setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    async function handleDeleteAccount() {
+      if (!hospitalData) return;
+      const confirm1 = confirm('Are you sure you want to delete your hospital account? This will permanently remove all your data including doctors, appointments, and profile.');
+      if (!confirm1) return;
+      const typed = prompt('Type DELETE to confirm:');
+      if (typed !== 'DELETE') {
+        showToast('Account deletion cancelled', 'info');
+        return;
+      }
+
+      showToast('Deleting account...', 'info');
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/delete-hospital`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            hospital_id: hospitalData.id,
+            email: hospitalData.email,
+            admin_key: 'self-delete'
+          })
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert('Your account has been deleted successfully.');
+          sessionStorage.removeItem('hj_hospital_user');
+          await sb.auth.signOut();
+          await firebase.auth().signOut();
+          window.location.href = '/';
+        } else {
+          showToast('Delete failed: ' + (result.error || 'Unknown error'), 'error');
+        }
+      } catch (err) {
+        showToast('Delete failed: ' + err.message, 'error');
+      }
     }
 
     async function handleLogout() {
