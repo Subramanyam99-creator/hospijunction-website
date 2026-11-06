@@ -3,23 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hospitals in Tirupati — Book Doctor Appointments | HospiJunction</title>
-  <meta name="description" content="Find verified hospitals in Tirupati, Andhra Pradesh. Book OPD appointments online, get a stable token number, and skip the queue — all for ₹20 on HospiJunction." />
+  <title>Hospitals — HospiJunction</title>
+  <meta name="description" content="Find verified hospitals and book OPD appointments on HospiJunction." />
   <meta name="theme-color" content="#0F2E5C" />
-  <link rel="canonical" href="https://www.hospijunction.com/hospitals/tirupati/" />
 
-  <!-- Favicon -->
   <link rel="icon" href="/favicon.ico" sizes="48x48" />
   <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <!-- OG -->
-  <meta property="og:title" content="Hospitals in Tirupati — HospiJunction" />
-  <meta property="og:description" content="Book doctor appointments in Tirupati for ₹20. Verified hospitals, stable tokens, no queues." />
+  <meta property="og:title" content="Hospitals — HospiJunction" />
+  <meta property="og:description" content="Book doctor appointments for ₹20. Verified hospitals, stable tokens, no queues." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.hospijunction.com/hospitals/tirupati/" />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -46,8 +41,7 @@
     .hospital-type{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--blue-50);color:var(--blue-700)}
 
     .doctors-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:16px}
-    .doc-card{background:var(--blue-50);border-radius:var(--radius-sm);padding:16px 18px}
-    .doc-card{display:flex;gap:14px;align-items:flex-start}
+    .doc-card{background:var(--blue-50);border-radius:var(--radius-sm);padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
     .doc-photo{width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border-2)}
     .doc-photo-placeholder{width:48px;height:48px;border-radius:50%;background:var(--blue-700);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--white);flex-shrink:0}
     .doc-info{flex:1;min-width:0}
@@ -85,16 +79,14 @@
     @media(max-width:480px){.h-actions{flex-direction:column}.h-btn{justify-content:center}}
   </style>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-  <!-- Structured Data -->
   <script type="application/ld+json" id="structured-data">
   {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "Hospitals in Tirupati",
-    "description": "Verified hospitals in Tirupati on HospiJunction",
+    "name": "Hospitals",
+    "description": "Verified hospitals on HospiJunction",
     "itemListElement": []
   }
   </script>
@@ -119,9 +111,9 @@
 
   <section class="city-hero">
     <div class="container">
-      <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/hospitals/">Hospitals</a> &rsaquo; Tirupati</div>
-      <h1 class="section-title">Hospitals in Tirupati</h1>
-      <p class="section-sub">Book OPD appointments at verified hospitals in Tirupati, Andhra Pradesh.</p>
+      <div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/hospitals/">Hospitals</a> &rsaquo; <span id="breadcrumb-city">Loading...</span></div>
+      <h1 class="section-title" id="city-title">Hospitals</h1>
+      <p class="section-sub" id="city-sub">Loading hospital details...</p>
     </div>
   </section>
 
@@ -131,7 +123,7 @@
       <div id="hospitals" class="city-loading"><div class="spin"></div><p style="margin-top:16px">Loading hospitals&hellip;</p></div>
 
       <div class="download-cta" style="display:none" id="download-cta">
-        <h2>Book an appointment in Tirupati</h2>
+        <h2 id="cta-title">Book an appointment</h2>
         <p>Download the HospiJunction app to book your slot, get a token number, and skip the queue.</p>
         <a href="https://play.google.com/store/apps/details?id=com.hospijunction.app" class="btn btn-primary" target="_blank" rel="noopener">Download on Google Play</a>
       </div>
@@ -157,8 +149,27 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    const CITY_NAME  = "Tirupati";
-    const CITY_STATE = "Andhra Pradesh";
+    // Read city from URL: /hospitals/city/?c=tirupati OR /hospitals/city/?c=Tirupati
+    const params = new URLSearchParams(window.location.search);
+    const cityParam = (params.get('c') || '').trim();
+
+    if (!cityParam) {
+      window.location.href = '/hospitals/';
+    }
+
+    // Format city name: capitalize first letter of each word
+    function titleCase(str) {
+      return str.replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    const CITY_NAME = titleCase(cityParam.toLowerCase());
+    let CITY_STATE = '';
+
+    // Update page elements
+    document.getElementById('breadcrumb-city').textContent = CITY_NAME;
+    document.getElementById('city-title').textContent = 'Hospitals in ' + CITY_NAME;
+    document.title = 'Hospitals in ' + CITY_NAME + ' — Book Doctor Appointments | HospiJunction';
+    document.querySelector('meta[property="og:title"]').setAttribute('content', 'Hospitals in ' + CITY_NAME + ' — HospiJunction');
 
     const SUPABASE_URL  = "https://xamjhwkclcftbyjpzvnq.supabase.co";
     const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
@@ -175,7 +186,7 @@
     }
 
     function getBookingUrl(hospital) {
-      return 'https://www.hospijunction.com/hospitals/' + CITY_NAME.toLowerCase() + '/#' + slugify(hospital.name);
+      return 'https://www.hospijunction.com/hospitals/city/?c=' + encodeURIComponent(CITY_NAME) + '#' + slugify(hospital.name);
     }
 
     function getWhatsAppUrl(hospital) {
@@ -188,8 +199,7 @@
     }
 
     function copyLink(btn, hospitalName) {
-      const slug = slugify(hospitalName);
-      const url = 'https://www.hospijunction.com/hospitals/' + CITY_NAME.toLowerCase() + '/#' + slug;
+      const url = 'https://www.hospijunction.com/hospitals/city/?c=' + encodeURIComponent(CITY_NAME) + '#' + slugify(hospitalName);
       navigator.clipboard.writeText(url).then(() => {
         const orig = btn.innerHTML;
         btn.innerHTML = '✓ Copied!';
@@ -205,11 +215,10 @@
       const hospDocs = activeFilter
         ? (docMap[h.id] || []).filter(d => d.specialization && d.specialization.toLowerCase().includes(activeFilter.toLowerCase()))
         : (docMap[h.id] || []);
-      // If filtering by specialization and this hospital has no matching doctors, skip
       if (activeFilter && hospDocs.length === 0) return '';
 
       return `
-        <div class="hospital-card">
+        <div class="hospital-card" id="${slugify(h.name)}">
           ${h.cover_image_url ? `<img src="${escapeHtml(h.cover_image_url)}" alt="${escapeHtml(h.name)}" style="width:100%;height:180px;object-fit:cover;border-radius:var(--radius-sm);margin-bottom:18px" loading="lazy" />` : ''}
           <div class="hospital-header">
             ${h.logo_url
@@ -291,7 +300,6 @@
 
     function setFilter(spec) {
       activeFilter = spec;
-      // Update chip styles
       document.querySelectorAll('.filter-chip').forEach(c => {
         if ((!spec && c.dataset.spec === 'all') || c.dataset.spec === spec) {
           c.classList.add('active');
@@ -307,7 +315,7 @@
       try {
         const { data: hospitals, error } = await sb
           .from('hospital_profiles')
-          .select('id, name, address, phone, hospital_type, consultation_fee, rating, total_reviews, map_link, logo_url, cover_image_url')
+          .select('id, name, address, phone, hospital_type, consultation_fee, rating, total_reviews, map_link, logo_url, cover_image_url, state')
           .eq('is_active', true)
           .eq('is_verified', true)
           .ilike('city', CITY_NAME)
@@ -316,10 +324,16 @@
         if (error) throw error;
 
         if (!hospitals || hospitals.length === 0) {
-          container.innerHTML = '<div class="city-empty">No verified hospitals in ' + CITY_NAME + ' yet. We\'re expanding &mdash; check back soon!</div>';
+          container.innerHTML = '<div class="city-empty">No verified hospitals in ' + escapeHtml(CITY_NAME) + ' yet. We\'re expanding &mdash; check back soon!</div>';
           document.getElementById('download-cta').style.display = 'block';
           return;
         }
+
+        // Get state from first hospital
+        CITY_STATE = hospitals[0].state || '';
+        document.getElementById('city-sub').textContent = 'Book OPD appointments at verified hospitals in ' + CITY_NAME + (CITY_STATE ? ', ' + CITY_STATE : '') + '.';
+        document.querySelector('meta[name="description"]').setAttribute('content', 'Find verified hospitals in ' + CITY_NAME + (CITY_STATE ? ', ' + CITY_STATE : '') + '. Book OPD appointments online for ₹20 on HospiJunction.');
+        document.getElementById('cta-title').textContent = 'Book an appointment in ' + CITY_NAME;
 
         allHospitals = hospitals;
         const hospitalIds = hospitals.map(h => h.id);
@@ -380,6 +394,12 @@
 
         renderHospitals();
         document.getElementById('download-cta').style.display = 'block';
+
+        // Scroll to hospital if hash present
+        if (window.location.hash) {
+          const el = document.getElementById(window.location.hash.substring(1));
+          if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+        }
 
       } catch (err) {
         container.innerHTML = '<div class="city-empty">Could not load hospitals. Please try again later.</div>';

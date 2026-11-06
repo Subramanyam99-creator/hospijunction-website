@@ -151,9 +151,8 @@
 
         let html = '<div class="city-grid">';
         cities.forEach(c => {
-          const slug = c.city.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
           html += `
-            <a href="/hospitals/${slug}/" class="city-card">
+            <a href="/hospitals/city/?c=${encodeURIComponent(c.city)}" class="city-card">
               <h3>${c.city}</h3>
               <div class="city-state">${c.state}</div>
               <div class="city-stat">
