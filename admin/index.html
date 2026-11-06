@@ -11,54 +11,141 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
-    :root{--blue-900:#0F2E5C;--blue-700:#1A56B5;--blue-50:#EFF6FF;--cream:#FAF6EE;--white:#FFFFFF;--ink:#1A1A2E;--muted:#7A7A8A;--border:#E5E7EB;--green:#16A34A;--red:#DC2626;--orange:#EA580C;--radius:8px;--display:'Fraunces',serif;--body:'DM Sans',sans-serif}
+    :root{--blue-900:#0F2E5C;--blue-700:#1A56B5;--blue-50:#EFF6FF;--cream:#FAF6EE;--white:#FFFFFF;--ink:#1A1A2E;--ink-2:#4A4A5A;--muted:#7A7A8A;--border:#E5E7EB;--border-2:#F0F0F5;--green:#16A34A;--green-50:#F0FDF4;--red:#DC2626;--red-50:#FEF2F2;--orange:#EA580C;--orange-50:#FFF7ED;--purple:#7C3AED;--purple-50:#F5F3FF;--radius:10px;--display:'Fraunces',serif;--body:'DM Sans',sans-serif;--shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.04)}
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:var(--body);background:#F5F6FA;color:var(--ink);font-size:14px}
+    body{font-family:var(--body);background:#F5F6FA;color:var(--ink);font-size:14px;min-height:100vh}
 
-    .admin-header{background:var(--blue-900);color:var(--white);padding:20px 32px;display:flex;align-items:center;justify-content:space-between}
-    .admin-header h1{font-family:var(--display);font-weight:600;font-size:20px;display:flex;align-items:center;gap:12px}
-    .admin-header .logo-mark{display:inline-block;background:var(--white);color:var(--blue-900);font-family:var(--display);font-weight:800;padding:5px 9px;border-radius:6px;font-size:14px}
-    .admin-header .logout-btn{background:rgba(255,255,255,.12);border:none;color:var(--white);padding:8px 16px;border-radius:8px;cursor:pointer;font-family:var(--body);font-size:13px}
-    .admin-header .logout-btn:hover{background:rgba(255,255,255,.2)}
+    /* ── Header ── */
+    .admin-header{background:var(--blue-900);color:var(--white);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:50}
+    .admin-header h1{font-family:var(--display);font-weight:600;font-size:18px;display:flex;align-items:center;gap:10px}
+    .admin-header .logo-mark{display:inline-block;background:var(--white);color:var(--blue-900);font-family:var(--display);font-weight:800;padding:4px 8px;border-radius:5px;font-size:12px}
+    .header-right{display:flex;align-items:center;gap:14px}
+    .header-time{font-size:12px;color:rgba(255,255,255,.6)}
+    .logout-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:var(--white);padding:7px 16px;border-radius:8px;cursor:pointer;font-family:var(--body);font-size:12px;font-weight:500;transition:all .15s}
+    .logout-btn:hover{background:rgba(255,255,255,.2)}
 
-    .container{max-width:1200px;margin:0 auto;padding:28px 24px}
-
-    .login-wrap{min-height:80vh;display:flex;align-items:center;justify-content:center}
-    .login-card{background:var(--white);border-radius:12px;padding:40px;max-width:380px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-    .login-card h2{font-family:var(--display);font-weight:600;font-size:22px;margin-bottom:20px;text-align:center}
-    .login-card label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
-    .login-card input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--body);margin-bottom:16px;box-sizing:border-box}
+    /* ── Login ── */
+    .login-wrap{min-height:90vh;display:flex;align-items:center;justify-content:center}
+    .login-card{background:var(--white);border-radius:16px;padding:44px 36px;max-width:380px;width:100%;box-shadow:var(--shadow)}
+    .login-card h2{font-family:var(--display);font-weight:600;font-size:22px;margin-bottom:4px;text-align:center}
+    .login-card .login-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:24px}
+    .login-card label{display:block;font-size:12px;font-weight:600;margin-bottom:5px;color:var(--ink-2)}
+    .login-card input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--body);margin-bottom:16px}
     .login-card input:focus{outline:none;border-color:var(--blue-700)}
     .login-card button{width:100%;padding:12px;background:var(--blue-700);color:var(--white);border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--body)}
     .login-card button:hover{background:var(--blue-900)}
     .login-card .error{color:var(--red);font-size:13px;margin-bottom:12px;display:none}
 
-    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
-    .stat-card{background:var(--white);border-radius:12px;padding:20px;border:1px solid var(--border)}
-    .stat-card .stat-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-    .stat-card .stat-value{font-family:var(--display);font-weight:700;font-size:28px;margin-top:6px}
+    /* ── Layout ── */
+    .admin-body{display:flex;min-height:calc(100vh - 60px)}
 
-    .card{background:var(--white);border-radius:12px;border:1px solid var(--border);margin-bottom:20px}
-    .card-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-    .card-header h2{font-family:var(--display);font-weight:600;font-size:17px}
+    /* ── Sidebar ── */
+    .sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:16px 0;flex-shrink:0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+    .nav-section{padding:0 16px;margin-bottom:4px}
+    .nav-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:12px 0 6px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink-2);transition:all .12s;margin-bottom:2px}
+    .nav-item:hover{background:var(--blue-50);color:var(--blue-700)}
+    .nav-item.active{background:var(--blue-50);color:var(--blue-700);font-weight:600}
+    .nav-item svg{width:18px;height:18px;flex-shrink:0}
+    .nav-badge{margin-left:auto;background:var(--orange);color:var(--white);font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px}
+
+    /* ── Main ── */
+    .main{flex:1;padding:24px 28px;overflow-x:hidden}
+    .page{display:none}
+    .page.active{display:block}
+    .page-title{font-family:var(--display);font-weight:600;font-size:22px;margin-bottom:4px}
+    .page-sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+
+    /* ── Stats ── */
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+    .stat-card{background:var(--white);border-radius:var(--radius);padding:20px;border:1px solid var(--border);position:relative;overflow:hidden}
+    .stat-card::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px}
+    .stat-card.blue::after{background:var(--blue-700)}
+    .stat-card.green::after{background:var(--green)}
+    .stat-card.orange::after{background:var(--orange)}
+    .stat-card.purple::after{background:var(--purple)}
+    .stat-card.red::after{background:var(--red)}
+    .stat-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .stat-value{font-family:var(--display);font-weight:700;font-size:30px;margin-top:4px;line-height:1.2}
+    .stat-change{font-size:11px;margin-top:4px}
+    .stat-change.up{color:var(--green)}
+    .stat-change.down{color:var(--red)}
+
+    /* ── Quick Actions ── */
+    .quick-actions{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+    .qa-btn{display:flex;align-items:center;gap:10px;padding:16px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;font-family:var(--body);font-size:13px;font-weight:500;color:var(--ink)}
+    .qa-btn:hover{border-color:var(--blue-700);box-shadow:var(--shadow)}
+    .qa-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .qa-icon.blue{background:var(--blue-50);color:var(--blue-700)}
+    .qa-icon.green{background:var(--green-50);color:var(--green)}
+    .qa-icon.orange{background:var(--orange-50);color:var(--orange)}
+    .qa-icon.purple{background:var(--purple-50);color:var(--purple)}
+    .qa-icon.red{background:var(--red-50);color:var(--red)}
+
+    /* ── Charts area ── */
+    .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+    .chart-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:20px}
+    .chart-card h3{font-family:var(--display);font-weight:600;font-size:15px;margin-bottom:16px}
+    .chart-bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding-top:10px}
+    .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+    .chart-bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s;min-height:2px;cursor:pointer;position:relative}
+    .chart-bar:hover{opacity:.8}
+    .chart-bar-label{font-size:10px;color:var(--muted);white-space:nowrap}
+    .chart-bar-value{font-size:10px;font-weight:600;color:var(--ink)}
+    .chart-bar-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+
+    /* ── Recent list ── */
+    .recent-list{background:var(--white);border-radius:var(--radius);border:1px solid var(--border)}
+    .recent-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .recent-header h3{font-family:var(--display);font-weight:600;font-size:15px}
+    .recent-item{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border-2);transition:background .1s}
+    .recent-item:last-child{border-bottom:none}
+    .recent-item:hover{background:#FAFBFC}
+    .recent-avatar{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+    .recent-info{flex:1;min-width:0}
+    .recent-name{font-weight:600;font-size:13px}
+    .recent-meta{font-size:12px;color:var(--muted)}
+    .recent-time{font-size:11px;color:var(--muted);white-space:nowrap}
+
+    /* ── Card / Table ── */
+    .card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:20px}
+    .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .card-header h2{font-family:var(--display);font-weight:600;font-size:16px}
+    .card-actions{display:flex;gap:8px;align-items:center}
     .card-body{padding:0}
     .table-wrap{overflow-x:auto}
     table{width:100%;border-collapse:collapse}
     th{background:#F9FAFB;padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap}
-    td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;white-space:nowrap}
+    td{padding:11px 16px;border-bottom:1px solid var(--border-2);font-size:13px}
     tr:hover td{background:#FAFBFC}
     .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
-    .badge-green{background:#F0FDF4;color:var(--green)}
-    .badge-orange{background:#FFF7ED;color:var(--orange)}
+    .badge-green{background:var(--green-50);color:var(--green)}
+    .badge-orange{background:var(--orange-50);color:var(--orange)}
+    .badge-red{background:var(--red-50);color:var(--red)}
+    .badge-blue{background:var(--blue-50);color:var(--blue-700)}
+    .badge-purple{background:var(--purple-50);color:var(--purple)}
     .btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--body);transition:all .15s}
-    .btn-red{background:#FEF2F2;color:var(--red);border:1px solid #FECACA}
+    .btn-sm{padding:5px 10px;font-size:11px}
+    .btn-red{background:var(--red-50);color:var(--red);border:1px solid #FECACA}
     .btn-red:hover{background:var(--red);color:var(--white)}
-    .btn-green{background:#F0FDF4;color:var(--green);border:1px solid #BBF7D0}
+    .btn-green{background:var(--green-50);color:var(--green);border:1px solid #BBF7D0}
     .btn-green:hover{background:var(--green);color:var(--white)}
+    .btn-blue{background:var(--blue-50);color:var(--blue-700);border:1px solid #BFDBFE}
+    .btn-blue:hover{background:var(--blue-700);color:var(--white)}
+    .btn-outline{background:var(--white);color:var(--ink-2);border:1px solid var(--border)}
+    .btn-outline:hover{border-color:var(--blue-700);color:var(--blue-700)}
+    .btn-primary{background:var(--blue-700);color:var(--white);border:none;padding:8px 18px}
+    .btn-primary:hover{background:var(--blue-900)}
 
-    .search-bar{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--body);min-width:220px}
+    .search-bar{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--body);min-width:200px}
     .search-bar:focus{outline:none;border-color:var(--blue-700)}
+
+    select.filter-select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:var(--body);background:var(--white);cursor:pointer}
+    select.filter-select:focus{outline:none;border-color:var(--blue-700)}
 
     .toast{position:fixed;bottom:24px;right:24px;padding:14px 22px;border-radius:10px;color:var(--white);font-size:13px;font-weight:500;transform:translateY(100px);opacity:0;transition:all .3s;z-index:999}
     .toast.show{transform:translateY(0);opacity:1}
@@ -70,11 +157,78 @@
     .spin{display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--blue-700);border-radius:50%;animation:spin .6s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
+    /* ── Earnings ── */
+    .earnings-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px}
+    .earnings-card{background:var(--white);border-radius:var(--radius);padding:22px;border:1px solid var(--border)}
+    .earnings-card h4{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+    .earnings-card .amount{font-family:var(--display);font-weight:700;font-size:32px;color:var(--green)}
+    .earnings-card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+    .invoice-controls{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+
+    /* ── Tabs within pages ── */
+    .tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+    .tab-btn{padding:10px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;font-family:var(--body);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+    .tab-btn:hover{color:var(--blue-700)}
+    .tab-btn.active{color:var(--blue-700);border-bottom-color:var(--blue-700)}
+
+    /* ── Pagination ── */
+    .pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;border-top:1px solid var(--border)}
+    .page-btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;background:var(--white);font-family:var(--body)}
+    .page-btn:hover{border-color:var(--blue-700)}
+    .page-btn.active{background:var(--blue-700);color:var(--white);border-color:var(--blue-700)}
+    .page-btn:disabled{opacity:.4;cursor:not-allowed}
+
+    /* ── Responsive ── */
+    @media(max-width:900px){
+      .charts-row{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .mobile-nav{display:flex!important}
+    }
     @media(max-width:768px){
-      .admin-header{padding:16px 20px}
-      .container{padding:20px 16px}
+      .admin-header{padding:0 16px}
+      .main{padding:20px 16px}
+      .stats-row{grid-template-columns:repeat(2,1fr)}
       .card-header{flex-direction:column;align-items:flex-start}
     }
+
+    /* ── Mobile bottom nav ── */
+    .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);z-index:50;padding:6px 0;justify-content:space-around}
+    .mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--muted);cursor:pointer;padding:4px 8px}
+    .mobile-nav-item.active{color:var(--blue-700)}
+    .mobile-nav-item svg{width:20px;height:20px}
+
+    /* ── Modal ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:none;align-items:center;justify-content:center}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--white);border-radius:14px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:28px}
+    .modal h3{font-family:var(--display);font-weight:600;font-size:18px;margin-bottom:16px}
+    .modal-close{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);padding:0 4px}
+    .modal-close:hover{color:var(--ink)}
+
+    /* ── Detail modal ── */
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:20px}
+    .detail-item{font-size:13px}
+    .detail-item .dl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+    .detail-item .dv{font-weight:500;word-break:break-word}
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:12px}
+    .doc-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s}
+    .doc-card:hover{border-color:var(--blue-700);box-shadow:var(--shadow)}
+    .doc-thumb{width:100%;height:100px;object-fit:cover;background:var(--blue-50);display:flex;align-items:center;justify-content:center}
+    .doc-thumb img{width:100%;height:100%;object-fit:cover}
+    .doc-thumb .doc-icon{font-size:32px;color:var(--blue-700)}
+    .doc-label{padding:8px 10px;font-size:11px;font-weight:600;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .section-divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+    .section-title{font-family:var(--display);font-weight:600;font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .section-title svg{width:18px;height:18px;color:var(--blue-700)}
+    .appt-history-item{padding:10px 0;border-bottom:1px solid var(--border-2);font-size:13px}
+    .appt-history-item:last-child{border:none}
+
+    /* ── Image viewer ── */
+    .img-viewer{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:center;justify-content:center;cursor:pointer}
+    .img-viewer.show{display:flex}
+    .img-viewer img{max-width:90vw;max-height:90vh;border-radius:8px}
+    .img-viewer-close{position:fixed;top:16px;right:20px;color:#fff;font-size:28px;cursor:pointer;z-index:201}
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -89,11 +243,12 @@
     <div class="login-wrap">
       <div class="login-card">
         <h2>Admin Login</h2>
+        <p class="login-sub">HospiJunction management console</p>
         <div class="error" id="login-error"></div>
         <label>Email</label>
         <input type="email" id="admin-email" placeholder="admin@hospijunction.com" />
         <label>Password</label>
-        <input type="password" id="admin-password" placeholder="Password" />
+        <input type="password" id="admin-password" placeholder="Password" onkeydown="if(event.key==='Enter')adminLogin()" />
         <button onclick="adminLogin()">Log in</button>
       </div>
     </div>
@@ -102,47 +257,276 @@
   <!-- Admin Dashboard -->
   <div id="admin-dashboard" style="display:none">
     <div class="admin-header">
-      <h1><span class="logo-mark">HJ</span> Admin Panel</h1>
-      <button class="logout-btn" onclick="adminLogout()">Logout</button>
-    </div>
-
-    <div class="container">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Total Hospitals</div><div class="stat-value" id="stat-total">-</div></div>
-        <div class="stat-card"><div class="stat-label">Verified</div><div class="stat-value" id="stat-verified" style="color:var(--green)">-</div></div>
-        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" id="stat-pending" style="color:var(--orange)">-</div></div>
-        <div class="stat-card"><div class="stat-label">Total Patients</div><div class="stat-value" id="stat-patients">-</div></div>
-        <div class="stat-card"><div class="stat-label">Total Appointments</div><div class="stat-value" id="stat-appointments">-</div></div>
-      </div>
-
-      <!-- Hospitals -->
-      <div class="card">
-        <div class="card-header">
-          <h2>All Hospitals</h2>
-          <input type="text" class="search-bar" id="search-input" placeholder="Search by name, email, city..." oninput="filterHospitals()" />
-        </div>
-        <div class="card-body"><div class="table-wrap">
-          <table>
-            <thead><tr><th>Hospital</th><th>Email</th><th>City</th><th>Phone</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
-            <tbody id="hospitals-table"><tr><td colspan="7" class="empty"><div class="spin"></div></td></tr></tbody>
-          </table>
-        </div></div>
-      </div>
-
-      <!-- Patients -->
-      <div class="card">
-        <div class="card-header">
-          <h2>All Patients</h2>
-          <input type="text" class="search-bar" id="patient-search" placeholder="Search patients..." oninput="filterPatients()" />
-        </div>
-        <div class="card-body"><div class="table-wrap">
-          <table>
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Gender</th><th>Registered</th><th>Actions</th></tr></thead>
-            <tbody id="patients-table"><tr><td colspan="7" class="empty"><div class="spin"></div></td></tr></tbody>
-          </table>
-        </div></div>
+      <h1><span class="logo-mark">HJ</span> Admin</h1>
+      <div class="header-right">
+        <span class="header-time" id="header-time"></span>
+        <button class="logout-btn" onclick="adminLogout()">Logout</button>
       </div>
     </div>
+
+    <div class="admin-body">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="nav-section">
+          <div class="nav-section-label">Main</div>
+          <div class="nav-item active" onclick="showPage('dashboard')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </div>
+          <div class="nav-item" onclick="showPage('hospitals')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg>
+            Hospitals
+            <span class="nav-badge" id="nav-pending-badge" style="display:none">0</span>
+          </div>
+          <div class="nav-item" onclick="showPage('patients')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            Patients
+          </div>
+          <div class="nav-item" onclick="showPage('appointments')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Appointments
+          </div>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-label">Finance</div>
+          <div class="nav-item" onclick="showPage('earnings')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            Earnings
+          </div>
+          <div class="nav-item" onclick="showPage('invoices')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            GST Invoices
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main">
+
+        <!-- ═══ DASHBOARD PAGE ═══ -->
+        <div class="page active" id="page-dashboard">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub">Overview of HospiJunction platform</p>
+
+          <div class="stats-row">
+            <div class="stat-card blue"><div class="stat-label">Total Hospitals</div><div class="stat-value" id="s-hospitals">-</div></div>
+            <div class="stat-card green"><div class="stat-label">Verified</div><div class="stat-value" id="s-verified" style="color:var(--green)">-</div></div>
+            <div class="stat-card orange"><div class="stat-label">Pending Verification</div><div class="stat-value" id="s-pending" style="color:var(--orange)">-</div></div>
+            <div class="stat-card purple"><div class="stat-label">Total Patients</div><div class="stat-value" id="s-patients" style="color:var(--purple)">-</div></div>
+            <div class="stat-card blue"><div class="stat-label">Total Appointments</div><div class="stat-value" id="s-appointments">-</div></div>
+            <div class="stat-card green"><div class="stat-label">Total Revenue</div><div class="stat-value" id="s-revenue" style="color:var(--green)">-</div></div>
+          </div>
+
+          <h3 style="font-family:var(--display);font-weight:600;font-size:16px;margin-bottom:14px">Quick Actions</h3>
+          <div class="quick-actions">
+            <button class="qa-btn" onclick="showPage('hospitals');document.getElementById('h-filter').value='pending';filterHospitals()">
+              <div class="qa-icon orange"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              Review pending hospitals
+            </button>
+            <button class="qa-btn" onclick="showPage('appointments')">
+              <div class="qa-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div>
+              View today's appointments
+            </button>
+            <button class="qa-btn" onclick="showPage('earnings')">
+              <div class="qa-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+              Check earnings
+            </button>
+            <button class="qa-btn" onclick="showPage('invoices')">
+              <div class="qa-icon purple"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              Download GST invoice
+            </button>
+            <button class="qa-btn" onclick="exportAllData()">
+              <div class="qa-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+              Export all data (Excel)
+            </button>
+          </div>
+
+          <div class="charts-row">
+            <div class="chart-card">
+              <h3>Monthly Appointments (Last 6 months)</h3>
+              <div class="chart-bars" id="chart-appointments"></div>
+            </div>
+            <div class="chart-card">
+              <h3>Monthly Revenue (Last 6 months)</h3>
+              <div class="chart-bars" id="chart-revenue"></div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="recent-list">
+              <div class="recent-header"><h3>Recent Hospitals</h3></div>
+              <div id="recent-hospitals"></div>
+            </div>
+            <div class="recent-list">
+              <div class="recent-header"><h3>Recent Appointments</h3></div>
+              <div id="recent-appointments"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ HOSPITALS PAGE ═══ -->
+        <div class="page" id="page-hospitals">
+          <h1 class="page-title">Hospitals</h1>
+          <p class="page-sub">Manage all registered hospitals</p>
+          <div class="card">
+            <div class="card-header">
+              <h2>All Hospitals (<span id="h-count">0</span>)</h2>
+              <div class="card-actions">
+                <select class="filter-select" id="h-filter" onchange="filterHospitals()">
+                  <option value="all">All status</option>
+                  <option value="verified">Verified</option>
+                  <option value="pending">Pending</option>
+                </select>
+                <input type="text" class="search-bar" id="h-search" placeholder="Search hospitals..." oninput="filterHospitals()" />
+                <button class="btn btn-blue" onclick="exportHospitals()">Export</button>
+              </div>
+            </div>
+            <div class="card-body"><div class="table-wrap">
+              <table>
+                <thead><tr><th>Hospital</th><th>Email</th><th>City</th><th>Phone</th><th>Type</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
+                <tbody id="hospitals-table"><tr><td colspan="8" class="empty"><div class="spin"></div></td></tr></tbody>
+              </table>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- ═══ PATIENTS PAGE ═══ -->
+        <div class="page" id="page-patients">
+          <h1 class="page-title">Patients</h1>
+          <p class="page-sub">All registered patients on the platform</p>
+          <div class="card">
+            <div class="card-header">
+              <h2>All Patients (<span id="p-count">0</span>)</h2>
+              <div class="card-actions">
+                <input type="text" class="search-bar" id="p-search" placeholder="Search patients..." oninput="filterPatients()" />
+                <button class="btn btn-blue" onclick="exportPatients()">Export</button>
+              </div>
+            </div>
+            <div class="card-body"><div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Gender</th><th>DOB</th><th>Registered</th><th>Actions</th></tr></thead>
+                <tbody id="patients-table"><tr><td colspan="8" class="empty"><div class="spin"></div></td></tr></tbody>
+              </table>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- ═══ APPOINTMENTS PAGE ═══ -->
+        <div class="page" id="page-appointments">
+          <h1 class="page-title">Appointments</h1>
+          <p class="page-sub">All bookings across the platform</p>
+          <div class="card">
+            <div class="card-header">
+              <h2>All Appointments (<span id="a-count">0</span>)</h2>
+              <div class="card-actions">
+                <select class="filter-select" id="a-status-filter" onchange="filterAppointments()">
+                  <option value="all">All status</option>
+                  <option value="booked">Booked</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="no_show">No Show</option>
+                </select>
+                <input type="date" class="search-bar" id="a-date-filter" onchange="filterAppointments()" style="min-width:140px" />
+                <input type="text" class="search-bar" id="a-search" placeholder="Search..." oninput="filterAppointments()" />
+                <button class="btn btn-blue" onclick="exportAppointments()">Export</button>
+              </div>
+            </div>
+            <div class="card-body"><div class="table-wrap">
+              <table>
+                <thead><tr><th>Patient</th><th>Doctor</th><th>Hospital</th><th>Date</th><th>Slot</th><th>Token</th><th>Status</th><th>Payment</th><th>Booked On</th></tr></thead>
+                <tbody id="appointments-table"><tr><td colspan="9" class="empty"><div class="spin"></div></td></tr></tbody>
+              </table>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- ═══ EARNINGS PAGE ═══ -->
+        <div class="page" id="page-earnings">
+          <h1 class="page-title">Earnings</h1>
+          <p class="page-sub">Platform revenue from ₹20 booking fees</p>
+
+          <div class="earnings-summary">
+            <div class="earnings-card"><h4>Total Revenue (All Time)</h4><div class="amount" id="e-total">₹0</div><div class="sub" id="e-total-count">0 bookings</div></div>
+            <div class="earnings-card"><h4>This Month</h4><div class="amount" id="e-month">₹0</div><div class="sub" id="e-month-count">0 bookings</div></div>
+            <div class="earnings-card"><h4>Last Month</h4><div class="amount" id="e-last-month">₹0</div><div class="sub" id="e-last-month-count">0 bookings</div></div>
+            <div class="earnings-card"><h4>Today</h4><div class="amount" id="e-today">₹0</div><div class="sub" id="e-today-count">0 bookings</div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Monthly Breakdown</h2>
+              <button class="btn btn-blue" onclick="exportEarnings()">Export to Excel</button>
+            </div>
+            <div class="card-body"><div class="table-wrap">
+              <table>
+                <thead><tr><th>Month</th><th>Bookings</th><th>Revenue (₹)</th><th>GST (18%)</th><th>Net Revenue</th><th>Action</th></tr></thead>
+                <tbody id="earnings-table"></tbody>
+              </table>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- ═══ GST INVOICES PAGE ═══ -->
+        <div class="page" id="page-invoices">
+          <h1 class="page-title">GST Invoices</h1>
+          <p class="page-sub">Generate month-wise invoices for GST filing</p>
+
+          <div class="invoice-controls">
+            <label style="font-weight:600;font-size:13px">Select Month:</label>
+            <input type="month" class="search-bar" id="invoice-month" style="min-width:160px" />
+            <button class="btn btn-primary" onclick="generateInvoice()">Generate Invoice</button>
+            <button class="btn btn-blue" onclick="downloadInvoiceExcel()">Download Excel</button>
+          </div>
+
+          <div class="card" id="invoice-preview" style="display:none">
+            <div class="card-body" style="padding:28px" id="invoice-content"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2>Hospital-wise Revenue</h2></div>
+            <div class="card-body"><div class="table-wrap">
+              <table>
+                <thead><tr><th>Hospital</th><th>City</th><th>Bookings</th><th>Revenue (₹)</th></tr></thead>
+                <tbody id="hospital-revenue-table"></tbody>
+              </table>
+            </div></div>
+          </div>
+        </div>
+
+      </div><!-- /main -->
+    </div><!-- /admin-body -->
+
+    <!-- Mobile bottom nav -->
+    <div class="mobile-nav">
+      <div class="mobile-nav-item active" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Home
+      </div>
+      <div class="mobile-nav-item" onclick="showPage('hospitals')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/></svg>
+        Hospitals
+      </div>
+      <div class="mobile-nav-item" onclick="showPage('appointments')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+        Bookings
+      </div>
+      <div class="mobile-nav-item" onclick="showPage('earnings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Earnings
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal" id="detail-modal-content" style="max-width:680px"></div>
+  </div>
+
+  <!-- Image Viewer -->
+  <div class="img-viewer" id="img-viewer" onclick="this.classList.remove('show')">
+    <span class="img-viewer-close">&times;</span>
+    <img id="img-viewer-src" src="" />
   </div>
 
   <div class="toast" id="toast"></div>
@@ -152,12 +536,19 @@
     const SUPABASE_ANON = "sb_publishable_Gq_qXLbuG3hwyFxi-_Ou3g_5HFGBVEM";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     const ADMIN_EMAIL = "admin@hospijunction.com";
+    const PLATFORM_FEE = 20;
 
-    let allHospitals = [];
-    let allPatients = [];
+    let allHospitals = [], allPatients = [], allAppointments = [], allDoctors = [];
     let adminKey = '';
 
-    // Auto-login check
+    // ── Clock ──
+    function updateClock() {
+      const d = new Date();
+      document.getElementById('header-time').textContent = d.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' }) + '  ' + d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    }
+    setInterval(updateClock, 30000);
+
+    // ── Auto-login ──
     (async () => {
       const { data: { session } } = await sb.auth.getSession();
       if (session && session.user.email === ADMIN_EMAIL) {
@@ -170,21 +561,10 @@
       const email = document.getElementById('admin-email').value.trim();
       const password = document.getElementById('admin-password').value;
       const errEl = document.getElementById('login-error');
-
-      if (email !== ADMIN_EMAIL) {
-        errEl.textContent = 'Access denied. Admin only.';
-        errEl.style.display = 'block';
-        return;
-      }
-
+      if (email !== ADMIN_EMAIL) { errEl.textContent = 'Access denied. Admin only.'; errEl.style.display = 'block'; return; }
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) {
-        errEl.textContent = 'Invalid credentials: ' + error.message;
-        errEl.style.display = 'block';
-        return;
-      }
-
-      adminKey = prompt('Enter admin delete key (for delete operations):') || '';
+      if (error) { errEl.textContent = 'Invalid credentials: ' + error.message; errEl.style.display = 'block'; return; }
+      adminKey = prompt('Enter admin delete key:') || '';
       sessionStorage.setItem('hj_admin_key', adminKey);
       showDashboard();
     }
@@ -192,129 +572,660 @@
     function showDashboard() {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('admin-dashboard').style.display = 'block';
-      loadAdminData();
+      updateClock();
+      // Set invoice month default to current
+      const now = new Date();
+      document.getElementById('invoice-month').value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      loadAllData();
     }
 
     async function adminLogout() {
       await sb.auth.signOut();
       adminKey = '';
       sessionStorage.removeItem('hj_admin_key');
-      document.getElementById('login-screen').style.display = 'block';
-      document.getElementById('admin-dashboard').style.display = 'none';
+      location.reload();
     }
 
-    async function loadAdminData() {
-      const { data: hospitals } = await sb.from('hospital_profiles')
-        .select('id, name, email, phone, city, state, is_verified, is_active, created_at, firebase_uid')
-        .order('created_at', { ascending: false });
-      allHospitals = hospitals || [];
+    // ── Navigation ──
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-item').forEach(n => n.classList.remove('active'));
+      const items = document.querySelectorAll('.nav-item');
+      const mItems = document.querySelectorAll('.mobile-nav-item');
+      const map = { dashboard: 0, hospitals: 1, patients: 2, appointments: 3, earnings: 4, invoices: 5 };
+      const mMap = { dashboard: 0, hospitals: 1, appointments: 2, earnings: 3 };
+      if (map[name] !== undefined && items[map[name]]) items[map[name]].classList.add('active');
+      if (mMap[name] !== undefined && mItems[mMap[name]]) mItems[mMap[name]].classList.add('active');
+    }
 
-      const { data: patients } = await sb.from('patient_profiles')
-        .select('id, full_name, email, phone, preferred_city, gender, created_at')
-        .order('created_at', { ascending: false });
-      allPatients = patients || [];
+    // ── Load all data ──
+    async function loadAllData() {
+      showToast('Loading data...', 'info');
 
-      const { count: apptCount } = await sb.from('appointments')
-        .select('id', { count: 'exact', head: true });
+      const [hospRes, patRes, apptRes, docRes] = await Promise.all([
+        sb.from('hospital_profiles').select('*').order('created_at', { ascending: false }),
+        sb.from('patient_profiles').select('*').order('created_at', { ascending: false }),
+        sb.from('appointments').select('*').order('created_at', { ascending: false }),
+        sb.from('doctors').select('id, hospital_id, full_name, specialization, is_active').order('full_name')
+      ]);
 
-      document.getElementById('stat-total').textContent = allHospitals.length;
-      document.getElementById('stat-verified').textContent = allHospitals.filter(h => h.is_verified).length;
-      document.getElementById('stat-pending').textContent = allHospitals.filter(h => !h.is_verified).length;
-      document.getElementById('stat-patients').textContent = allPatients.length;
-      document.getElementById('stat-appointments').textContent = apptCount || 0;
+      allHospitals = hospRes.data || [];
+      allPatients = patRes.data || [];
+      allAppointments = apptRes.data || [];
+      allDoctors = docRes.data || [];
 
+      updateDashboardStats();
       renderHospitals(allHospitals);
       renderPatients(allPatients);
+      renderAppointments(allAppointments);
+      updateEarnings();
+      buildCharts();
+      buildRecentLists();
+      showToast('Data loaded', 'success');
     }
 
+    // ── Dashboard Stats ──
+    function updateDashboardStats() {
+      const verified = allHospitals.filter(h => h.is_verified).length;
+      const pending = allHospitals.filter(h => !h.is_verified).length;
+      const totalRevenue = allAppointments.length * PLATFORM_FEE;
+
+      document.getElementById('s-hospitals').textContent = allHospitals.length;
+      document.getElementById('s-verified').textContent = verified;
+      document.getElementById('s-pending').textContent = pending;
+      document.getElementById('s-patients').textContent = allPatients.length;
+      document.getElementById('s-appointments').textContent = allAppointments.length;
+      document.getElementById('s-revenue').textContent = '₹' + totalRevenue.toLocaleString('en-IN');
+
+      // Pending badge
+      const badge = document.getElementById('nav-pending-badge');
+      if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline'; }
+      else { badge.style.display = 'none'; }
+    }
+
+    // ── Charts ──
+    function buildCharts() {
+      const months = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(); d.setMonth(d.getMonth() - i);
+        months.push({ key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'), label: d.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }) });
+      }
+
+      const monthlyCounts = {};
+      months.forEach(m => monthlyCounts[m.key] = 0);
+      allAppointments.forEach(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (monthlyCounts[k] !== undefined) monthlyCounts[k]++;
+      });
+
+      const maxCount = Math.max(...Object.values(monthlyCounts), 1);
+
+      // Appointments chart
+      document.getElementById('chart-appointments').innerHTML = months.map(m => {
+        const v = monthlyCounts[m.key];
+        const h = Math.max((v / maxCount) * 100, 3);
+        return `<div class="chart-bar-wrap"><div class="chart-bar-value">${v}</div><div class="chart-bar-col"><div class="chart-bar" style="height:${h}%;background:var(--blue-700);width:100%"></div></div><div class="chart-bar-label">${m.label}</div></div>`;
+      }).join('');
+
+      // Revenue chart
+      document.getElementById('chart-revenue').innerHTML = months.map(m => {
+        const v = monthlyCounts[m.key] * PLATFORM_FEE;
+        const h = Math.max((monthlyCounts[m.key] / maxCount) * 100, 3);
+        return `<div class="chart-bar-wrap"><div class="chart-bar-value">₹${v.toLocaleString('en-IN')}</div><div class="chart-bar-col"><div class="chart-bar" style="height:${h}%;background:var(--green);width:100%"></div></div><div class="chart-bar-label">${m.label}</div></div>`;
+      }).join('');
+    }
+
+    // ── Recent Lists ──
+    function buildRecentLists() {
+      // Recent hospitals
+      const rh = document.getElementById('recent-hospitals');
+      const recentH = allHospitals.slice(0, 5);
+      rh.innerHTML = recentH.length === 0 ? '<div class="empty">No hospitals yet</div>' :
+        recentH.map(h => `<div class="recent-item">
+          <div class="recent-avatar" style="background:${h.is_verified ? 'var(--green-50);color:var(--green)' : 'var(--orange-50);color:var(--orange)'}">${esc(h.name||'').substring(0,2).toUpperCase()}</div>
+          <div class="recent-info"><div class="recent-name">${esc(h.name||'-')}</div><div class="recent-meta">${esc(h.city||'')} · ${h.is_verified ? 'Verified' : 'Pending'}</div></div>
+          <div class="recent-time">${timeAgo(h.created_at)}</div>
+        </div>`).join('');
+
+      // Recent appointments
+      const ra = document.getElementById('recent-appointments');
+      const recentA = allAppointments.slice(0, 5);
+      ra.innerHTML = recentA.length === 0 ? '<div class="empty">No appointments yet</div>' :
+        recentA.map(a => `<div class="recent-item">
+          <div class="recent-avatar" style="background:var(--blue-50);color:var(--blue-700)">${(a.token_number || '?')}</div>
+          <div class="recent-info"><div class="recent-name">${esc(a.patient_name || 'Patient')}</div><div class="recent-meta">${esc(a.doctor_name || '')} · ${a.status || 'booked'}</div></div>
+          <div class="recent-time">${timeAgo(a.created_at)}</div>
+        </div>`).join('');
+    }
+
+    // ── Hospitals ──
     function renderHospitals(list) {
+      document.getElementById('h-count').textContent = list.length;
       const tbody = document.getElementById('hospitals-table');
-      if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No hospitals found</td></tr>'; return; }
+      if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">No hospitals found</td></tr>'; return; }
       tbody.innerHTML = list.map(h => `<tr>
-        <td><strong>${esc(h.name || '-')}</strong></td>
-        <td>${esc(h.email || '-')}</td>
-        <td>${esc(h.city || '-')}, ${esc(h.state || '')}</td>
-        <td>${esc(h.phone || '-')}</td>
+        <td><strong>${esc(h.name||'-')}</strong></td>
+        <td>${esc(h.email||'-')}</td>
+        <td>${esc(h.city||'-')}${h.state ? ', ' + esc(h.state) : ''}</td>
+        <td>${esc(h.phone||'-')}</td>
+        <td><span style="font-size:11px;color:var(--muted)">${esc(h.hospital_type||'-')}</span></td>
         <td>${h.is_verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-orange">Pending</span>'}</td>
-        <td>${h.created_at ? new Date(h.created_at).toLocaleDateString('en-IN') : '-'}</td>
-        <td>
-          ${!h.is_verified ? `<button class="btn btn-green" onclick="verifyHospital('${h.id}')">Verify</button> ` : ''}
-          <button class="btn btn-red" onclick="deleteHospital('${h.id}','${esc(h.email||'')}','${esc(h.name||'')}')">Delete</button>
+        <td>${fmtDate(h.created_at)}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-blue btn-sm" onclick="viewHospital('${h.id}')">View</button>
+          ${!h.is_verified ? `<button class="btn btn-green btn-sm" onclick="verifyHospital('${h.id}')">Verify</button> ` : ''}
+          <button class="btn btn-red btn-sm" onclick="deleteHospital('${h.id}','${esc(h.email||'')}','${esc(h.name||'')}')">Delete</button>
         </td>
       </tr>`).join('');
     }
 
+    function filterHospitals() {
+      const q = document.getElementById('h-search').value.toLowerCase();
+      const status = document.getElementById('h-filter').value;
+      let list = allHospitals;
+      if (status === 'verified') list = list.filter(h => h.is_verified);
+      else if (status === 'pending') list = list.filter(h => !h.is_verified);
+      if (q) list = list.filter(h => (h.name||'').toLowerCase().includes(q) || (h.email||'').toLowerCase().includes(q) || (h.city||'').toLowerCase().includes(q) || (h.phone||'').includes(q));
+      renderHospitals(list);
+    }
+
+    // ── Patients ──
     function renderPatients(list) {
+      document.getElementById('p-count').textContent = list.length;
       const tbody = document.getElementById('patients-table');
-      if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No patients found</td></tr>'; return; }
+      if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">No patients found</td></tr>'; return; }
       tbody.innerHTML = list.map(p => `<tr>
-        <td><strong>${esc(p.full_name || '-')}</strong></td>
-        <td>${esc(p.email || '-')}</td>
-        <td>${esc(p.phone || '-')}</td>
-        <td>${esc(p.preferred_city || '-')}</td>
-        <td>${esc(p.gender || '-')}</td>
-        <td>${p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN') : '-'}</td>
-        <td><button class="btn btn-red" onclick="deletePatient('${p.id}','${esc(p.full_name||'')}')">Delete</button></td>
+        <td><strong>${esc(p.full_name||'-')}</strong></td>
+        <td>${esc(p.email||'-')}</td>
+        <td>${esc(p.phone||'-')}</td>
+        <td>${esc(p.preferred_city||'-')}</td>
+        <td>${esc(p.gender||'-')}</td>
+        <td>${p.date_of_birth ? fmtDate(p.date_of_birth) : '-'}</td>
+        <td>${fmtDate(p.created_at)}</td>
+        <td style="white-space:nowrap"><button class="btn btn-blue btn-sm" onclick="viewPatient('${p.id}')">View</button> <button class="btn btn-red btn-sm" onclick="deletePatient('${p.id}','${esc(p.full_name||'')}')">Delete</button></td>
       </tr>`).join('');
     }
 
-    function filterHospitals() {
-      const q = document.getElementById('search-input').value.toLowerCase();
-      renderHospitals(allHospitals.filter(h =>
-        (h.name||'').toLowerCase().includes(q) || (h.email||'').toLowerCase().includes(q) ||
-        (h.city||'').toLowerCase().includes(q) || (h.phone||'').includes(q)));
-    }
-
     function filterPatients() {
-      const q = document.getElementById('patient-search').value.toLowerCase();
-      renderPatients(allPatients.filter(p =>
-        (p.full_name||'').toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q) ||
-        (p.phone||'').includes(q) || (p.preferred_city||'').toLowerCase().includes(q)));
+      const q = document.getElementById('p-search').value.toLowerCase();
+      renderPatients(allPatients.filter(p => (p.full_name||'').toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q) || (p.phone||'').includes(q) || (p.preferred_city||'').toLowerCase().includes(q)));
     }
 
+    // ── Appointments ──
+    function renderAppointments(list) {
+      document.getElementById('a-count').textContent = list.length;
+      const tbody = document.getElementById('appointments-table');
+      if (!list.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty">No appointments found</td></tr>'; return; }
+      const statusColors = { booked:'blue', confirmed:'green', completed:'green', cancelled:'red', no_show:'orange', rescheduled:'purple' };
+      tbody.innerHTML = list.map(a => `<tr>
+        <td>${esc(a.patient_name||'-')}</td>
+        <td>${esc(a.doctor_name||'-')}</td>
+        <td>${esc(a.hospital_name||'-')}</td>
+        <td>${fmtDate(a.appointment_date)}</td>
+        <td>${esc(a.time_slot||'-')}</td>
+        <td><strong>${a.token_number||'-'}</strong></td>
+        <td><span class="badge badge-${statusColors[a.status]||'blue'}">${esc(a.status||'booked')}</span></td>
+        <td><span class="badge badge-${a.payment_status==='paid'?'green':'orange'}">${esc(a.payment_status||'pending')}</span></td>
+        <td>${fmtDate(a.created_at)}</td>
+      </tr>`).join('');
+    }
+
+    function filterAppointments() {
+      const q = document.getElementById('a-search').value.toLowerCase();
+      const status = document.getElementById('a-status-filter').value;
+      const dateVal = document.getElementById('a-date-filter').value;
+      let list = allAppointments;
+      if (status !== 'all') list = list.filter(a => a.status === status);
+      if (dateVal) list = list.filter(a => (a.appointment_date||'').startsWith(dateVal));
+      if (q) list = list.filter(a => (a.patient_name||'').toLowerCase().includes(q) || (a.doctor_name||'').toLowerCase().includes(q) || (a.hospital_name||'').toLowerCase().includes(q));
+      renderAppointments(list);
+    }
+
+    // ── Earnings ──
+    function updateEarnings() {
+      const now = new Date();
+      const thisMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      const lastM = new Date(now); lastM.setMonth(lastM.getMonth() - 1);
+      const lastMonth = lastM.getFullYear() + '-' + String(lastM.getMonth() + 1).padStart(2, '0');
+      const today = now.toISOString().slice(0, 10);
+
+      let thisMonthCount = 0, lastMonthCount = 0, todayCount = 0;
+      const monthlyMap = {};
+
+      allAppointments.forEach(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        const mk = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        const dk = d.toISOString().slice(0, 10);
+        monthlyMap[mk] = (monthlyMap[mk] || 0) + 1;
+        if (mk === thisMonth) thisMonthCount++;
+        if (mk === lastMonth) lastMonthCount++;
+        if (dk === today) todayCount++;
+      });
+
+      document.getElementById('e-total').textContent = '₹' + (allAppointments.length * PLATFORM_FEE).toLocaleString('en-IN');
+      document.getElementById('e-total-count').textContent = allAppointments.length + ' bookings';
+      document.getElementById('e-month').textContent = '₹' + (thisMonthCount * PLATFORM_FEE).toLocaleString('en-IN');
+      document.getElementById('e-month-count').textContent = thisMonthCount + ' bookings this month';
+      document.getElementById('e-last-month').textContent = '₹' + (lastMonthCount * PLATFORM_FEE).toLocaleString('en-IN');
+      document.getElementById('e-last-month-count').textContent = lastMonthCount + ' bookings';
+      document.getElementById('e-today').textContent = '₹' + (todayCount * PLATFORM_FEE).toLocaleString('en-IN');
+      document.getElementById('e-today-count').textContent = todayCount + ' bookings today';
+
+      // Monthly breakdown table
+      const months = Object.keys(monthlyMap).sort().reverse();
+      const tbody = document.getElementById('earnings-table');
+      if (months.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">No revenue data yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = months.map(m => {
+        const count = monthlyMap[m];
+        const revenue = count * PLATFORM_FEE;
+        const gst = Math.round(revenue * 18 / 118 * 100) / 100;
+        const net = revenue - gst;
+        return `<tr>
+          <td><strong>${formatMonthLabel(m)}</strong></td>
+          <td>${count}</td>
+          <td>₹${revenue.toLocaleString('en-IN')}</td>
+          <td>₹${gst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+          <td>₹${net.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+          <td><button class="btn btn-blue btn-sm" onclick="downloadMonthInvoice('${m}')">Download</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ── GST Invoice ──
+    function generateInvoice() {
+      const month = document.getElementById('invoice-month').value;
+      if (!month) { showToast('Select a month', 'error'); return; }
+
+      const monthAppts = allAppointments.filter(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        return (d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')) === month;
+      });
+
+      const count = monthAppts.length;
+      const revenue = count * PLATFORM_FEE;
+      const gst = Math.round(revenue * 18 / 118 * 100) / 100;
+      const cgst = Math.round(gst / 2 * 100) / 100;
+      const sgst = cgst;
+      const taxable = revenue - gst;
+
+      // Hospital-wise breakdown
+      const hospMap = {};
+      monthAppts.forEach(a => {
+        const hName = a.hospital_name || 'Unknown';
+        hospMap[hName] = (hospMap[hName] || 0) + 1;
+      });
+
+      const preview = document.getElementById('invoice-preview');
+      const content = document.getElementById('invoice-content');
+      preview.style.display = 'block';
+
+      content.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px">
+          <div>
+            <h2 style="font-family:var(--display);font-weight:700;font-size:22px;color:var(--blue-900)">HospiJunction</h2>
+            <p style="font-size:13px;color:var(--muted);margin-top:4px">Tax Invoice / GST Summary</p>
+          </div>
+          <div style="text-align:right;font-size:13px;color:var(--muted)">
+            <div><strong>Invoice Period:</strong> ${formatMonthLabel(month)}</div>
+            <div><strong>Generated:</strong> ${new Date().toLocaleDateString('en-IN')}</div>
+            <div><strong>GSTIN:</strong> <span style="color:var(--ink)">_________________</span></div>
+          </div>
+        </div>
+        <hr style="border:none;border-top:2px solid var(--blue-900);margin-bottom:24px" />
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+          <tr style="background:var(--blue-50)"><td style="padding:10px 16px;font-weight:600">Description</td><td style="padding:10px 16px;text-align:right;font-weight:600">Amount</td></tr>
+          <tr><td style="padding:10px 16px">Platform fee collections (${count} bookings × ₹${PLATFORM_FEE})</td><td style="padding:10px 16px;text-align:right">₹${revenue.toLocaleString('en-IN')}</td></tr>
+          <tr><td style="padding:10px 16px">Taxable value (excl. GST)</td><td style="padding:10px 16px;text-align:right">₹${taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
+          <tr><td style="padding:10px 16px">CGST @ 9%</td><td style="padding:10px 16px;text-align:right">₹${cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
+          <tr><td style="padding:10px 16px">SGST @ 9%</td><td style="padding:10px 16px;text-align:right">₹${sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
+          <tr style="background:var(--cream);font-weight:700"><td style="padding:12px 16px;font-size:15px">Total Revenue</td><td style="padding:12px 16px;text-align:right;font-size:15px">₹${revenue.toLocaleString('en-IN')}</td></tr>
+        </table>
+        <p style="font-size:12px;color:var(--muted)">Note: GST rate 18% applied. CGST and SGST applicable for intra-state supply. For inter-state supply, IGST @ 18% applies.</p>
+      `;
+
+      // Hospital revenue table
+      const hospEntries = Object.entries(hospMap).sort((a, b) => b[1] - a[1]);
+      const hospTbody = document.getElementById('hospital-revenue-table');
+      hospTbody.innerHTML = hospEntries.map(([name, cnt]) => {
+        const hospCity = allHospitals.find(h => h.name === name);
+        return `<tr>
+          <td><strong>${esc(name)}</strong></td>
+          <td>${hospCity ? esc(hospCity.city || '') : '-'}</td>
+          <td>${cnt}</td>
+          <td>₹${(cnt * PLATFORM_FEE).toLocaleString('en-IN')}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="4" class="empty">No data for this month</td></tr>';
+    }
+
+    function downloadMonthInvoice(month) {
+      document.getElementById('invoice-month').value = month;
+      generateInvoice();
+      downloadInvoiceExcel();
+    }
+
+    function downloadInvoiceExcel() {
+      const month = document.getElementById('invoice-month').value;
+      if (!month) { showToast('Select a month first', 'error'); return; }
+
+      const monthAppts = allAppointments.filter(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        return (d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')) === month;
+      });
+
+      const count = monthAppts.length;
+      const revenue = count * PLATFORM_FEE;
+      const gst = Math.round(revenue * 18 / 118 * 100) / 100;
+      const cgst = Math.round(gst / 2 * 100) / 100;
+      const taxable = revenue - gst;
+
+      // Summary sheet
+      const summaryData = [
+        ['HospiJunction — GST Invoice Summary'],
+        ['Month', formatMonthLabel(month)],
+        ['Generated', new Date().toLocaleDateString('en-IN')],
+        [],
+        ['Description', 'Amount (₹)'],
+        ['Total Bookings', count],
+        ['Gross Revenue', revenue],
+        ['Taxable Value (excl. GST)', Math.round(taxable * 100) / 100],
+        ['CGST @ 9%', cgst],
+        ['SGST @ 9%', cgst],
+        ['Total GST', Math.round(gst * 100) / 100],
+        ['Net Revenue (after GST)', Math.round(taxable * 100) / 100],
+      ];
+
+      // Booking details sheet
+      const detailHeaders = ['Sr.', 'Date', 'Patient', 'Doctor', 'Hospital', 'Token', 'Status', 'Payment', 'Platform Fee (₹)'];
+      const detailRows = monthAppts.map((a, i) => [
+        i + 1,
+        fmtDate(a.appointment_date || a.created_at),
+        a.patient_name || '-',
+        a.doctor_name || '-',
+        a.hospital_name || '-',
+        a.token_number || '-',
+        a.status || '-',
+        a.payment_status || '-',
+        PLATFORM_FEE
+      ]);
+
+      // Hospital-wise sheet
+      const hospMap = {};
+      monthAppts.forEach(a => { const n = a.hospital_name || 'Unknown'; hospMap[n] = (hospMap[n] || 0) + 1; });
+      const hospHeaders = ['Hospital', 'Bookings', 'Revenue (₹)'];
+      const hospRows = Object.entries(hospMap).sort((a, b) => b[1] - a[1]).map(([n, c]) => [n, c, c * PLATFORM_FEE]);
+
+      const wb = XLSX.utils.book_new();
+      const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
+      ws1['!cols'] = [{ wch: 30 }, { wch: 20 }];
+      XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+
+      const ws2 = XLSX.utils.aoa_to_sheet([detailHeaders, ...detailRows]);
+      ws2['!cols'] = [{ wch: 5 }, { wch: 12 }, { wch: 20 }, { wch: 20 }, { wch: 25 }, { wch: 8 }, { wch: 12 }, { wch: 12 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, ws2, 'Booking Details');
+
+      const ws3 = XLSX.utils.aoa_to_sheet([hospHeaders, ...hospRows]);
+      ws3['!cols'] = [{ wch: 30 }, { wch: 12 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, ws3, 'Hospital Revenue');
+
+      XLSX.writeFile(wb, `HospiJunction_Invoice_${month}.xlsx`);
+      showToast('Invoice downloaded!', 'success');
+    }
+
+    // ── Export functions ──
+    function exportHospitals() {
+      const data = allHospitals.map(h => ({
+        Name: h.name, Email: h.email, Phone: h.phone, City: h.city, State: h.state,
+        Type: h.hospital_type, Status: h.is_verified ? 'Verified' : 'Pending',
+        Registered: fmtDate(h.created_at)
+      }));
+      exportToExcel(data, 'HospiJunction_Hospitals');
+    }
+
+    function exportPatients() {
+      const data = allPatients.map(p => ({
+        Name: p.full_name, Email: p.email, Phone: p.phone, City: p.preferred_city,
+        Gender: p.gender, DOB: p.date_of_birth, Registered: fmtDate(p.created_at)
+      }));
+      exportToExcel(data, 'HospiJunction_Patients');
+    }
+
+    function exportAppointments() {
+      const data = allAppointments.map(a => ({
+        Patient: a.patient_name, Doctor: a.doctor_name, Hospital: a.hospital_name,
+        Date: a.appointment_date, Slot: a.time_slot, Token: a.token_number,
+        Status: a.status, Payment: a.payment_status, 'Platform Fee': PLATFORM_FEE,
+        'Booked On': fmtDate(a.created_at)
+      }));
+      exportToExcel(data, 'HospiJunction_Appointments');
+    }
+
+    function exportEarnings() {
+      const monthlyMap = {};
+      allAppointments.forEach(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        const mk = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        monthlyMap[mk] = (monthlyMap[mk] || 0) + 1;
+      });
+      const data = Object.keys(monthlyMap).sort().reverse().map(m => {
+        const c = monthlyMap[m];
+        const rev = c * PLATFORM_FEE;
+        const gst = Math.round(rev * 18 / 118 * 100) / 100;
+        return { Month: formatMonthLabel(m), Bookings: c, 'Revenue (₹)': rev, 'GST 18% (₹)': gst, 'Net (₹)': Math.round((rev - gst) * 100) / 100 };
+      });
+      exportToExcel(data, 'HospiJunction_Earnings');
+    }
+
+    function exportAllData() {
+      const wb = XLSX.utils.book_new();
+      const ws1 = XLSX.utils.json_to_sheet(allHospitals.map(h => ({ Name: h.name, Email: h.email, Phone: h.phone, City: h.city, State: h.state, Type: h.hospital_type, Verified: h.is_verified, Active: h.is_active, Registered: fmtDate(h.created_at) })));
+      XLSX.utils.book_append_sheet(wb, ws1, 'Hospitals');
+      const ws2 = XLSX.utils.json_to_sheet(allPatients.map(p => ({ Name: p.full_name, Email: p.email, Phone: p.phone, City: p.preferred_city, Gender: p.gender, Registered: fmtDate(p.created_at) })));
+      XLSX.utils.book_append_sheet(wb, ws2, 'Patients');
+      const ws3 = XLSX.utils.json_to_sheet(allAppointments.map(a => ({ Patient: a.patient_name, Doctor: a.doctor_name, Hospital: a.hospital_name, Date: a.appointment_date, Slot: a.time_slot, Token: a.token_number, Status: a.status, Payment: a.payment_status, Fee: PLATFORM_FEE, Booked: fmtDate(a.created_at) })));
+      XLSX.utils.book_append_sheet(wb, ws3, 'Appointments');
+      XLSX.writeFile(wb, 'HospiJunction_AllData_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      showToast('All data exported!', 'success');
+    }
+
+    function exportToExcel(data, name) {
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Data');
+      XLSX.writeFile(wb, name + '_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      showToast('Exported!', 'success');
+    }
+
+    // ── Actions ──
     async function verifyHospital(id) {
       if (!confirm('Mark this hospital as verified?')) return;
-      const { error } = await sb.from('hospital_profiles').update({ is_verified: true }).eq('id', id);
-      if (error) { showToast('Failed: ' + error.message, 'error'); }
-      else { showToast('Hospital verified!', 'success'); loadAdminData(); }
+      const { error } = await sb.from('hospital_profiles').update({ is_verified: true, is_active: true }).eq('id', id);
+      if (error) showToast('Failed: ' + error.message, 'error');
+      else { showToast('Hospital verified & activated!', 'success'); loadAllData(); }
     }
 
     async function deleteHospital(id, email, name) {
-      if (!confirm(`Delete hospital "${name}" (${email})?\n\nThis removes from database, Supabase Auth, and Firebase Auth. Cannot be undone.`)) return;
+      if (!confirm(`Delete hospital "${name}" (${email})?\n\nThis removes from database + Supabase Auth + Firebase Auth. Cannot be undone.`)) return;
       if (prompt('Type DELETE to confirm:') !== 'DELETE') return;
-
-      if (!adminKey) {
-        adminKey = prompt('Enter admin delete key:') || '';
-        sessionStorage.setItem('hj_admin_key', adminKey);
-      }
-
+      if (!adminKey) { adminKey = prompt('Enter admin delete key:') || ''; sessionStorage.setItem('hj_admin_key', adminKey); }
       showToast('Deleting hospital...', 'info');
       try {
         const res = await fetch(`${SUPABASE_URL}/functions/v1/delete-hospital`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ hospital_id: id, email, admin_key: adminKey })
         });
         const result = await res.json();
-        if (res.ok && result.success) {
-          showToast('Hospital deleted from all systems', 'success');
-          loadAdminData();
-        } else {
-          showToast('Failed: ' + (result.error || JSON.stringify(result)), 'error');
-        }
+        if (res.ok && result.success) { showToast('Hospital deleted from all systems', 'success'); loadAllData(); }
+        else showToast('Failed: ' + (result.error || JSON.stringify(result)), 'error');
       } catch (err) { showToast('Failed: ' + err.message, 'error'); }
     }
 
     async function deletePatient(id, name) {
       if (!confirm(`Delete patient "${name}"? Cannot be undone.`)) return;
       if (prompt('Type DELETE to confirm:') !== 'DELETE') return;
-
       const { error } = await sb.from('patient_profiles').delete().eq('id', id);
-      if (error) { showToast('Failed: ' + error.message, 'error'); }
-      else { showToast('Patient deleted', 'success'); loadAdminData(); }
+      if (error) showToast('Failed: ' + error.message, 'error');
+      else { showToast('Patient deleted', 'success'); loadAllData(); }
     }
 
+    // ── View Hospital Detail + Documents ──
+    async function viewHospital(id) {
+      const h = allHospitals.find(x => x.id === id);
+      if (!h) return;
+
+      const modal = document.getElementById('detail-modal');
+      const content = document.getElementById('detail-modal-content');
+
+      // Count hospital's appointments & doctors
+      const hospAppts = allAppointments.filter(a => a.hospital_id === id);
+      const hospDocs = allDoctors.filter(d => d.hospital_id === id);
+
+      content.innerHTML = `
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <h3>${esc(h.name||'Hospital Details')}</h3>
+        <div style="margin-bottom:8px">${h.is_verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-orange">Pending Verification</span>'}</div>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="dl">Email</div><div class="dv">${esc(h.email||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Phone</div><div class="dv">${esc(h.phone||'-')}</div></div>
+          <div class="detail-item"><div class="dl">City</div><div class="dv">${esc(h.city||'-')}</div></div>
+          <div class="detail-item"><div class="dl">State</div><div class="dv">${esc(h.state||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Type</div><div class="dv">${esc(h.hospital_type||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Address</div><div class="dv">${esc(h.address||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Registered</div><div class="dv">${fmtDate(h.created_at)}</div></div>
+          <div class="detail-item"><div class="dl">Website</div><div class="dv">${h.website ? '<a href="'+esc(h.website)+'" target="_blank" style="color:var(--blue-700)">'+esc(h.website)+'</a>' : '-'}</div></div>
+          <div class="detail-item"><div class="dl">Total Doctors</div><div class="dv"><strong>${hospDocs.length}</strong></div></div>
+          <div class="detail-item"><div class="dl">Total Appointments</div><div class="dv"><strong>${hospAppts.length}</strong></div></div>
+          <div class="detail-item"><div class="dl">Revenue Generated</div><div class="dv" style="color:var(--green);font-weight:600">₹${(hospAppts.length * PLATFORM_FEE).toLocaleString('en-IN')}</div></div>
+          <div class="detail-item"><div class="dl">Registration Number</div><div class="dv">${esc(h.registration_number||'-')}</div></div>
+        </div>
+
+        ${hospDocs.length > 0 ? `
+        <hr class="section-divider" />
+        <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Doctors (${hospDocs.length})</div>
+        <div style="margin-bottom:12px">
+          ${hospDocs.map(d => `<div style="display:inline-block;padding:6px 12px;background:var(--blue-50);border-radius:8px;margin:3px;font-size:12px"><strong>${esc(d.full_name)}</strong> <span style="color:var(--muted)">· ${esc(d.specialization||'')}</span> ${d.is_active ? '' : '<span class="badge badge-red" style="font-size:9px">Inactive</span>'}</div>`).join('')}
+        </div>` : ''}
+
+        <hr class="section-divider" />
+        <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Uploaded Documents</div>
+        <div id="hosp-docs-area"><div style="text-align:center;padding:20px"><div class="spin"></div> Loading documents...</div></div>
+
+        <hr class="section-divider" />
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          ${!h.is_verified ? `<button class="btn btn-green" onclick="verifyHospital('${h.id}');closeModal()">Verify Hospital</button>` : ''}
+          <button class="btn btn-red" onclick="deleteHospital('${h.id}','${esc(h.email||'')}','${esc(h.name||'')}');closeModal()">Delete Hospital</button>
+        </div>
+      `;
+
+      modal.classList.add('show');
+
+      // Load documents from hospital_documents table
+      const { data: docs } = await sb.from('hospital_documents').select('*').eq('hospital_id', id);
+      const docsArea = document.getElementById('hosp-docs-area');
+
+      if (!docs || docs.length === 0) {
+        // Try Supabase Storage as fallback
+        const { data: storageFiles } = await sb.storage.from('hospital-documents').list(id);
+        if (storageFiles && storageFiles.length > 0) {
+          docsArea.innerHTML = '<div class="doc-grid">' + storageFiles.map(f => {
+            const url = SUPABASE_URL + '/storage/v1/object/public/hospital-documents/' + id + '/' + f.name;
+            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+            const isPdf = /\.pdf$/i.test(f.name);
+            return `<div class="doc-card" onclick="${isImage ? `viewImage('${url}')` : `window.open('${url}','_blank')`}">
+              <div class="doc-thumb">${isImage ? `<img src="${url}" alt="${esc(f.name)}" />` : `<div class="doc-icon">${isPdf ? '📄' : '📁'}</div>`}</div>
+              <div class="doc-label" title="${esc(f.name)}">${esc(f.name)}</div>
+            </div>`;
+          }).join('') + '</div>';
+        } else {
+          docsArea.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0">No documents uploaded yet.</p>';
+        }
+      } else {
+        docsArea.innerHTML = '<div class="doc-grid">' + docs.map(d => {
+          const url = d.file_url || (d.storage_path ? SUPABASE_URL + '/storage/v1/object/public/hospital-documents/' + d.storage_path : '');
+          const name = d.document_type || d.file_name || d.storage_path || 'Document';
+          const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+          const isPdf = /\.pdf$/i.test(url);
+          return `<div class="doc-card" onclick="${isImage ? `viewImage('${url}')` : (url ? `window.open('${url}','_blank')` : '')}">
+            <div class="doc-thumb">${isImage ? `<img src="${url}" alt="${esc(name)}" />` : `<div class="doc-icon">${isPdf ? '📄' : '📁'}</div>`}</div>
+            <div class="doc-label" title="${esc(name)}">${esc(name)}</div>
+          </div>`;
+        }).join('') + '</div>';
+      }
+    }
+
+    // ── View Patient Detail ──
+    function viewPatient(id) {
+      const p = allPatients.find(x => x.id === id);
+      if (!p) return;
+
+      const patAppts = allAppointments.filter(a => a.patient_id === id);
+      const modal = document.getElementById('detail-modal');
+      const content = document.getElementById('detail-modal-content');
+
+      content.innerHTML = `
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <h3>${esc(p.full_name||'Patient Details')}</h3>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="dl">Full Name</div><div class="dv">${esc(p.full_name||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Email</div><div class="dv">${esc(p.email||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Phone</div><div class="dv">${esc(p.phone||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Gender</div><div class="dv">${esc(p.gender||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Date of Birth</div><div class="dv">${p.date_of_birth ? fmtDate(p.date_of_birth) : '-'}</div></div>
+          <div class="detail-item"><div class="dl">Blood Group</div><div class="dv">${esc(p.blood_group||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Preferred City</div><div class="dv">${esc(p.preferred_city||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Address</div><div class="dv">${esc(p.address||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Emergency Contact</div><div class="dv">${esc(p.emergency_contact||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Registered</div><div class="dv">${fmtDate(p.created_at)}</div></div>
+          <div class="detail-item"><div class="dl">Total Appointments</div><div class="dv"><strong>${patAppts.length}</strong></div></div>
+          <div class="detail-item"><div class="dl">Fees Paid</div><div class="dv" style="color:var(--green);font-weight:600">₹${(patAppts.length * PLATFORM_FEE).toLocaleString('en-IN')}</div></div>
+        </div>
+
+        ${patAppts.length > 0 ? `
+        <hr class="section-divider" />
+        <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg> Appointment History (${patAppts.length})</div>
+        ${patAppts.slice(0, 10).map(a => `<div class="appt-history-item">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>${esc(a.doctor_name||'-')}</strong> <span style="color:var(--muted)">at ${esc(a.hospital_name||'-')}</span></div>
+            <span class="badge badge-${({booked:'blue',confirmed:'green',completed:'green',cancelled:'red',no_show:'orange'})[a.status]||'blue'}">${esc(a.status||'booked')}</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">${fmtDate(a.appointment_date)} · ${esc(a.time_slot||'')} · Token #${a.token_number||'-'} · ${esc(a.payment_status||'pending')}</div>
+        </div>`).join('')}
+        ${patAppts.length > 10 ? `<p style="font-size:12px;color:var(--muted);padding:8px 0">+ ${patAppts.length - 10} more appointments</p>` : ''}
+        ` : '<hr class="section-divider" /><p style="color:var(--muted);font-size:13px">No appointments yet.</p>'}
+
+        <hr class="section-divider" />
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-red" onclick="deletePatient('${p.id}','${esc(p.full_name||'')}');closeModal()">Delete Patient</button>
+        </div>
+      `;
+
+      modal.classList.add('show');
+    }
+
+    // ── Modal helpers ──
+    function closeModal() { document.getElementById('detail-modal').classList.remove('show'); }
+    function viewImage(url) { document.getElementById('img-viewer-src').src = url; document.getElementById('img-viewer').classList.add('show'); }
+    document.getElementById('detail-modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+    // ── Utilities ──
     function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function fmtDate(d) { if (!d) return '-'; return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
+    function formatMonthLabel(m) { const [y, mo] = m.split('-'); return new Date(y, mo - 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); }
+
+    function timeAgo(d) {
+      if (!d) return '';
+      const diff = (Date.now() - new Date(d)) / 1000;
+      if (diff < 60) return 'just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+      return fmtDate(d);
+    }
 
     function showToast(msg, type) {
       const t = document.getElementById('toast');
