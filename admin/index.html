@@ -314,8 +314,8 @@
             <div class="stat-card green"><div class="stat-label">Verified</div><div class="stat-value" id="s-verified" style="color:var(--green)">-</div></div>
             <div class="stat-card orange"><div class="stat-label">Pending Verification</div><div class="stat-value" id="s-pending" style="color:var(--orange)">-</div></div>
             <div class="stat-card purple"><div class="stat-label">Total Patients</div><div class="stat-value" id="s-patients" style="color:var(--purple)">-</div></div>
-            <div class="stat-card blue"><div class="stat-label">Total Appointments</div><div class="stat-value" id="s-appointments">-</div></div>
-            <div class="stat-card green"><div class="stat-label">Total Revenue</div><div class="stat-value" id="s-revenue" style="color:var(--green)">-</div></div>
+            <div class="stat-card blue"><div class="stat-label">This Month's Appointments</div><div class="stat-value" id="s-appointments">-</div></div>
+            <div class="stat-card green"><div class="stat-label">This Month's Revenue</div><div class="stat-value" id="s-revenue" style="color:var(--green)">-</div></div>
           </div>
 
           <h3 style="font-family:var(--display);font-weight:600;font-size:16px;margin-bottom:14px">Quick Actions</h3>
@@ -339,6 +339,10 @@
             <button class="qa-btn" onclick="exportAllData()">
               <div class="qa-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
               Export all data (Excel)
+            </button>
+            <button class="qa-btn" onclick="showCleanupModal()">
+              <div class="qa-icon red"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></div>
+              Clean up test data
             </button>
           </div>
 
@@ -448,10 +452,10 @@
           <p class="page-sub">Platform revenue from ₹20 booking fees</p>
 
           <div class="earnings-summary">
-            <div class="earnings-card"><h4>Total Revenue (All Time)</h4><div class="amount" id="e-total">₹0</div><div class="sub" id="e-total-count">0 bookings</div></div>
+            <div class="earnings-card"><h4>Today</h4><div class="amount" id="e-today">₹0</div><div class="sub" id="e-today-count">0 bookings</div></div>
             <div class="earnings-card"><h4>This Month</h4><div class="amount" id="e-month">₹0</div><div class="sub" id="e-month-count">0 bookings</div></div>
             <div class="earnings-card"><h4>Last Month</h4><div class="amount" id="e-last-month">₹0</div><div class="sub" id="e-last-month-count">0 bookings</div></div>
-            <div class="earnings-card"><h4>Today</h4><div class="amount" id="e-today">₹0</div><div class="sub" id="e-today-count">0 bookings</div></div>
+            <div class="earnings-card"><h4>Total (All Time)</h4><div class="amount" id="e-total">₹0</div><div class="sub" id="e-total-count">0 bookings</div></div>
           </div>
 
           <div class="card">
@@ -629,14 +633,22 @@
     function updateDashboardStats() {
       const verified = allHospitals.filter(h => h.is_verified).length;
       const pending = allHospitals.filter(h => !h.is_verified).length;
-      const totalRevenue = allAppointments.length * PLATFORM_FEE;
+
+      // This month's data only
+      const now = new Date();
+      const thisMonthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      const thisMonthAppts = allAppointments.filter(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        return (d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')) === thisMonthKey;
+      });
+      const thisMonthRevenue = thisMonthAppts.length * PLATFORM_FEE;
 
       document.getElementById('s-hospitals').textContent = allHospitals.length;
       document.getElementById('s-verified').textContent = verified;
       document.getElementById('s-pending').textContent = pending;
       document.getElementById('s-patients').textContent = allPatients.length;
-      document.getElementById('s-appointments').textContent = allAppointments.length;
-      document.getElementById('s-revenue').textContent = '₹' + totalRevenue.toLocaleString('en-IN');
+      document.getElementById('s-appointments').textContent = thisMonthAppts.length;
+      document.getElementById('s-revenue').textContent = '₹' + thisMonthRevenue.toLocaleString('en-IN');
 
       // Pending badge
       const badge = document.getElementById('nav-pending-badge');
@@ -1210,6 +1222,76 @@
     function closeModal() { document.getElementById('detail-modal').classList.remove('show'); }
     function viewImage(url) { document.getElementById('img-viewer-src').src = url; document.getElementById('img-viewer').classList.add('show'); }
     document.getElementById('detail-modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+    // ── Cleanup Test Data ──
+    function showCleanupModal() {
+      const modal = document.getElementById('detail-modal');
+      const content = document.getElementById('detail-modal-content');
+
+      // Find appointments older than current month
+      const now = new Date();
+      const thisMonthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+      const oldAppts = allAppointments.filter(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        const mk = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        return mk < thisMonthKey;
+      });
+
+      content.innerHTML = `
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <h3>Clean Up Test / Old Data</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Remove old test appointments and data that shouldn't count towards real analytics.</p>
+
+        <div style="margin-bottom:16px">
+          <strong style="font-size:13px">Old Appointments (before this month): ${oldAppts.length}</strong>
+        </div>
+
+        ${oldAppts.length > 0 ? `
+        <div style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:16px">
+          <table style="width:100%">
+            <thead><tr><th><input type="checkbox" id="select-all-cleanup" onchange="toggleAllCleanup(this.checked)" /></th><th>Patient</th><th>Doctor</th><th>Hospital</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>${oldAppts.map(a => `<tr>
+              <td><input type="checkbox" class="cleanup-cb" value="${a.id}" checked /></td>
+              <td>${esc(a.patient_name||'-')}</td>
+              <td>${esc(a.doctor_name||'-')}</td>
+              <td>${esc(a.hospital_name||'-')}</td>
+              <td>${fmtDate(a.appointment_date||a.created_at)}</td>
+              <td><span class="badge badge-${({booked:'blue',confirmed:'green',completed:'green',cancelled:'red'})[a.status]||'blue'}">${esc(a.status||'-')}</span></td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-red" onclick="deleteSelectedAppointments()" style="background:var(--red);color:white;border:none">Delete Selected</button>
+        </div>
+        ` : '<p style="color:var(--green);font-size:13px">No old data found — everything is from this month.</p>'}
+      `;
+      document.getElementById('select-all-cleanup').checked = true;
+      modal.classList.add('show');
+    }
+
+    function toggleAllCleanup(checked) {
+      document.querySelectorAll('.cleanup-cb').forEach(cb => cb.checked = checked);
+    }
+
+    async function deleteSelectedAppointments() {
+      const ids = [...document.querySelectorAll('.cleanup-cb:checked')].map(cb => cb.value);
+      if (!ids.length) { showToast('No appointments selected', 'error'); return; }
+      if (!confirm('Delete ' + ids.length + ' old appointment(s)? This cannot be undone.')) return;
+
+      showToast('Deleting ' + ids.length + ' appointments...', 'info');
+      let deleted = 0, failed = 0;
+      for (const id of ids) {
+        const { error } = await sb.from('appointments').delete().eq('id', id);
+        if (error) failed++;
+        else deleted++;
+      }
+
+      closeModal();
+      showToast(deleted + ' deleted' + (failed ? ', ' + failed + ' failed' : ''), deleted > 0 ? 'success' : 'error');
+      loadAllData();
+    }
 
     // ── Utilities ──
     function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
