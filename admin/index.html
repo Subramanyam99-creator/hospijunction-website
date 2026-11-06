@@ -477,11 +477,30 @@
           <h1 class="page-title">GST Invoices</h1>
           <p class="page-sub">Generate month-wise invoices for GST filing</p>
 
+          <!-- Financial Year Selector -->
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header">
+              <h2>Financial Year Report</h2>
+              <div class="card-actions">
+                <select class="filter-select" id="fy-select" onchange="updateFYTable()">
+                </select>
+                <button class="btn btn-primary" onclick="downloadFYExcel()">Download FY Excel (All Months)</button>
+              </div>
+            </div>
+            <div class="card-body"><div class="table-wrap">
+              <table>
+                <thead><tr><th>Month</th><th>Bookings</th><th>Gross (₹)</th><th>Taxable (₹)</th><th>CGST 9% (₹)</th><th>SGST 9% (₹)</th><th>Total GST (₹)</th><th>Action</th></tr></thead>
+                <tbody id="fy-table"></tbody>
+              </table>
+            </div></div>
+          </div>
+
+          <!-- Single Month Invoice -->
           <div class="invoice-controls">
-            <label style="font-weight:600;font-size:13px">Select Month:</label>
+            <label style="font-weight:600;font-size:13px">Single Month Invoice:</label>
             <input type="month" class="search-bar" id="invoice-month" style="min-width:160px" />
-            <button class="btn btn-primary" onclick="generateInvoice()">Generate Invoice</button>
-            <button class="btn btn-blue" onclick="downloadInvoiceExcel()">Download Excel</button>
+            <button class="btn btn-primary" onclick="generateInvoice()">Preview Invoice</button>
+            <button class="btn btn-blue" onclick="downloadInvoiceExcel()">Download Month Excel</button>
           </div>
 
           <div class="card" id="invoice-preview" style="display:none">
@@ -489,7 +508,7 @@
           </div>
 
           <div class="card">
-            <div class="card-header"><h2>Hospital-wise Revenue</h2></div>
+            <div class="card-header"><h2>Hospital-wise Revenue (Selected Month)</h2></div>
             <div class="card-body"><div class="table-wrap">
               <table>
                 <thead><tr><th>Hospital</th><th>City</th><th>Bookings</th><th>Revenue (₹)</th></tr></thead>
@@ -601,6 +620,7 @@
       const mMap = { dashboard: 0, hospitals: 1, appointments: 2, earnings: 3 };
       if (map[name] !== undefined && items[map[name]]) items[map[name]].classList.add('active');
       if (mMap[name] !== undefined && mItems[mMap[name]]) mItems[mMap[name]].classList.add('active');
+      if (name === 'invoices' && allAppointments.length) populateFYDropdown();
     }
 
     // ── Load all data ──
@@ -986,6 +1006,221 @@
 
       XLSX.writeFile(wb, `HospiJunction_Invoice_${month}.xlsx`);
       showToast('Invoice downloaded!', 'success');
+    }
+
+    // ── Financial Year Invoice Functions ──
+    function populateFYDropdown() {
+      const sel = document.getElementById('fy-select');
+      // Find earliest appointment year
+      let minYear = new Date().getFullYear();
+      allAppointments.forEach(a => {
+        const y = new Date(a.created_at || a.appointment_date).getFullYear();
+        if (y < minYear) minYear = y;
+      });
+      const curYear = new Date().getFullYear();
+      const curMonth = new Date().getMonth() + 1; // 1-12
+      sel.innerHTML = '';
+      // Current FY and past FYs
+      for (let y = curYear; y >= minYear; y--) {
+        // FY starts April. If current month < April, current FY started last year
+        const fyStart = (curMonth >= 4 && y === curYear) || y < curYear ? y : y - 1;
+        const label = 'FY ' + fyStart + '-' + String(fyStart + 1).slice(2);
+        // Avoid duplicates
+        if (sel.querySelector('option[value="' + fyStart + '"]')) continue;
+        const opt = document.createElement('option');
+        opt.value = fyStart;
+        opt.textContent = label;
+        sel.appendChild(opt);
+      }
+      // If April hasn't come yet this year, ensure current FY is listed
+      if (curMonth < 4) {
+        const fy = curYear - 1;
+        if (!sel.querySelector('option[value="' + fy + '"]')) {
+          const opt = document.createElement('option');
+          opt.value = fy;
+          opt.textContent = 'FY ' + fy + '-' + String(fy + 1).slice(2);
+          sel.prepend(opt);
+        }
+      }
+      updateFYTable();
+    }
+
+    function getFYMonths(fyStartYear) {
+      // April of fyStartYear to March of fyStartYear+1
+      const months = [];
+      for (let m = 4; m <= 12; m++) {
+        months.push(fyStartYear + '-' + String(m).padStart(2, '0'));
+      }
+      for (let m = 1; m <= 3; m++) {
+        months.push((fyStartYear + 1) + '-' + String(m).padStart(2, '0'));
+      }
+      return months;
+    }
+
+    function getMonthlyAppointmentCounts() {
+      const map = {};
+      allAppointments.forEach(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        const mk = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        map[mk] = (map[mk] || 0) + 1;
+      });
+      return map;
+    }
+
+    function updateFYTable() {
+      const fyStart = parseInt(document.getElementById('fy-select').value);
+      if (isNaN(fyStart)) return;
+      const months = getFYMonths(fyStart);
+      const monthlyCounts = getMonthlyAppointmentCounts();
+      const tbody = document.getElementById('fy-table');
+
+      let totalBookings = 0, totalGross = 0, totalGST = 0;
+
+      const rows = months.map(m => {
+        const count = monthlyCounts[m] || 0;
+        const gross = count * PLATFORM_FEE;
+        const gst = Math.round(gross * 18 / 118 * 100) / 100;
+        const taxable = Math.round((gross - gst) * 100) / 100;
+        const cgst = Math.round(gst / 2 * 100) / 100;
+        const sgst = cgst;
+        totalBookings += count;
+        totalGross += gross;
+        totalGST += gst;
+        return `<tr>
+          <td><strong>${formatMonthLabel(m)}</strong></td>
+          <td>${count}</td>
+          <td>₹${gross.toLocaleString('en-IN')}</td>
+          <td>₹${taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+          <td>₹${cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+          <td>₹${sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+          <td>₹${gst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+          <td>${count > 0 ? `<button class="btn btn-blue btn-sm" onclick="downloadMonthInvoice('${m}')">Download</button>` : '<span style="color:var(--muted);font-size:11px">No data</span>'}</td>
+        </tr>`;
+      });
+
+      // Totals row
+      const totalTaxable = Math.round((totalGross - totalGST) * 100) / 100;
+      const totalCGST = Math.round(totalGST / 2 * 100) / 100;
+      rows.push(`<tr style="background:var(--cream);font-weight:700">
+        <td>Total FY ${fyStart}-${String(fyStart+1).slice(2)}</td>
+        <td>${totalBookings}</td>
+        <td>₹${totalGross.toLocaleString('en-IN')}</td>
+        <td>₹${totalTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td>₹${totalCGST.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td>₹${totalCGST.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td>₹${totalGST.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td></td>
+      </tr>`);
+
+      tbody.innerHTML = rows.join('');
+    }
+
+    function downloadFYExcel() {
+      const fyStart = parseInt(document.getElementById('fy-select').value);
+      if (isNaN(fyStart)) { showToast('Select a financial year', 'error'); return; }
+      const months = getFYMonths(fyStart);
+      const monthlyCounts = getMonthlyAppointmentCounts();
+      const fyLabel = 'FY ' + fyStart + '-' + String(fyStart + 1).slice(2);
+      const wb = XLSX.utils.book_new();
+
+      // ── Sheet 1: FY Summary ──
+      const summaryRows = [
+        ['HospiJunction — GST Summary'],
+        ['Financial Year', fyLabel],
+        ['Generated', new Date().toLocaleDateString('en-IN')],
+        ['GSTIN', ''],
+        [],
+        ['Month', 'Bookings', 'Gross Revenue (₹)', 'Taxable Value (₹)', 'CGST 9% (₹)', 'SGST 9% (₹)', 'Total GST (₹)']
+      ];
+      let fyTotalBookings = 0, fyTotalGross = 0, fyTotalGST = 0;
+      months.forEach(m => {
+        const c = monthlyCounts[m] || 0;
+        const gross = c * PLATFORM_FEE;
+        const gst = Math.round(gross * 18 / 118 * 100) / 100;
+        const taxable = Math.round((gross - gst) * 100) / 100;
+        const cgst = Math.round(gst / 2 * 100) / 100;
+        fyTotalBookings += c;
+        fyTotalGross += gross;
+        fyTotalGST += gst;
+        summaryRows.push([formatMonthLabel(m), c, gross, taxable, cgst, cgst, Math.round(gst * 100) / 100]);
+      });
+      const fyTotalTaxable = Math.round((fyTotalGross - fyTotalGST) * 100) / 100;
+      const fyTotalCGST = Math.round(fyTotalGST / 2 * 100) / 100;
+      summaryRows.push([]);
+      summaryRows.push(['TOTAL ' + fyLabel, fyTotalBookings, fyTotalGross, fyTotalTaxable, fyTotalCGST, fyTotalCGST, Math.round(fyTotalGST * 100) / 100]);
+
+      const ws1 = XLSX.utils.aoa_to_sheet(summaryRows);
+      ws1['!cols'] = [{ wch: 20 }, { wch: 10 }, { wch: 18 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, ws1, 'FY Summary');
+
+      // ── Sheet per month with bookings ──
+      months.forEach(m => {
+        const monthAppts = allAppointments.filter(a => {
+          const d = new Date(a.created_at || a.appointment_date);
+          return (d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')) === m;
+        });
+        if (monthAppts.length === 0) return;
+
+        const c = monthAppts.length;
+        const gross = c * PLATFORM_FEE;
+        const gst = Math.round(gross * 18 / 118 * 100) / 100;
+        const taxable = Math.round((gross - gst) * 100) / 100;
+        const cgst = Math.round(gst / 2 * 100) / 100;
+
+        const rows = [
+          ['HospiJunction — Invoice: ' + formatMonthLabel(m)],
+          ['Period', formatMonthLabel(m)],
+          ['Total Bookings', c],
+          ['Gross Revenue', gross],
+          ['Taxable Value', taxable],
+          ['CGST @ 9%', cgst],
+          ['SGST @ 9%', cgst],
+          ['Total GST', Math.round(gst * 100) / 100],
+          [],
+          ['Sr.', 'Date', 'Patient', 'Doctor', 'Hospital', 'Token', 'Status', 'Payment', 'Platform Fee (₹)']
+        ];
+        monthAppts.forEach((a, i) => {
+          rows.push([
+            i + 1,
+            fmtDate(a.appointment_date || a.created_at),
+            a.patient_name || '-',
+            a.doctor_name || '-',
+            a.hospital_name || '-',
+            a.token_number || '-',
+            a.status || '-',
+            a.payment_status || '-',
+            PLATFORM_FEE
+          ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [{ wch: 5 }, { wch: 12 }, { wch: 20 }, { wch: 20 }, { wch: 25 }, { wch: 8 }, { wch: 12 }, { wch: 12 }, { wch: 14 }];
+        // Sheet name: month short form
+        const [y, mo] = m.split('-');
+        const sheetName = new Date(y, mo - 1).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      });
+
+      // ── Hospital-wise sheet ──
+      const hospMap = {};
+      allAppointments.forEach(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        const mk = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (months.includes(mk)) {
+          const n = a.hospital_name || 'Unknown';
+          hospMap[n] = (hospMap[n] || 0) + 1;
+        }
+      });
+      const hospRows = [['Hospital', 'Bookings', 'Revenue (₹)']];
+      Object.entries(hospMap).sort((a, b) => b[1] - a[1]).forEach(([n, c]) => {
+        hospRows.push([n, c, c * PLATFORM_FEE]);
+      });
+      const wsH = XLSX.utils.aoa_to_sheet(hospRows);
+      wsH['!cols'] = [{ wch: 30 }, { wch: 12 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, wsH, 'Hospital Revenue');
+
+      XLSX.writeFile(wb, 'HospiJunction_GST_' + fyLabel.replace(/\s/g, '_') + '.xlsx');
+      showToast('FY Excel downloaded with all monthly sheets!', 'success');
     }
 
     // ── Export functions ──
