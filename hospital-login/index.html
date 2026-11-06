@@ -51,6 +51,10 @@
     .forgot-link{font-size:13px;color:var(--blue-700);font-weight:500;text-decoration:none;float:right;margin-top:-4px}
     .forgot-link:hover{text-decoration:underline}
 
+    .pw-wrap{position:relative}
+    .pw-wrap input{padding-right:44px}
+    .pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;padding:0}
+
     @media(max-width:480px){
       .login-card{padding:36px 24px}
     }
@@ -99,7 +103,10 @@
         <div class="field">
           <label for="password">Password</label>
           <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot password?</a>
-          <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" />
+          <div class="pw-wrap">
+            <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" />
+            <button type="button" class="pw-toggle" onclick="togglePassword()" id="pw-toggle-btn" title="Show password">&#128065;</button>
+          </div>
         </div>
         <button type="submit" class="login-btn" id="login-btn">Log in</button>
       </form>
@@ -168,6 +175,20 @@
       } catch (e) {
         console.error('Verify error:', e);
         return false;
+      }
+    }
+
+    function togglePassword() {
+      const inp = document.getElementById('password');
+      const btn = document.getElementById('pw-toggle-btn');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerHTML = '&#128064;';
+        btn.title = 'Hide password';
+      } else {
+        inp.type = 'password';
+        btn.innerHTML = '&#128065;';
+        btn.title = 'Show password';
       }
     }
 
