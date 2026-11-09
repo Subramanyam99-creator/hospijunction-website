@@ -1378,24 +1378,42 @@
         // Try Supabase Storage as fallback
         const { data: storageFiles } = await sb.storage.from('hospital-documents').list(id);
         if (storageFiles && storageFiles.length > 0) {
-          docsArea.innerHTML = '<div class="doc-grid">' + storageFiles.map(f => {
-            const url = SUPABASE_URL + '/storage/v1/object/public/hospital-documents/' + id + '/' + f.name;
-            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
-            const isPdf = /\.pdf$/i.test(f.name);
-            return `<div class="doc-card" onclick="${isImage ? `viewImage('${url}')` : `window.open('${url}','_blank')`}">
-              <div class="doc-thumb">${isImage ? `<img src="${url}" alt="${esc(f.name)}" />` : `<div class="doc-icon">${isPdf ? '📄' : '📁'}</div>`}</div>
-              <div class="doc-label" title="${esc(f.name)}">${esc(f.name)}</div>
-            </div>`;
-          }).join('') + '</div>';
+          const realFiles = storageFiles.filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
+          if (realFiles.length > 0) {
+            // Get signed URLs for private bucket (valid 1 hour)
+            const signedResults = await Promise.all(realFiles.map(f =>
+              sb.storage.from('hospital-documents').createSignedUrl(id + '/' + f.name, 3600)
+            ));
+            docsArea.innerHTML = '<div class="doc-grid">' + realFiles.map((f, i) => {
+              const url = signedResults[i]?.data?.signedUrl || '';
+              if (!url) return '';
+              const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+              const isPdf = /\.pdf$/i.test(f.name);
+              return `<div class="doc-card" onclick="${isImage ? `viewImage('${url}')` : `window.open('${url}','_blank')`}">
+                <div class="doc-thumb">${isImage ? `<img src="${url}" alt="${esc(f.name)}" />` : `<div class="doc-icon">${isPdf ? '📄' : '📁'}</div>`}</div>
+                <div class="doc-label" title="${esc(f.name)}">${esc(f.name)}</div>
+              </div>`;
+            }).join('') + '</div>';
+          } else {
+            docsArea.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0">No documents uploaded yet.</p>';
+          }
         } else {
           docsArea.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0">No documents uploaded yet.</p>';
         }
       } else {
-        docsArea.innerHTML = '<div class="doc-grid">' + docs.map(d => {
-          const url = d.file_url || (d.storage_path ? SUPABASE_URL + '/storage/v1/object/public/hospital-documents/' + d.storage_path : '');
+        // Get signed URLs for docs from hospital_documents table
+        const docUrls = await Promise.all(docs.map(async d => {
+          if (d.storage_path) {
+            const { data } = await sb.storage.from('hospital-documents').createSignedUrl(d.storage_path, 3600);
+            return data?.signedUrl || d.file_url || '';
+          }
+          return d.file_url || '';
+        }));
+        docsArea.innerHTML = '<div class="doc-grid">' + docs.map((d, i) => {
+          const url = docUrls[i];
           const name = d.document_type || d.file_name || d.storage_path || 'Document';
-          const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
-          const isPdf = /\.pdf$/i.test(url);
+          const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url || name);
+          const isPdf = /\.pdf$/i.test(url || name);
           return `<div class="doc-card" onclick="${isImage ? `viewImage('${url}')` : (url ? `window.open('${url}','_blank')` : '')}">
             <div class="doc-thumb">${isImage ? `<img src="${url}" alt="${esc(name)}" />` : `<div class="doc-icon">${isPdf ? '📄' : '📁'}</div>`}</div>
             <div class="doc-label" title="${esc(name)}">${esc(name)}</div>
