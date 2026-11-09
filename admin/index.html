@@ -743,11 +743,12 @@
         <td>${esc(h.city||'-')}${h.state ? ', ' + esc(h.state) : ''}</td>
         <td>${esc(h.phone||'-')}</td>
         <td><span style="font-size:11px;color:var(--muted)">${esc(h.hospital_type||'-')}</span></td>
-        <td>${h.is_verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-orange">Pending</span>'}</td>
+        <td>${h.is_verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-orange">Pending</span>'}${h.is_active === false ? ' <span class="badge badge-red">Inactive</span>' : ''}</td>
         <td>${fmtDate(h.created_at)}</td>
         <td style="white-space:nowrap">
           <button class="btn btn-blue btn-sm" onclick="viewHospital('${h.id}')">View</button>
           ${!h.is_verified ? `<button class="btn btn-green btn-sm" onclick="verifyHospital('${h.id}')">Verify</button> ` : ''}
+          ${h.is_active === false ? `<button class="btn btn-green btn-sm" onclick="toggleHospitalActive('${h.id}',true)">Activate</button>` : `<button class="btn btn-sm" style="background:#f59e0b;color:#fff" onclick="toggleHospitalActive('${h.id}',false)">Deactivate</button>`}
           <button class="btn btn-red btn-sm" onclick="deleteHospital('${h.id}','${esc(h.email||'')}','${esc(h.name||'')}')">Delete</button>
         </td>
       </tr>`).join('');
@@ -1295,6 +1296,15 @@
       else { showToast('Hospital verified & activated!', 'success'); loadAllData(); }
     }
 
+    async function toggleHospitalActive(id, activate) {
+      const h = allHospitals.find(x => x.id === id);
+      const label = activate ? 'activate' : 'deactivate';
+      if (!confirm(`${activate ? 'Activate' : 'Deactivate'} hospital "${h?.name || id}"?`)) return;
+      const { error } = await sb.from('hospital_profiles').update({ is_active: activate }).eq('id', id);
+      if (error) showToast('Failed: ' + error.message, 'error');
+      else { showToast(`Hospital ${label}d!`, 'success'); loadAllData(); }
+    }
+
     async function deleteHospital(id, email, name) {
       if (!confirm(`Delete hospital "${name}" (${email})?\n\nThis removes from database + Supabase Auth + Firebase Auth. Cannot be undone.`)) return;
       if (prompt('Type DELETE to confirm:') !== 'DELETE') return;
@@ -1319,7 +1329,7 @@
       else { showToast('Patient deleted', 'success'); loadAllData(); }
     }
 
-    // ── View Hospital Detail + Documents ──
+    // ── View Hospital Detail + Documents + Analytics ──
     async function viewHospital(id) {
       const h = allHospitals.find(x => x.id === id);
       if (!h) return;
@@ -1327,14 +1337,92 @@
       const modal = document.getElementById('detail-modal');
       const content = document.getElementById('detail-modal-content');
 
-      // Count hospital's appointments & doctors
+      // Hospital's appointments & doctors
       const hospAppts = allAppointments.filter(a => a.hospital_id === id);
       const hospDocs = allDoctors.filter(d => d.hospital_id === id);
 
+      // ── Analytics calculations ──
+      const now = new Date();
+      const thisMonthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+      // Monthly breakdown (last 6 months)
+      const monthlyData = {};
+      for (let i = 0; i < 6; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        monthlyData[key] = { total: 0, completed: 0, cancelled: 0, noshow: 0 };
+      }
+      hospAppts.forEach(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (monthlyData[key]) {
+          monthlyData[key].total++;
+          if ((a.status||'').toLowerCase() === 'cancelled') monthlyData[key].cancelled++;
+          else if ((a.status||'').toLowerCase() === 'no_show' || (a.status||'').toLowerCase() === 'noshow') monthlyData[key].noshow++;
+          else if ((a.status||'').toLowerCase() === 'completed' || (a.status||'').toLowerCase() === 'visited') monthlyData[key].completed++;
+        }
+      });
+
+      // This month stats
+      const thisMonthAppts = hospAppts.filter(a => {
+        const d = new Date(a.created_at || a.appointment_date);
+        return (d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')) === thisMonthKey;
+      });
+
+      // Status breakdown
+      const statusMap = {};
+      hospAppts.forEach(a => {
+        const s = (a.status || 'unknown').toLowerCase();
+        statusMap[s] = (statusMap[s] || 0) + 1;
+      });
+      const cancelledCount = statusMap['cancelled'] || 0;
+      const completedCount = (statusMap['completed'] || 0) + (statusMap['visited'] || 0);
+      const cancelRate = hospAppts.length > 0 ? Math.round(cancelledCount / hospAppts.length * 100) : 0;
+
+      // Repeated visitors (patients who booked more than once at this hospital)
+      const patientVisits = {};
+      hospAppts.forEach(a => { if (a.patient_id) patientVisits[a.patient_id] = (patientVisits[a.patient_id] || 0) + 1; });
+      const repeatVisitors = Object.values(patientVisits).filter(c => c > 1).length;
+      const uniquePatients = Object.keys(patientVisits).length;
+
+      // Doctor-wise appointment count
+      const doctorAppts = {};
+      hospAppts.forEach(a => {
+        const dn = a.doctor_name || 'Unknown';
+        doctorAppts[dn] = (doctorAppts[dn] || 0) + 1;
+      });
+
+      // Peak booking days (day of week)
+      const dayMap = { 0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat' };
+      const dayCounts = [0, 0, 0, 0, 0, 0, 0];
+      hospAppts.forEach(a => {
+        const d = new Date(a.appointment_date || a.created_at);
+        if (!isNaN(d)) dayCounts[d.getDay()]++;
+      });
+      const peakDay = dayCounts.indexOf(Math.max(...dayCounts));
+
+      // Payment stats
+      const paidCount = hospAppts.filter(a => (a.payment_status||'').toLowerCase() === 'paid').length;
+      const refundCount = hospAppts.filter(a => (a.payment_status||'').toLowerCase() === 'refunded').length;
+
+      // Average appointments per month (months since registration)
+      const regDate = new Date(h.created_at);
+      const monthsSinceReg = Math.max(1, Math.round((now - regDate) / (30.44 * 24 * 60 * 60 * 1000)));
+      const avgPerMonth = (hospAppts.length / monthsSinceReg).toFixed(1);
+
+      // Monthly chart bars (last 6 months)
+      const sortedMonths = Object.keys(monthlyData).sort();
+      const maxMonthly = Math.max(...sortedMonths.map(m => monthlyData[m].total), 1);
+
       content.innerHTML = `
         <button class="modal-close" onclick="closeModal()">&times;</button>
-        <h3>${esc(h.name||'Hospital Details')}</h3>
-        <div style="margin-bottom:8px">${h.is_verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-orange">Pending Verification</span>'}</div>
+        <h3 style="margin-bottom:4px">${esc(h.name||'Hospital Details')}</h3>
+        <div style="margin-bottom:12px">
+          ${h.is_verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-orange">Pending</span>'}
+          ${h.is_active === false ? '<span class="badge badge-red">Inactive</span>' : '<span class="badge badge-green">Active</span>'}
+        </div>
+
+        <!-- Basic Info -->
         <div class="detail-grid">
           <div class="detail-item"><div class="dl">Email</div><div class="dv">${esc(h.email||'-')}</div></div>
           <div class="detail-item"><div class="dl">Phone</div><div class="dv">${esc(h.phone||'-')}</div></div>
@@ -1344,26 +1432,151 @@
           <div class="detail-item"><div class="dl">Address</div><div class="dv">${esc(h.address||'-')}</div></div>
           <div class="detail-item"><div class="dl">Registered</div><div class="dv">${fmtDate(h.created_at)}</div></div>
           <div class="detail-item"><div class="dl">Website</div><div class="dv">${h.website ? '<a href="'+esc(h.website)+'" target="_blank" style="color:var(--blue-700)">'+esc(h.website)+'</a>' : '-'}</div></div>
-          <div class="detail-item"><div class="dl">Total Doctors</div><div class="dv"><strong>${hospDocs.length}</strong></div></div>
-          <div class="detail-item"><div class="dl">Total Appointments</div><div class="dv"><strong>${hospAppts.length}</strong></div></div>
-          <div class="detail-item"><div class="dl">Revenue Generated</div><div class="dv" style="color:var(--green);font-weight:600">₹${(hospAppts.length * PLATFORM_FEE).toLocaleString('en-IN')}</div></div>
-          <div class="detail-item"><div class="dl">Registration Number</div><div class="dv">${esc(h.registration_number||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Registration No.</div><div class="dv">${esc(h.registration_number||'-')}</div></div>
+          <div class="detail-item"><div class="dl">Description</div><div class="dv">${esc(h.description||'-')}</div></div>
         </div>
 
+        <!-- Key Stats Cards -->
+        <hr class="section-divider" />
+        <div class="section-title">📊 Key Statistics</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+          <div style="background:var(--blue-50);padding:14px;border-radius:12px;text-align:center">
+            <div style="font-size:24px;font-weight:800;color:var(--blue-700)">${hospAppts.length}</div>
+            <div style="font-size:11px;color:var(--muted)">Total Appointments</div>
+          </div>
+          <div style="background:#f0fdf4;padding:14px;border-radius:12px;text-align:center">
+            <div style="font-size:24px;font-weight:800;color:var(--green)">₹${(hospAppts.length * PLATFORM_FEE).toLocaleString('en-IN')}</div>
+            <div style="font-size:11px;color:var(--muted)">Revenue Generated</div>
+          </div>
+          <div style="background:#fef3c7;padding:14px;border-radius:12px;text-align:center">
+            <div style="font-size:24px;font-weight:800;color:#d97706">${thisMonthAppts.length}</div>
+            <div style="font-size:11px;color:var(--muted)">This Month</div>
+          </div>
+          <div style="background:#fce4ec;padding:14px;border-radius:12px;text-align:center">
+            <div style="font-size:24px;font-weight:800;color:var(--red)">${cancelRate}%</div>
+            <div style="font-size:11px;color:var(--muted)">Cancellation Rate</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+          <div style="background:var(--blue-50);padding:14px;border-radius:12px;text-align:center">
+            <div style="font-size:24px;font-weight:800;color:var(--blue-700)">${uniquePatients}</div>
+            <div style="font-size:11px;color:var(--muted)">Unique Patients</div>
+          </div>
+          <div style="background:#f3e8ff;padding:14px;border-radius:12px;text-align:center">
+            <div style="font-size:24px;font-weight:800;color:#7c3aed">${repeatVisitors}</div>
+            <div style="font-size:11px;color:var(--muted)">Repeat Visitors</div>
+          </div>
+          <div style="background:#e0f2fe;padding:14px;border-radius:12px;text-align:center">
+            <div style="font-size:24px;font-weight:800;color:#0284c7">${avgPerMonth}</div>
+            <div style="font-size:11px;color:var(--muted)">Avg / Month</div>
+          </div>
+          <div style="background:#f0fdf4;padding:14px;border-radius:12px;text-align:center">
+            <div style="font-size:24px;font-weight:800;color:var(--green)">${hospDocs.length}</div>
+            <div style="font-size:11px;color:var(--muted)">Doctors</div>
+          </div>
+        </div>
+
+        <!-- Monthly Trend Chart -->
+        <hr class="section-divider" />
+        <div class="section-title">📈 Monthly Appointments (Last 6 Months)</div>
+        <div style="display:flex;align-items:flex-end;gap:6px;height:120px;margin-bottom:4px;padding:0 4px">
+          ${sortedMonths.map(m => {
+            const d = monthlyData[m];
+            const h1 = Math.max(4, Math.round(d.total / maxMonthly * 100));
+            const cancelH = d.total > 0 ? Math.max(0, Math.round(d.cancelled / d.total * h1)) : 0;
+            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div style="font-size:10px;font-weight:700;color:var(--blue-700)">${d.total}</div>
+              <div style="width:100%;position:relative;height:${h1}px;border-radius:6px 6px 0 0;overflow:hidden">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:100%;background:var(--blue-700);border-radius:6px 6px 0 0"></div>
+                ${cancelH > 0 ? `<div style="position:absolute;top:0;left:0;right:0;height:${cancelH}px;background:var(--red);border-radius:6px 6px 0 0"></div>` : ''}
+              </div>
+              <div style="font-size:9px;color:var(--muted);white-space:nowrap">${formatMonthLabel(m).split(' ')[0].slice(0,3)}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:16px;font-size:10px;color:var(--muted)">
+          <span>🟦 Total</span><span>🟥 Cancelled</span>
+        </div>
+
+        <!-- Status Breakdown -->
+        <hr class="section-divider" />
+        <div class="section-title">📋 Appointment Status Breakdown</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+          ${Object.entries(statusMap).sort((a,b) => b[1] - a[1]).map(([s, c]) => {
+            const colors = { completed: '#16a34a', visited: '#16a34a', confirmed: '#1A56B5', cancelled: '#dc2626', pending: '#f59e0b', no_show: '#9333ea', noshow: '#9333ea' };
+            const color = colors[s] || '#6b7280';
+            return `<div style="padding:8px 16px;border-radius:10px;background:${color}15;border:1px solid ${color}30;text-align:center">
+              <div style="font-size:18px;font-weight:800;color:${color}">${c}</div>
+              <div style="font-size:10px;color:${color};text-transform:capitalize">${s.replace('_',' ')}</div>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <!-- Payment Stats -->
+        <hr class="section-divider" />
+        <div class="section-title">💰 Payment Summary</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="padding:12px;background:#f0fdf4;border-radius:10px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--green)">${paidCount}</div>
+            <div style="font-size:11px;color:var(--muted)">Paid</div>
+          </div>
+          <div style="padding:12px;background:#fef3c7;border-radius:10px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:#d97706">${refundCount}</div>
+            <div style="font-size:11px;color:var(--muted)">Refunded</div>
+          </div>
+          <div style="padding:12px;background:var(--blue-50);border-radius:10px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--blue-700)">${dayMap[peakDay]}</div>
+            <div style="font-size:11px;color:var(--muted)">Peak Day</div>
+          </div>
+        </div>
+
+        <!-- Doctor-wise breakdown -->
         ${hospDocs.length > 0 ? `
         <hr class="section-divider" />
-        <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Doctors (${hospDocs.length})</div>
-        <div style="margin-bottom:12px">
-          ${hospDocs.map(d => `<div style="display:inline-block;padding:6px 12px;background:var(--blue-50);border-radius:8px;margin:3px;font-size:12px"><strong>${esc(d.full_name)}</strong> <span style="color:var(--muted)">· ${esc(d.specialization||'')}</span> ${d.is_active ? '' : '<span class="badge badge-red" style="font-size:9px">Inactive</span>'}</div>`).join('')}
+        <div class="section-title">👨‍⚕️ Doctors & Appointments</div>
+        <div style="margin-bottom:16px">
+          ${hospDocs.map(d => {
+            const dc = doctorAppts[d.full_name] || 0;
+            const barW = hospAppts.length > 0 ? Math.max(4, Math.round(dc / Math.max(...Object.values(doctorAppts), 1) * 100)) : 0;
+            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+              <div style="width:140px;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(d.full_name)}">${esc(d.full_name)}</div>
+              <div style="flex:1;height:18px;background:#eee;border-radius:9px;overflow:hidden">
+                <div style="height:100%;width:${barW}%;background:${d.is_active ? 'var(--blue-700)' : '#ccc'};border-radius:9px;transition:width .3s"></div>
+              </div>
+              <div style="font-size:12px;font-weight:700;color:var(--blue-700);min-width:30px;text-align:right">${dc}</div>
+              <div style="font-size:10px;color:var(--muted)">${esc(d.specialization||'')}</div>
+              ${d.is_active ? '' : '<span class="badge badge-red" style="font-size:9px">Inactive</span>'}
+            </div>`;
+          }).join('')}
         </div>` : ''}
 
+        <!-- Repeat Visitors Detail -->
+        ${repeatVisitors > 0 ? `
         <hr class="section-divider" />
-        <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Uploaded Documents</div>
+        <div class="section-title">🔄 Repeat Visitors (${repeatVisitors})</div>
+        <div style="max-height:150px;overflow-y:auto;margin-bottom:16px">
+          <table class="data-table" style="font-size:12px"><thead><tr><th>Patient</th><th>Visits</th><th>Last Visit</th></tr></thead><tbody>
+          ${Object.entries(patientVisits).filter(([,c]) => c > 1).sort((a,b) => b[1] - a[1]).slice(0, 20).map(([pid, count]) => {
+            const pa = hospAppts.filter(a => a.patient_id === pid);
+            const name = pa[0]?.patient_name || 'Unknown';
+            const lastDate = pa.sort((a,b) => new Date(b.created_at||b.appointment_date) - new Date(a.created_at||a.appointment_date))[0];
+            return `<tr><td>${esc(name)}</td><td><strong>${count}</strong></td><td>${fmtDate(lastDate?.appointment_date || lastDate?.created_at)}</td></tr>`;
+          }).join('')}
+          </tbody></table>
+        </div>` : ''}
+
+        <!-- Documents -->
+        <hr class="section-divider" />
+        <div class="section-title">📄 Uploaded Documents</div>
         <div id="hosp-docs-area"><div style="text-align:center;padding:20px"><div class="spin"></div> Loading documents...</div></div>
 
+        <!-- Action buttons -->
         <hr class="section-divider" />
-        <div style="display:flex;gap:8px;justify-content:flex-end">
+        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
           ${!h.is_verified ? `<button class="btn btn-green" onclick="verifyHospital('${h.id}');closeModal()">Verify Hospital</button>` : ''}
+          ${h.is_active === false
+            ? `<button class="btn btn-green" onclick="toggleHospitalActive('${h.id}',true);closeModal()">Activate</button>`
+            : `<button class="btn" style="background:#f59e0b;color:#fff" onclick="toggleHospitalActive('${h.id}',false);closeModal()">Deactivate</button>`}
           <button class="btn btn-red" onclick="deleteHospital('${h.id}','${esc(h.email||'')}','${esc(h.name||'')}');closeModal()">Delete Hospital</button>
         </div>
       `;
