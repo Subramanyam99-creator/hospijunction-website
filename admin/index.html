@@ -336,6 +336,10 @@
               <div class="qa-icon purple"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
               Download GST invoice
             </button>
+            <button class="qa-btn" onclick="exportCityWiseReport()">
+              <div class="qa-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+              City-wise hospital report
+            </button>
             <button class="qa-btn" onclick="exportAllData()">
               <div class="qa-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
               Export all data (Excel)
@@ -1266,6 +1270,165 @@
         return { Month: formatMonthLabel(m), Bookings: c, 'Revenue (₹)': rev, 'GST 18% (₹)': gst, 'Net (₹)': Math.round((rev - gst) * 100) / 100 };
       });
       exportToExcel(data, 'HospiJunction_Earnings');
+    }
+
+    function exportCityWiseReport() {
+      const now = new Date();
+      const wb = XLSX.utils.book_new();
+
+      // Build hospital city lookup
+      const hospCityMap = {};
+      allHospitals.forEach(h => { hospCityMap[h.id] = h.city || 'Unknown'; });
+
+      // Get last 6 months keys
+      const months = [];
+      for (let i = 0; i < 6; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
+      }
+      months.reverse();
+
+      // ── Sheet 1: City-wise Summary (current month) ──
+      const thisMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      const cityData = {};
+      allAppointments.forEach(a => {
+        const city = hospCityMap[a.hospital_id] || 'Unknown';
+        const d = new Date(a.created_at || a.appointment_date);
+        const mk = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (!cityData[city]) cityData[city] = {};
+        if (!cityData[city][mk]) cityData[city][mk] = { total: 0, completed: 0, cancelled: 0, pending: 0 };
+        cityData[city][mk].total++;
+        const status = (a.status || '').toLowerCase();
+        if (status === 'cancelled') cityData[city][mk].cancelled++;
+        else if (status === 'completed' || status === 'visited') cityData[city][mk].completed++;
+        else cityData[city][mk].pending++;
+      });
+
+      const summaryRows = [
+        ['HospiJunction — City-wise Hospital Performance Report'],
+        ['Generated', new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })],
+        [],
+        ['City', ...months.map(m => formatMonthLabel(m) + ' Total'), ...months.map(m => formatMonthLabel(m) + ' Completed'), ...months.map(m => formatMonthLabel(m) + ' Cancelled')]
+      ];
+      const cities = Object.keys(cityData).sort();
+      cities.forEach(city => {
+        const row = [city];
+        months.forEach(m => row.push(cityData[city]?.[m]?.total || 0));
+        months.forEach(m => row.push(cityData[city]?.[m]?.completed || 0));
+        months.forEach(m => row.push(cityData[city]?.[m]?.cancelled || 0));
+        summaryRows.push(row);
+      });
+      // Totals row
+      const totRow = ['TOTAL'];
+      months.forEach(m => totRow.push(cities.reduce((s, c) => s + (cityData[c]?.[m]?.total || 0), 0)));
+      months.forEach(m => totRow.push(cities.reduce((s, c) => s + (cityData[c]?.[m]?.completed || 0), 0)));
+      months.forEach(m => totRow.push(cities.reduce((s, c) => s + (cityData[c]?.[m]?.cancelled || 0), 0)));
+      summaryRows.push([]);
+      summaryRows.push(totRow);
+      const ws1 = XLSX.utils.aoa_to_sheet(summaryRows);
+      ws1['!cols'] = [{ wch: 18 }, ...Array(months.length * 3).fill({ wch: 16 })];
+      XLSX.utils.book_append_sheet(wb, ws1, 'City Summary');
+
+      // ── Sheet 2: Hospital-wise Detail (all hospitals, monthly) ──
+      const hospMonthly = {};
+      allAppointments.forEach(a => {
+        const hid = a.hospital_id;
+        const d = new Date(a.created_at || a.appointment_date);
+        const mk = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (!hospMonthly[hid]) hospMonthly[hid] = {};
+        if (!hospMonthly[hid][mk]) hospMonthly[hid][mk] = { total: 0, completed: 0, cancelled: 0, revenue: 0 };
+        hospMonthly[hid][mk].total++;
+        hospMonthly[hid][mk].revenue += PLATFORM_FEE;
+        const status = (a.status || '').toLowerCase();
+        if (status === 'cancelled') hospMonthly[hid][mk].cancelled++;
+        else if (status === 'completed' || status === 'visited') hospMonthly[hid][mk].completed++;
+      });
+
+      const detailRows = [
+        ['Hospital', 'City', 'State', 'Verified', 'Active', 'Month', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Revenue (₹)']
+      ];
+      allHospitals.forEach(h => {
+        months.forEach(m => {
+          const d = hospMonthly[h.id]?.[m];
+          if (d && d.total > 0) {
+            detailRows.push([
+              h.name || '-', h.city || '-', h.state || '-',
+              h.is_verified ? 'Yes' : 'No', h.is_active !== false ? 'Yes' : 'No',
+              formatMonthLabel(m), d.total, d.completed, d.cancelled,
+              Math.round(d.completed / d.total * 100) + '%',
+              Math.round(d.cancelled / d.total * 100) + '%',
+              d.revenue
+            ]);
+          }
+        });
+      });
+      const ws2 = XLSX.utils.aoa_to_sheet(detailRows);
+      ws2['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 8 }, { wch: 8 }, { wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, ws2, 'Hospital Monthly');
+
+      // ── Sheet 3: Top Performing Hospitals (by total appointments) ──
+      const hospTotals = {};
+      allAppointments.forEach(a => {
+        const hid = a.hospital_id;
+        if (!hospTotals[hid]) hospTotals[hid] = { total: 0, completed: 0, cancelled: 0, uniquePatients: new Set() };
+        hospTotals[hid].total++;
+        const status = (a.status || '').toLowerCase();
+        if (status === 'cancelled') hospTotals[hid].cancelled++;
+        else if (status === 'completed' || status === 'visited') hospTotals[hid].completed++;
+        if (a.patient_id) hospTotals[hid].uniquePatients.add(a.patient_id);
+      });
+
+      const rankRows = [
+        ['Rank', 'Hospital', 'City', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Unique Patients', 'Revenue (₹)', 'Incentive Eligible?']
+      ];
+      const ranked = allHospitals
+        .map(h => ({ ...h, stats: hospTotals[h.id] || { total: 0, completed: 0, cancelled: 0, uniquePatients: new Set() } }))
+        .filter(h => h.stats.total > 0)
+        .sort((a, b) => b.stats.total - a.stats.total);
+      ranked.forEach((h, i) => {
+        const s = h.stats;
+        const compRate = Math.round(s.completed / s.total * 100);
+        const cancelRate = Math.round(s.cancelled / s.total * 100);
+        // Incentive: completion > 70% and cancellation < 20%
+        const eligible = compRate >= 70 && cancelRate <= 20 ? 'Yes' : 'No';
+        rankRows.push([
+          i + 1, h.name || '-', h.city || '-',
+          s.total, s.completed, s.cancelled,
+          compRate + '%', cancelRate + '%',
+          s.uniquePatients.size,
+          s.total * PLATFORM_FEE,
+          eligible
+        ]);
+      });
+      const ws3 = XLSX.utils.aoa_to_sheet(rankRows);
+      ws3['!cols'] = [{ wch: 6 }, { wch: 25 }, { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }];
+      XLSX.utils.book_append_sheet(wb, ws3, 'Hospital Rankings');
+
+      // ── Sheet 4: City-wise This Month (for quick incentive decisions) ──
+      const incentiveRows = [
+        ['City-wise This Month: ' + formatMonthLabel(thisMonth)],
+        [],
+        ['City', 'Hospitals', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Revenue (₹)', 'Avg per Hospital']
+      ];
+      cities.forEach(city => {
+        const cityHospitals = allHospitals.filter(h => (h.city || 'Unknown') === city);
+        const cm = cityData[city]?.[thisMonth] || { total: 0, completed: 0, cancelled: 0 };
+        if (cm.total > 0 || cityHospitals.length > 0) {
+          incentiveRows.push([
+            city, cityHospitals.length, cm.total, cm.completed, cm.cancelled,
+            cm.total > 0 ? Math.round(cm.completed / cm.total * 100) + '%' : '0%',
+            cm.total > 0 ? Math.round(cm.cancelled / cm.total * 100) + '%' : '0%',
+            cm.total * PLATFORM_FEE,
+            cityHospitals.length > 0 ? (cm.total / cityHospitals.length).toFixed(1) : '0'
+          ]);
+        }
+      });
+      const ws4 = XLSX.utils.aoa_to_sheet(incentiveRows);
+      ws4['!cols'] = [{ wch: 18 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
+      XLSX.utils.book_append_sheet(wb, ws4, 'This Month Incentives');
+
+      XLSX.writeFile(wb, 'HospiJunction_CityWise_Report_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      showToast('City-wise report downloaded!', 'success');
     }
 
     function exportAllData() {
