@@ -1276,9 +1276,9 @@
       const now = new Date();
       const wb = XLSX.utils.book_new();
 
-      // Build hospital city lookup
-      const hospCityMap = {};
-      allHospitals.forEach(h => { hospCityMap[h.id] = h.city || 'Unknown'; });
+      // Build hospital lookups
+      const hospLookup = {};
+      allHospitals.forEach(h => { hospLookup[h.id] = { city: h.city || 'Unknown', state: h.state || 'Unknown' }; });
 
       // Get last 6 months keys
       const months = [];
@@ -1287,49 +1287,63 @@
         months.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
       }
       months.reverse();
-
-      // ── Sheet 1: City-wise Summary (current month) ──
       const thisMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-      const cityData = {};
+
+      // Build State → City → Month data
+      const stateCityData = {};
       allAppointments.forEach(a => {
-        const city = hospCityMap[a.hospital_id] || 'Unknown';
+        const info = hospLookup[a.hospital_id] || { city: 'Unknown', state: 'Unknown' };
         const d = new Date(a.created_at || a.appointment_date);
         const mk = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-        if (!cityData[city]) cityData[city] = {};
-        if (!cityData[city][mk]) cityData[city][mk] = { total: 0, completed: 0, cancelled: 0, pending: 0 };
-        cityData[city][mk].total++;
+        if (!stateCityData[info.state]) stateCityData[info.state] = {};
+        if (!stateCityData[info.state][info.city]) stateCityData[info.state][info.city] = {};
+        if (!stateCityData[info.state][info.city][mk]) stateCityData[info.state][info.city][mk] = { total: 0, completed: 0, cancelled: 0 };
+        stateCityData[info.state][info.city][mk].total++;
         const status = (a.status || '').toLowerCase();
-        if (status === 'cancelled') cityData[city][mk].cancelled++;
-        else if (status === 'completed' || status === 'visited') cityData[city][mk].completed++;
-        else cityData[city][mk].pending++;
+        if (status === 'cancelled') stateCityData[info.state][info.city][mk].cancelled++;
+        else if (status === 'completed' || status === 'visited') stateCityData[info.state][info.city][mk].completed++;
       });
 
+      // ── Sheet 1: State → City Summary (last 6 months) ──
       const summaryRows = [
-        ['HospiJunction — City-wise Hospital Performance Report'],
+        ['HospiJunction — State & City-wise Performance Report'],
         ['Generated', new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })],
         [],
-        ['City', ...months.map(m => formatMonthLabel(m) + ' Total'), ...months.map(m => formatMonthLabel(m) + ' Completed'), ...months.map(m => formatMonthLabel(m) + ' Cancelled')]
+        ['State', 'City', ...months.map(m => formatMonthLabel(m) + ' Total'), ...months.map(m => formatMonthLabel(m) + ' Completed'), ...months.map(m => formatMonthLabel(m) + ' Cancelled')]
       ];
-      const cities = Object.keys(cityData).sort();
-      cities.forEach(city => {
-        const row = [city];
-        months.forEach(m => row.push(cityData[city]?.[m]?.total || 0));
-        months.forEach(m => row.push(cityData[city]?.[m]?.completed || 0));
-        months.forEach(m => row.push(cityData[city]?.[m]?.cancelled || 0));
-        summaryRows.push(row);
+      const states = Object.keys(stateCityData).sort();
+      states.forEach(state => {
+        const cities = Object.keys(stateCityData[state]).sort();
+        let stateTotal = Array(months.length * 3).fill(0);
+        cities.forEach(city => {
+          const row = [state, city];
+          months.forEach((m, i) => { const v = stateCityData[state][city]?.[m]?.total || 0; row.push(v); stateTotal[i] += v; });
+          months.forEach((m, i) => { const v = stateCityData[state][city]?.[m]?.completed || 0; row.push(v); stateTotal[months.length + i] += v; });
+          months.forEach((m, i) => { const v = stateCityData[state][city]?.[m]?.cancelled || 0; row.push(v); stateTotal[months.length * 2 + i] += v; });
+          summaryRows.push(row);
+        });
+        // State subtotal row
+        summaryRows.push([state + ' — TOTAL', '', ...stateTotal]);
+        summaryRows.push([]); // blank row between states
       });
-      // Totals row
-      const totRow = ['TOTAL'];
-      months.forEach(m => totRow.push(cities.reduce((s, c) => s + (cityData[c]?.[m]?.total || 0), 0)));
-      months.forEach(m => totRow.push(cities.reduce((s, c) => s + (cityData[c]?.[m]?.completed || 0), 0)));
-      months.forEach(m => totRow.push(cities.reduce((s, c) => s + (cityData[c]?.[m]?.cancelled || 0), 0)));
-      summaryRows.push([]);
-      summaryRows.push(totRow);
+      // Grand total
+      const grandTotal = Array(months.length * 3).fill(0);
+      states.forEach(state => {
+        Object.keys(stateCityData[state]).forEach(city => {
+          months.forEach((m, i) => {
+            const d = stateCityData[state][city]?.[m] || {};
+            grandTotal[i] += d.total || 0;
+            grandTotal[months.length + i] += d.completed || 0;
+            grandTotal[months.length * 2 + i] += d.cancelled || 0;
+          });
+        });
+      });
+      summaryRows.push(['GRAND TOTAL', '', ...grandTotal]);
       const ws1 = XLSX.utils.aoa_to_sheet(summaryRows);
-      ws1['!cols'] = [{ wch: 18 }, ...Array(months.length * 3).fill({ wch: 16 })];
-      XLSX.utils.book_append_sheet(wb, ws1, 'City Summary');
+      ws1['!cols'] = [{ wch: 20 }, { wch: 18 }, ...Array(months.length * 3).fill({ wch: 16 })];
+      XLSX.utils.book_append_sheet(wb, ws1, 'State-City Summary');
 
-      // ── Sheet 2: Hospital-wise Detail (all hospitals, monthly) ──
+      // ── Sheet 2: Hospital-wise Detail (grouped by State → City) ──
       const hospMonthly = {};
       allAppointments.forEach(a => {
         const hid = a.hospital_id;
@@ -1345,14 +1359,19 @@
       });
 
       const detailRows = [
-        ['Hospital', 'City', 'State', 'Verified', 'Active', 'Month', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Revenue (₹)']
+        ['State', 'City', 'Hospital', 'Verified', 'Active', 'Month', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Revenue (₹)']
       ];
-      allHospitals.forEach(h => {
+      // Sort hospitals by state then city
+      const sortedHospitals = [...allHospitals].sort((a, b) => {
+        const sc = (a.state || '').localeCompare(b.state || '');
+        return sc !== 0 ? sc : (a.city || '').localeCompare(b.city || '');
+      });
+      sortedHospitals.forEach(h => {
         months.forEach(m => {
           const d = hospMonthly[h.id]?.[m];
           if (d && d.total > 0) {
             detailRows.push([
-              h.name || '-', h.city || '-', h.state || '-',
+              h.state || '-', h.city || '-', h.name || '-',
               h.is_verified ? 'Yes' : 'No', h.is_active !== false ? 'Yes' : 'No',
               formatMonthLabel(m), d.total, d.completed, d.cancelled,
               Math.round(d.completed / d.total * 100) + '%',
@@ -1363,10 +1382,10 @@
         });
       });
       const ws2 = XLSX.utils.aoa_to_sheet(detailRows);
-      ws2['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 8 }, { wch: 8 }, { wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }];
+      ws2['!cols'] = [{ wch: 18 }, { wch: 15 }, { wch: 25 }, { wch: 8 }, { wch: 8 }, { wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }];
       XLSX.utils.book_append_sheet(wb, ws2, 'Hospital Monthly');
 
-      // ── Sheet 3: Top Performing Hospitals (by total appointments) ──
+      // ── Sheet 3: Hospital Rankings (with State & City) ──
       const hospTotals = {};
       allAppointments.forEach(a => {
         const hid = a.hospital_id;
@@ -1379,7 +1398,7 @@
       });
 
       const rankRows = [
-        ['Rank', 'Hospital', 'City', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Unique Patients', 'Revenue (₹)', 'Incentive Eligible?']
+        ['Rank', 'State', 'City', 'Hospital', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Unique Patients', 'Revenue (₹)', 'Incentive Eligible?']
       ];
       const ranked = allHospitals
         .map(h => ({ ...h, stats: hospTotals[h.id] || { total: 0, completed: 0, cancelled: 0, uniquePatients: new Set() } }))
@@ -1389,10 +1408,9 @@
         const s = h.stats;
         const compRate = Math.round(s.completed / s.total * 100);
         const cancelRate = Math.round(s.cancelled / s.total * 100);
-        // Incentive: completion > 70% and cancellation < 20%
         const eligible = compRate >= 70 && cancelRate <= 20 ? 'Yes' : 'No';
         rankRows.push([
-          i + 1, h.name || '-', h.city || '-',
+          i + 1, h.state || '-', h.city || '-', h.name || '-',
           s.total, s.completed, s.cancelled,
           compRate + '%', cancelRate + '%',
           s.uniquePatients.size,
@@ -1401,34 +1419,53 @@
         ]);
       });
       const ws3 = XLSX.utils.aoa_to_sheet(rankRows);
-      ws3['!cols'] = [{ wch: 6 }, { wch: 25 }, { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }];
+      ws3['!cols'] = [{ wch: 6 }, { wch: 18 }, { wch: 15 }, { wch: 25 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }];
       XLSX.utils.book_append_sheet(wb, ws3, 'Hospital Rankings');
 
-      // ── Sheet 4: City-wise This Month (for quick incentive decisions) ──
+      // ── Sheet 4: State → City This Month Incentives ──
       const incentiveRows = [
-        ['City-wise This Month: ' + formatMonthLabel(thisMonth)],
+        ['State & City-wise This Month: ' + formatMonthLabel(thisMonth)],
         [],
-        ['City', 'Hospitals', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Revenue (₹)', 'Avg per Hospital']
+        ['State', 'City', 'Hospitals', 'Total Appts', 'Completed', 'Cancelled', 'Completion %', 'Cancel %', 'Revenue (₹)', 'Avg per Hospital']
       ];
-      cities.forEach(city => {
-        const cityHospitals = allHospitals.filter(h => (h.city || 'Unknown') === city);
-        const cm = cityData[city]?.[thisMonth] || { total: 0, completed: 0, cancelled: 0 };
-        if (cm.total > 0 || cityHospitals.length > 0) {
+      states.forEach(state => {
+        const cities = Object.keys(stateCityData[state]).sort();
+        cities.forEach(city => {
+          const cityHospitals = allHospitals.filter(h => (h.state || 'Unknown') === state && (h.city || 'Unknown') === city);
+          const cm = stateCityData[state][city]?.[thisMonth] || { total: 0, completed: 0, cancelled: 0 };
+          if (cm.total > 0 || cityHospitals.length > 0) {
+            incentiveRows.push([
+              state, city, cityHospitals.length, cm.total, cm.completed, cm.cancelled,
+              cm.total > 0 ? Math.round(cm.completed / cm.total * 100) + '%' : '0%',
+              cm.total > 0 ? Math.round(cm.cancelled / cm.total * 100) + '%' : '0%',
+              cm.total * PLATFORM_FEE,
+              cityHospitals.length > 0 ? (cm.total / cityHospitals.length).toFixed(1) : '0'
+            ]);
+          }
+        });
+        // State subtotal
+        const stateHosps = allHospitals.filter(h => (h.state || 'Unknown') === state);
+        const stateThisMonth = cities.reduce((acc, c) => {
+          const cm = stateCityData[state][c]?.[thisMonth] || { total: 0, completed: 0, cancelled: 0 };
+          return { total: acc.total + cm.total, completed: acc.completed + cm.completed, cancelled: acc.cancelled + cm.cancelled };
+        }, { total: 0, completed: 0, cancelled: 0 });
+        if (stateThisMonth.total > 0 || stateHosps.length > 0) {
           incentiveRows.push([
-            city, cityHospitals.length, cm.total, cm.completed, cm.cancelled,
-            cm.total > 0 ? Math.round(cm.completed / cm.total * 100) + '%' : '0%',
-            cm.total > 0 ? Math.round(cm.cancelled / cm.total * 100) + '%' : '0%',
-            cm.total * PLATFORM_FEE,
-            cityHospitals.length > 0 ? (cm.total / cityHospitals.length).toFixed(1) : '0'
+            state + ' — TOTAL', '', stateHosps.length, stateThisMonth.total, stateThisMonth.completed, stateThisMonth.cancelled,
+            stateThisMonth.total > 0 ? Math.round(stateThisMonth.completed / stateThisMonth.total * 100) + '%' : '0%',
+            stateThisMonth.total > 0 ? Math.round(stateThisMonth.cancelled / stateThisMonth.total * 100) + '%' : '0%',
+            stateThisMonth.total * PLATFORM_FEE,
+            stateHosps.length > 0 ? (stateThisMonth.total / stateHosps.length).toFixed(1) : '0'
           ]);
         }
+        incentiveRows.push([]);
       });
       const ws4 = XLSX.utils.aoa_to_sheet(incentiveRows);
-      ws4['!cols'] = [{ wch: 18 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
+      ws4['!cols'] = [{ wch: 22 }, { wch: 18 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
       XLSX.utils.book_append_sheet(wb, ws4, 'This Month Incentives');
 
-      XLSX.writeFile(wb, 'HospiJunction_CityWise_Report_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-      showToast('City-wise report downloaded!', 'success');
+      XLSX.writeFile(wb, 'HospiJunction_StateCity_Report_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      showToast('State & city-wise report downloaded!', 'success');
     }
 
     function exportAllData() {
