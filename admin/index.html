@@ -631,17 +631,35 @@
     async function loadAllData() {
       showToast('Loading data...', 'info');
 
-      const [hospRes, patRes, apptRes, docRes] = await Promise.all([
+      const [hospRes, patRes, apptRes, docRes, famRes] = await Promise.all([
         sb.from('hospital_profiles').select('*').order('created_at', { ascending: false }),
         sb.from('patient_profiles').select('*').order('created_at', { ascending: false }),
         sb.from('appointments').select('*').order('created_at', { ascending: false }),
-        sb.from('doctors').select('id, hospital_id, full_name, specialization, is_active').order('full_name')
+        sb.from('doctors').select('id, hospital_id, full_name, specialization, is_active').order('full_name'),
+        sb.from('family_members').select('id, full_name, age, gender')  // best-effort (for "booked for")
       ]);
 
       allHospitals = hospRes.data || [];
       allPatients = patRes.data || [];
       allAppointments = apptRes.data || [];
       allDoctors = docRes.data || [];
+      const allFamily = famRes && famRes.data ? famRes.data : [];
+
+      // The appointments table stores IDs (patient_id, doctor_id, hospital_id,
+      // for_member) and uses slot_time / queue_number — NOT patient_name etc.
+      // Resolve readable fields once so every table/report/export below works.
+      const patientById = Object.fromEntries(allPatients.map(p => [p.id, p]));
+      const doctorById  = Object.fromEntries(allDoctors.map(d => [d.id, d]));
+      const hospitalById = Object.fromEntries(allHospitals.map(h => [h.id, h]));
+      const familyById  = Object.fromEntries(allFamily.map(f => [f.id, f]));
+      allAppointments.forEach(a => {
+        const member = a.for_member ? familyById[a.for_member] : null;
+        a.patient_name  = member?.full_name || patientById[a.patient_id]?.full_name || '-';
+        a.doctor_name   = doctorById[a.doctor_id]?.full_name || '-';
+        a.hospital_name = hospitalById[a.hospital_id]?.name || '-';
+        a.time_slot     = a.slot_time || a.time_slot || '-';
+        a.token_number  = a.queue_number != null ? a.queue_number : (a.token_number || '-');
+      });
 
       updateDashboardStats();
       renderHospitals(allHospitals);
