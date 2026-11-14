@@ -428,6 +428,12 @@
             <div class="card-header">
               <h2>All Appointments (<span id="a-count">0</span>)</h2>
               <div class="card-actions">
+                <select class="filter-select" id="a-period-filter" onchange="filterAppointments()">
+                  <option value="this">This month</option>
+                  <option value="last">Last month</option>
+                  <option value="6m">Last 6 months</option>
+                  <option value="all">All time</option>
+                </select>
                 <select class="filter-select" id="a-status-filter" onchange="filterAppointments()">
                   <option value="all">All status</option>
                   <option value="booked">Booked</option>
@@ -446,7 +452,9 @@
                 <thead><tr><th>Patient</th><th>Doctor</th><th>Hospital</th><th>Date</th><th>Slot</th><th>Token</th><th>Status</th><th>Payment</th><th>Booked On</th></tr></thead>
                 <tbody id="appointments-table"><tr><td colspan="9" class="empty"><div class="spin"></div></td></tr></tbody>
               </table>
-            </div></div>
+            </div>
+            <div id="a-pagination" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 4px 2px"></div>
+            </div>
           </div>
         </div>
 
@@ -664,7 +672,7 @@
       updateDashboardStats();
       renderHospitals(allHospitals);
       renderPatients(allPatients);
-      renderAppointments(allAppointments);
+      filterAppointments();   // applies default period (This month) + pagination
       updateEarnings();
       buildCharts();
       buildRecentLists();
@@ -809,8 +817,53 @@
     }
 
     // ── Appointments ──
-    function renderAppointments(list) {
-      document.getElementById('a-count').textContent = list.length;
+    const A_PAGE_SIZE = 25;
+    let aFiltered = [];      // current filtered set (all pages)
+    let aPage = 1;
+
+    // Date window for the period dropdown. Uses the appointment date,
+    // falling back to the booked-on date when an appointment has no date.
+    function apptDate(a) { return new Date(a.appointment_date || a.created_at); }
+    function periodRange(period) {
+      const now = new Date();
+      if (period === 'this') return [new Date(now.getFullYear(), now.getMonth(), 1), null];
+      if (period === 'last') return [new Date(now.getFullYear(), now.getMonth() - 1, 1), new Date(now.getFullYear(), now.getMonth(), 1)];
+      if (period === '6m')  return [new Date(now.getFullYear(), now.getMonth() - 5, 1), null];
+      return [null, null];  // all time
+    }
+
+    function filterAppointments() {
+      const q = document.getElementById('a-search').value.toLowerCase();
+      const status = document.getElementById('a-status-filter').value;
+      const dateVal = document.getElementById('a-date-filter').value;
+      const period = (document.getElementById('a-period-filter') || {}).value || 'this';
+      const [pStart, pEnd] = periodRange(period);
+
+      let list = allAppointments;
+      if (pStart) list = list.filter(a => { const d = apptDate(a); return d >= pStart && (!pEnd || d < pEnd); });
+      if (status !== 'all') list = list.filter(a => a.status === status);
+      if (dateVal) list = list.filter(a => (a.appointment_date||'').startsWith(dateVal));
+      if (q) list = list.filter(a => (a.patient_name||'').toLowerCase().includes(q) || (a.doctor_name||'').toLowerCase().includes(q) || (a.hospital_name||'').toLowerCase().includes(q));
+
+      aFiltered = list;
+      aPage = 1;
+      paintAppointments();
+    }
+
+    function paintAppointments() {
+      const total = aFiltered.length;
+      const pages = Math.max(1, Math.ceil(total / A_PAGE_SIZE));
+      if (aPage > pages) aPage = pages;
+      const start = (aPage - 1) * A_PAGE_SIZE;
+      renderAppointments(aFiltered.slice(start, start + A_PAGE_SIZE), total);
+      renderAPagination(total, pages, start);
+    }
+
+    function goAPage(p) { aPage = p; paintAppointments(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    function renderAppointments(list, total) {
+      if (typeof total !== 'number') total = list.length;
+      document.getElementById('a-count').textContent = total;
       const tbody = document.getElementById('appointments-table');
       if (!list.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty">No appointments found</td></tr>'; return; }
       const statusColors = { booked:'blue', confirmed:'green', completed:'green', cancelled:'red', no_show:'orange', rescheduled:'purple' };
@@ -827,15 +880,28 @@
       </tr>`).join('');
     }
 
-    function filterAppointments() {
-      const q = document.getElementById('a-search').value.toLowerCase();
-      const status = document.getElementById('a-status-filter').value;
-      const dateVal = document.getElementById('a-date-filter').value;
-      let list = allAppointments;
-      if (status !== 'all') list = list.filter(a => a.status === status);
-      if (dateVal) list = list.filter(a => (a.appointment_date||'').startsWith(dateVal));
-      if (q) list = list.filter(a => (a.patient_name||'').toLowerCase().includes(q) || (a.doctor_name||'').toLowerCase().includes(q) || (a.hospital_name||'').toLowerCase().includes(q));
-      renderAppointments(list);
+    function renderAPagination(total, pages, start) {
+      const el = document.getElementById('a-pagination');
+      if (!el) return;
+      if (total === 0) { el.innerHTML = ''; return; }
+      const from = start + 1, to = Math.min(start + A_PAGE_SIZE, total);
+      const info = `<div style="color:var(--muted);font-size:13px">Showing <strong>${from}–${to}</strong> of <strong>${total}</strong></div>`;
+      if (pages <= 1) { el.innerHTML = info; return; }
+      // Compact page window around the current page.
+      const btn = (p, label, disabled, active) =>
+        `<button class="btn btn-sm ${active ? 'btn-blue' : ''}" ${disabled ? 'disabled style="opacity:.5"' : ''} onclick="goAPage(${p})">${label || p}</button>`;
+      let nums = '';
+      const win = 2;
+      let lo = Math.max(1, aPage - win), hi = Math.min(pages, aPage + win);
+      if (lo > 1) { nums += btn(1); if (lo > 2) nums += '<span style="color:var(--muted)">…</span>'; }
+      for (let p = lo; p <= hi; p++) nums += btn(p, null, false, p === aPage);
+      if (hi < pages) { if (hi < pages - 1) nums += '<span style="color:var(--muted)">…</span>'; nums += btn(pages); }
+      el.innerHTML = info +
+        `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${btn(aPage - 1, '‹ Prev', aPage === 1)}
+          ${nums}
+          ${btn(aPage + 1, 'Next ›', aPage === pages)}
+        </div>`;
     }
 
     // ── Earnings ──
@@ -1265,7 +1331,8 @@
     }
 
     function exportAppointments() {
-      const data = allAppointments.map(a => ({
+      const source = (aFiltered && aFiltered.length) ? aFiltered : allAppointments;
+      const data = source.map(a => ({
         Patient: a.patient_name, Doctor: a.doctor_name, Hospital: a.hospital_name,
         Date: a.appointment_date, Slot: a.time_slot, Token: a.token_number,
         Status: a.status, Payment: a.payment_status, 'Platform Fee': PLATFORM_FEE,
